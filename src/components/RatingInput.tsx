@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { StarRating } from './StarRating';
 import { Badge } from '@/components/ui/badge';
-import { Send, Zap } from 'lucide-react';
+import { Send, Zap, ThumbsUp, ThumbsDown } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface RatingInputProps {
@@ -14,7 +14,8 @@ interface RatingInputProps {
     content: number; 
     feedback?: string;
     category: 'resume' | 'linkedin';
-  }) => void;
+    agreement?: 'agree' | 'disagree';
+  }) => Promise<void>;
 }
 
 export function RatingInput({ onSubmit }: RatingInputProps) {
@@ -23,6 +24,7 @@ export function RatingInput({ onSubmit }: RatingInputProps) {
   const [content, setContent] = useState(0);
   const [feedback, setFeedback] = useState('');
   const [category, setCategory] = useState<'resume' | 'linkedin'>('resume');
+  const [agreement, setAgreement] = useState<'agree' | 'disagree' | undefined>();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
@@ -44,7 +46,8 @@ export function RatingInput({ onSubmit }: RatingInputProps) {
         presentation,
         content,
         feedback: feedback.trim() || undefined,
-        category
+        category,
+        agreement
       });
       
       // Reset form
@@ -52,6 +55,7 @@ export function RatingInput({ onSubmit }: RatingInputProps) {
       setPresentation(0);
       setContent(0);
       setFeedback('');
+      setAgreement(undefined);
       
       toast({
         title: "Rating Submitted! ⭐",
@@ -132,6 +136,39 @@ export function RatingInput({ onSubmit }: RatingInputProps) {
             className="bg-input/50 border-neon-purple/30 focus:border-neon-purple"
             rows={3}
           />
+        </div>
+
+        {/* Agreement Section */}
+        <div className="space-y-3">
+          <label className="text-sm font-medium text-foreground">Do you agree with our feedback?</label>
+          <div className="flex gap-3">
+            <Button
+              type="button"
+              variant={agreement === 'agree' ? 'default' : 'outline'}
+              onClick={() => setAgreement(agreement === 'agree' ? undefined : 'agree')}
+              className={`flex-1 ${
+                agreement === 'agree' 
+                  ? 'bg-neon-green hover:bg-neon-green/90 text-primary-foreground border-neon-green' 
+                  : 'border-neon-green/50 text-neon-green hover:bg-neon-green/20'
+              }`}
+            >
+              <ThumbsUp className="w-4 h-4 mr-2" />
+              Agree
+            </Button>
+            <Button
+              type="button"
+              variant={agreement === 'disagree' ? 'default' : 'outline'}
+              onClick={() => setAgreement(agreement === 'disagree' ? undefined : 'disagree')}
+              className={`flex-1 ${
+                agreement === 'disagree' 
+                  ? 'bg-destructive hover:bg-destructive/90 text-destructive-foreground border-destructive' 
+                  : 'border-destructive/50 text-destructive hover:bg-destructive/20'
+              }`}
+            >
+              <ThumbsDown className="w-4 h-4 mr-2" />
+              Disagree
+            </Button>
+          </div>
         </div>
 
         <Button

@@ -34,6 +34,7 @@ export type Database = {
       }
       ratings: {
         Row: {
+          agreement: string | null
           category: string
           content: number
           created_at: string
@@ -44,6 +45,7 @@ export type Database = {
           target_person: string
         }
         Insert: {
+          agreement?: string | null
           category: string
           content: number
           created_at?: string
@@ -54,6 +56,7 @@ export type Database = {
           target_person: string
         }
         Update: {
+          agreement?: string | null
           category?: string
           content?: number
           created_at?: string

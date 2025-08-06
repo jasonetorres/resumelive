@@ -11,6 +11,7 @@ interface Rating {
   content: number;
   feedback?: string;
   category: 'resume' | 'linkedin';
+  agreement?: 'agree' | 'disagree' | null;
   created_at: string;
 }
 
@@ -123,6 +124,7 @@ const LiveDisplayPage = () => {
     content: rating.content,
     feedback: rating.feedback,
     category: rating.category,
+    agreement: rating.agreement,
     timestamp: rating.created_at
   }));
 

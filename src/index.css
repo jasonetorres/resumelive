@@ -154,4 +154,19 @@ All colors MUST be HSL.
     0%, 100% { transform: scale(1); }
     50% { transform: scale(1.2); }
   }
+
+  .animate-confetti {
+    animation: confetti-fall linear forwards;
+  }
+  
+  @keyframes confetti-fall {
+    0% {
+      transform: translateY(-100vh) rotate(0deg);
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(100vh) rotate(720deg);
+      opacity: 0;
+    }
+  }
 }

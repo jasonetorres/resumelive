@@ -4,7 +4,7 @@ import { StarRating } from './StarRating';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
-import { TrendingUp, Users, MessageSquare, Star, Eye, EyeOff, Sparkles } from 'lucide-react';
+import { TrendingUp, Users, MessageSquare, Star, Eye, EyeOff, Sparkles, ThumbsUp, ThumbsDown } from 'lucide-react';
 
 interface Rating {
   id: string;
@@ -13,6 +13,7 @@ interface Rating {
   content: number;
   feedback?: string;
   category: 'resume' | 'linkedin';
+  agreement?: 'agree' | 'disagree' | null;
   timestamp: string;
 }
 
@@ -24,6 +25,7 @@ export function LiveDisplay({ ratings }: LiveDisplayProps) {
   const [displayedRatings, setDisplayedRatings] = useState<Rating[]>([]);
   const [currentFeedback, setCurrentFeedback] = useState<string>('');
   const [isRevealed, setIsRevealed] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
 
   useEffect(() => {
     // Add new ratings with animation
@@ -66,28 +68,80 @@ export function LiveDisplay({ ratings }: LiveDisplayProps) {
   const linkedinStats = calculateStats(linkedinRatings);
   const allStats = calculateStats(displayedRatings);
 
+  // Calculate agreement stats
+  const agreementStats = {
+    total: displayedRatings.filter(r => r.agreement).length,
+    agree: displayedRatings.filter(r => r.agreement === 'agree').length,
+    disagree: displayedRatings.filter(r => r.agreement === 'disagree').length
+  };
+
+  const handleReveal = () => {
+    if (!isRevealed) {
+      setShowConfetti(true);
+      setTimeout(() => setShowConfetti(false), 3000);
+    }
+    setIsRevealed(!isRevealed);
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-background/80 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-background/80 p-6 relative overflow-hidden">
+      {/* Confetti Animation */}
+      {showConfetti && (
+        <div className="absolute inset-0 pointer-events-none z-50">
+          {[...Array(50)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute animate-confetti"
+              style={{
+                left: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 3}s`,
+                animationDuration: `${3 + Math.random() * 2}s`
+              }}
+            >
+              <div 
+                className={`w-2 h-2 ${
+                  ['bg-neon-purple', 'bg-neon-pink', 'bg-neon-cyan', 'bg-neon-orange', 'bg-neon-green'][Math.floor(Math.random() * 5)]
+                } rounded-full`}
+              />
+            </div>
+          ))}
+        </div>
+      )}
       {/* Header */}
       <div className="text-center mb-8">
         <h1 className="text-4xl font-bold bg-gradient-to-r from-neon-purple via-neon-pink to-neon-orange bg-clip-text text-transparent mb-4">
           🚀 LIVE RATINGS 🚀
         </h1>
-        <div className="flex justify-center items-center gap-6">
+        <div className="flex justify-center items-center gap-6 flex-wrap">
           <div className="flex items-center gap-2 text-neon-cyan">
             <Users className="w-5 h-5" />
             <span className="text-lg font-semibold">{displayedRatings.length} Anonymous Votes</span>
           </div>
           
+          {agreementStats.total > 0 && (
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 text-neon-green">
+                <ThumbsUp className="w-4 h-4" />
+                <span className="font-semibold">{agreementStats.agree}</span>
+              </div>
+              <div className="flex items-center gap-2 text-destructive">
+                <ThumbsDown className="w-4 h-4" />
+                <span className="font-semibold">{agreementStats.disagree}</span>
+              </div>
+            </div>
+          )}
+          
           <Button
-            onClick={() => setIsRevealed(!isRevealed)}
+            onClick={handleReveal}
             variant="outline"
             size="lg"
             className={`${
               isRevealed 
                 ? 'bg-neon-purple/20 border-neon-purple text-neon-purple' 
                 : 'bg-neon-orange/20 border-neon-orange text-neon-orange'
-            } hover:scale-105 transition-all duration-300 animate-pulse`}
+            } hover:scale-105 transition-all duration-300 ${
+              !isRevealed ? 'animate-pulse' : ''
+            }`}
           >
             {isRevealed ? (
               <>
