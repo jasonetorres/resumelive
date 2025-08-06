@@ -3,7 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { StarRating } from './StarRating';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { TrendingUp, Users, MessageSquare, Star } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { TrendingUp, Users, MessageSquare, Star, Eye, EyeOff, Sparkles } from 'lucide-react';
 
 interface Rating {
   id: string;
@@ -22,6 +23,7 @@ interface LiveDisplayProps {
 export function LiveDisplay({ ratings }: LiveDisplayProps) {
   const [displayedRatings, setDisplayedRatings] = useState<Rating[]>([]);
   const [currentFeedback, setCurrentFeedback] = useState<string>('');
+  const [isRevealed, setIsRevealed] = useState(false);
 
   useEffect(() => {
     // Add new ratings with animation
@@ -71,9 +73,34 @@ export function LiveDisplay({ ratings }: LiveDisplayProps) {
         <h1 className="text-4xl font-bold bg-gradient-to-r from-neon-purple via-neon-pink to-neon-orange bg-clip-text text-transparent mb-4">
           🚀 LIVE RATINGS 🚀
         </h1>
-        <div className="flex justify-center items-center gap-4 text-neon-cyan">
-          <Users className="w-5 h-5" />
-          <span className="text-lg font-semibold">{displayedRatings.length} Anonymous Votes</span>
+        <div className="flex justify-center items-center gap-6">
+          <div className="flex items-center gap-2 text-neon-cyan">
+            <Users className="w-5 h-5" />
+            <span className="text-lg font-semibold">{displayedRatings.length} Anonymous Votes</span>
+          </div>
+          
+          <Button
+            onClick={() => setIsRevealed(!isRevealed)}
+            variant="outline"
+            size="lg"
+            className={`${
+              isRevealed 
+                ? 'bg-neon-purple/20 border-neon-purple text-neon-purple' 
+                : 'bg-neon-orange/20 border-neon-orange text-neon-orange'
+            } hover:scale-105 transition-all duration-300 animate-pulse`}
+          >
+            {isRevealed ? (
+              <>
+                <EyeOff className="w-5 h-5 mr-2" />
+                Hide Results
+              </>
+            ) : (
+              <>
+                <Sparkles className="w-5 h-5 mr-2" />
+                Reveal Results
+              </>
+            )}
+          </Button>
         </div>
       </div>
 
@@ -91,125 +118,194 @@ export function LiveDisplay({ ratings }: LiveDisplayProps) {
         </Card>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Overall Stats */}
-        <Card className="glow-effect border-neon-purple/50">
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-neon-purple">
-              <TrendingUp className="w-5 h-5" />
-              Overall Score
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-center space-y-4">
-              <div className="text-5xl font-bold text-neon-orange">
-                {allStats.average.toFixed(1)}
-              </div>
-              <StarRating value={Math.round(allStats.average)} readonly size="lg" />
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span>Presentation</span>
-                  <span className="text-neon-cyan">{allStats.presentation.toFixed(1)}</span>
+      {/* Results Section */}
+      <div className={`transition-all duration-700 transform ${
+        isRevealed ? 'opacity-100 translate-y-0 scale-100' : 'opacity-30 translate-y-4 scale-95 pointer-events-none'
+      }`}>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Overall Stats */}
+          <Card className={`glow-effect border-neon-purple/50 transition-all duration-500 ${
+            isRevealed ? 'animate-scale-in' : ''
+          }`}>
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-neon-purple">
+                <TrendingUp className="w-5 h-5" />
+                Overall Score
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center space-y-4">
+                <div className={`text-5xl font-bold text-neon-orange transition-all duration-700 ${
+                  isRevealed ? 'animate-fade-in' : 'blur-sm'
+                }`}>
+                  {isRevealed ? allStats.average.toFixed(1) : '?'}
                 </div>
-                <Progress value={allStats.presentation * 20} className="h-2" />
-                <div className="flex justify-between text-sm">
-                  <span>Content</span>
-                  <span className="text-neon-green">{allStats.content.toFixed(1)}</span>
+                <div className={`transition-all duration-700 delay-100 ${
+                  isRevealed ? 'animate-fade-in' : 'blur-sm opacity-50'
+                }`}>
+                  <StarRating value={isRevealed ? Math.round(allStats.average) : 0} readonly size="lg" />
                 </div>
-                <Progress value={allStats.content * 20} className="h-2" />
+                <div className={`space-y-2 transition-all duration-700 delay-200 ${
+                  isRevealed ? 'animate-fade-in' : 'blur-sm opacity-30'
+                }`}>
+                  <div className="flex justify-between text-sm">
+                    <span>Presentation</span>
+                    <span className="text-neon-cyan">
+                      {isRevealed ? allStats.presentation.toFixed(1) : '?'}
+                    </span>
+                  </div>
+                  <Progress value={isRevealed ? allStats.presentation * 20 : 0} className="h-2" />
+                  <div className="flex justify-between text-sm">
+                    <span>Content</span>
+                    <span className="text-neon-green">
+                      {isRevealed ? allStats.content.toFixed(1) : '?'}
+                    </span>
+                  </div>
+                  <Progress value={isRevealed ? allStats.content * 20 : 0} className="h-2" />
+                </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
 
-        {/* Resume Stats */}
-        <Card className="glow-effect border-neon-purple/50">
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2">
-              <Badge className="bg-neon-purple text-primary-foreground">Resume</Badge>
-              <span className="text-sm text-muted-foreground">({resumeRatings.length} votes)</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-center space-y-4">
-              <div className="text-4xl font-bold text-neon-purple">
-                {resumeStats.average.toFixed(1)}
-              </div>
-              <StarRating value={Math.round(resumeStats.average)} readonly />
-              <div className="grid grid-cols-2 gap-2 text-sm">
-                <div className="text-center">
-                  <div className="text-neon-cyan font-semibold">{resumeStats.presentation.toFixed(1)}</div>
-                  <div className="text-muted-foreground">Presentation</div>
+          {/* Resume Stats */}
+          <Card className={`glow-effect border-neon-purple/50 transition-all duration-500 delay-100 ${
+            isRevealed ? 'animate-scale-in' : ''
+          }`}>
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2">
+                <Badge className="bg-neon-purple text-primary-foreground">Resume</Badge>
+                <span className="text-sm text-muted-foreground">({resumeRatings.length} votes)</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center space-y-4">
+                <div className={`text-4xl font-bold text-neon-purple transition-all duration-700 delay-300 ${
+                  isRevealed ? 'animate-fade-in' : 'blur-sm'
+                }`}>
+                  {isRevealed ? resumeStats.average.toFixed(1) : '?'}
                 </div>
-                <div className="text-center">
-                  <div className="text-neon-green font-semibold">{resumeStats.content.toFixed(1)}</div>
-                  <div className="text-muted-foreground">Content</div>
+                <div className={`transition-all duration-700 delay-400 ${
+                  isRevealed ? 'animate-fade-in' : 'blur-sm opacity-50'
+                }`}>
+                  <StarRating value={isRevealed ? Math.round(resumeStats.average) : 0} readonly />
+                </div>
+                <div className={`grid grid-cols-2 gap-2 text-sm transition-all duration-700 delay-500 ${
+                  isRevealed ? 'animate-fade-in' : 'blur-sm opacity-30'
+                }`}>
+                  <div className="text-center">
+                    <div className="text-neon-cyan font-semibold">
+                      {isRevealed ? resumeStats.presentation.toFixed(1) : '?'}
+                    </div>
+                    <div className="text-muted-foreground">Presentation</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-neon-green font-semibold">
+                      {isRevealed ? resumeStats.content.toFixed(1) : '?'}
+                    </div>
+                    <div className="text-muted-foreground">Content</div>
+                  </div>
                 </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
 
-        {/* LinkedIn Stats */}
-        <Card className="glow-effect border-neon-cyan/50">
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2">
-              <Badge className="bg-neon-cyan text-primary-foreground">LinkedIn</Badge>
-              <span className="text-sm text-muted-foreground">({linkedinRatings.length} votes)</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-center space-y-4">
-              <div className="text-4xl font-bold text-neon-cyan">
-                {linkedinStats.average.toFixed(1)}
-              </div>
-              <StarRating value={Math.round(linkedinStats.average)} readonly />
-              <div className="grid grid-cols-2 gap-2 text-sm">
-                <div className="text-center">
-                  <div className="text-neon-cyan font-semibold">{linkedinStats.presentation.toFixed(1)}</div>
-                  <div className="text-muted-foreground">Presentation</div>
+          {/* LinkedIn Stats */}
+          <Card className={`glow-effect border-neon-cyan/50 transition-all duration-500 delay-200 ${
+            isRevealed ? 'animate-scale-in' : ''
+          }`}>
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2">
+                <Badge className="bg-neon-cyan text-primary-foreground">LinkedIn</Badge>
+                <span className="text-sm text-muted-foreground">({linkedinRatings.length} votes)</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center space-y-4">
+                <div className={`text-4xl font-bold text-neon-cyan transition-all duration-700 delay-600 ${
+                  isRevealed ? 'animate-fade-in' : 'blur-sm'
+                }`}>
+                  {isRevealed ? linkedinStats.average.toFixed(1) : '?'}
                 </div>
-                <div className="text-center">
-                  <div className="text-neon-green font-semibold">{linkedinStats.content.toFixed(1)}</div>
-                  <div className="text-muted-foreground">Content</div>
+                <div className={`transition-all duration-700 delay-700 ${
+                  isRevealed ? 'animate-fade-in' : 'blur-sm opacity-50'
+                }`}>
+                  <StarRating value={isRevealed ? Math.round(linkedinStats.average) : 0} readonly />
+                </div>
+                <div className={`grid grid-cols-2 gap-2 text-sm transition-all duration-700 delay-800 ${
+                  isRevealed ? 'animate-fade-in' : 'blur-sm opacity-30'
+                }`}>
+                  <div className="text-center">
+                    <div className="text-neon-cyan font-semibold">
+                      {isRevealed ? linkedinStats.presentation.toFixed(1) : '?'}
+                    </div>
+                    <div className="text-muted-foreground">Presentation</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-neon-green font-semibold">
+                      {isRevealed ? linkedinStats.content.toFixed(1) : '?'}
+                    </div>
+                    <div className="text-muted-foreground">Content</div>
+                  </div>
                 </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Recent Ratings Stream */}
+        {displayedRatings.length > 0 && (
+          <Card className={`mt-6 border-neon-pink/30 transition-all duration-700 delay-300 ${
+            isRevealed ? 'animate-fade-in' : 'opacity-30'
+          }`}>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-neon-pink">
+                <Star className="w-5 h-5" />
+                Recent Ratings
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 max-h-40 overflow-y-auto">
+                {displayedRatings.slice(0, 20).map((rating, index) => (
+                  <div
+                    key={rating.id}
+                    className={`flex items-center gap-2 p-2 rounded-lg bg-muted/50 border border-border/50 transition-all duration-500 ${
+                      isRevealed ? 'animate-fade-in opacity-100' : 'blur-sm opacity-30'
+                    }`}
+                    style={{ 
+                      animationDelay: isRevealed ? `${800 + index * 50}ms` : '0ms' 
+                    }}
+                  >
+                    <Badge 
+                      variant="outline" 
+                      className={rating.category === 'resume' ? 'border-neon-purple/50' : 'border-neon-cyan/50'}
+                    >
+                      {rating.category}
+                    </Badge>
+                    <StarRating value={isRevealed ? rating.overall : 0} readonly size="sm" />
+                    <span className="text-sm font-semibold text-neon-orange">
+                      {isRevealed ? rating.overall : '?'}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
 
-      {/* Recent Ratings Stream */}
-      {displayedRatings.length > 0 && (
-        <Card className="mt-6 border-neon-pink/30">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-neon-pink">
-              <Star className="w-5 h-5" />
-              Recent Ratings
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 max-h-40 overflow-y-auto">
-              {displayedRatings.slice(0, 20).map((rating) => (
-                <div
-                  key={rating.id}
-                  className="flex items-center gap-2 p-2 rounded-lg bg-muted/50 border border-border/50"
-                >
-                  <Badge 
-                    variant="outline" 
-                    className={rating.category === 'resume' ? 'border-neon-purple/50' : 'border-neon-cyan/50'}
-                  >
-                    {rating.category}
-                  </Badge>
-                  <StarRating value={rating.overall} readonly size="sm" />
-                  <span className="text-sm font-semibold text-neon-orange">
-                    {rating.overall}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+      {/* Unrevealed State Message */}
+      {!isRevealed && displayedRatings.length > 0 && (
+        <div className="text-center mt-8">
+          <Card className="border-neon-orange/30 bg-neon-orange/5 max-w-md mx-auto">
+            <CardContent className="p-6">
+              <Eye className="w-12 h-12 text-neon-orange mx-auto mb-3" />
+              <h3 className="text-xl font-bold text-neon-orange mb-2">Results Hidden</h3>
+              <p className="text-muted-foreground">
+                Click "Reveal Results" when you're ready to show the ratings!
+              </p>
+            </CardContent>
+          </Card>
+        </div>
       )}
     </div>
   );
