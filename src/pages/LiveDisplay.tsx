@@ -1,41 +1,142 @@
 import React, { useState, useEffect } from 'react';
 import { LiveDisplay } from '@/components/LiveDisplay';
+import { TargetManager } from '@/components/TargetManager';
+import { supabase } from '@/integrations/supabase/client';
 
-// Mock data for demonstration
-const generateMockRating = () => ({
-  id: Math.random().toString(36).substr(2, 9),
-  overall: Math.floor(Math.random() * 5) + 1,
-  presentation: Math.floor(Math.random() * 5) + 1,
-  content: Math.floor(Math.random() * 5) + 1,
-  feedback: Math.random() > 0.7 ? [
-    "Great layout and design!",
-    "Could use more specific examples",
-    "Professional appearance",
-    "Easy to read and well organized",
-    "Needs better keywords",
-    "Love the clean format!"
-  ][Math.floor(Math.random() * 6)] : undefined,
-  category: Math.random() > 0.5 ? 'resume' : 'linkedin' as 'resume' | 'linkedin',
-  timestamp: new Date().toISOString()
-});
+interface Rating {
+  id: string;
+  target_person: string;
+  overall: number;
+  presentation: number;
+  content: number;
+  feedback?: string;
+  category: 'resume' | 'linkedin';
+  created_at: string;
+}
 
 const LiveDisplayPage = () => {
-  const [ratings, setRatings] = useState(() => 
-    Array.from({ length: 8 }, generateMockRating)
-  );
+  const [ratings, setRatings] = useState<Rating[]>([]);
+  const [currentTarget, setCurrentTarget] = useState<string | null>(null);
 
-  // Simulate new ratings coming in
   useEffect(() => {
-    const interval = setInterval(() => {
-      if (Math.random() > 0.6) { // 40% chance every 3 seconds
-        setRatings(prev => [generateMockRating(), ...prev]);
+    // Fetch initial data
+    const fetchInitialData = async () => {
+      // Get current target
+      const { data: targetData } = await supabase
+        .from('current_target')
+        .select('target_person')
+        .eq('id', 1)
+        .single();
+      
+      setCurrentTarget(targetData?.target_person || null);
+
+      // Get ratings for current target
+      if (targetData?.target_person) {
+        const { data: ratingsData } = await supabase
+          .from('ratings')
+          .select('*')
+          .eq('target_person', targetData.target_person)
+          .order('created_at', { ascending: false });
+        
+        setRatings((ratingsData || []) as Rating[]);
       }
-    }, 3000);
+    };
 
-    return () => clearInterval(interval);
-  }, []);
+    fetchInitialData();
 
-  return <LiveDisplay ratings={ratings} />;
+    // Subscribe to target changes
+    const targetChannel = supabase
+      .channel('target-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'current_target'
+        },
+        async (payload) => {
+          const newTarget = payload.new.target_person;
+          setCurrentTarget(newTarget);
+          
+          // Fetch ratings for new target
+          if (newTarget) {
+            const { data: ratingsData } = await supabase
+              .from('ratings')
+              .select('*')
+              .eq('target_person', newTarget)
+              .order('created_at', { ascending: false });
+            
+            setRatings((ratingsData || []) as Rating[]);
+          } else {
+            setRatings([]);
+          }
+        }
+      )
+      .subscribe();
+
+    // Subscribe to new ratings
+    const ratingsChannel = supabase
+      .channel('ratings-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'ratings'
+        },
+        (payload) => {
+          const newRating = payload.new as Rating;
+          // Only add if it's for the current target
+          if (newRating.target_person === currentTarget) {
+            setRatings(prev => [newRating, ...prev]);
+          }
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'DELETE',
+          schema: 'public',
+          table: 'ratings'
+        },
+        (payload) => {
+          const deletedRating = payload.old as Rating;
+          // Remove from current ratings if it was for current target
+          if (deletedRating.target_person === currentTarget) {
+            setRatings(prev => prev.filter(r => r.id !== deletedRating.id));
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(targetChannel);
+      supabase.removeChannel(ratingsChannel);
+    };
+  }, [currentTarget]);
+
+  // Transform ratings to match the LiveDisplay component's expected format
+  const transformedRatings = ratings.map(rating => ({
+    id: rating.id,
+    overall: rating.overall,
+    presentation: rating.presentation,
+    content: rating.content,
+    feedback: rating.feedback,
+    category: rating.category,
+    timestamp: rating.created_at
+  }));
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 p-4">
+      <div className="max-w-7xl mx-auto">
+        <TargetManager 
+          currentTarget={currentTarget}
+          onTargetChange={setCurrentTarget}
+        />
+        <LiveDisplay ratings={transformedRatings} />
+      </div>
+    </div>
+  );
 };
 
 export default LiveDisplayPage;
