@@ -1,0 +1,158 @@
+import React, { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Textarea } from '@/components/ui/textarea';
+import { StarRating } from './StarRating';
+import { Badge } from '@/components/ui/badge';
+import { Send, Zap } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+
+interface RatingInputProps {
+  onSubmit: (rating: { 
+    overall: number; 
+    presentation: number; 
+    content: number; 
+    feedback?: string;
+    category: 'resume' | 'linkedin';
+  }) => void;
+}
+
+export function RatingInput({ onSubmit }: RatingInputProps) {
+  const [overall, setOverall] = useState(0);
+  const [presentation, setPresentation] = useState(0);
+  const [content, setContent] = useState(0);
+  const [feedback, setFeedback] = useState('');
+  const [category, setCategory] = useState<'resume' | 'linkedin'>('resume');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { toast } = useToast();
+
+  const handleSubmit = async () => {
+    if (overall === 0 || presentation === 0 || content === 0) {
+      toast({
+        title: "Incomplete Rating",
+        description: "Please rate all categories before submitting!",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+    
+    try {
+      await onSubmit({
+        overall,
+        presentation,
+        content,
+        feedback: feedback.trim() || undefined,
+        category
+      });
+      
+      // Reset form
+      setOverall(0);
+      setPresentation(0);
+      setContent(0);
+      setFeedback('');
+      
+      toast({
+        title: "Rating Submitted! ⭐",
+        description: "Your anonymous feedback has been sent to the stream!"
+      });
+    } catch (error) {
+      toast({
+        title: "Submission Failed",
+        description: "Something went wrong. Please try again!",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const averageRating = (overall + presentation + content) / 3;
+
+  return (
+    <Card className="glow-effect border-neon-purple/30 bg-card/90 backdrop-blur">
+      <CardHeader className="text-center">
+        <CardTitle className="text-2xl bg-gradient-to-r from-neon-purple to-neon-pink bg-clip-text text-transparent">
+          Rate Anonymously ⚡
+        </CardTitle>
+        <div className="flex justify-center gap-2 mt-2">
+          <Badge 
+            variant={category === 'resume' ? 'default' : 'outline'}
+            className={category === 'resume' ? 'bg-neon-purple text-primary-foreground' : 'border-neon-purple/50'}
+            onClick={() => setCategory('resume')}
+          >
+            Resume
+          </Badge>
+          <Badge 
+            variant={category === 'linkedin' ? 'default' : 'outline'}
+            className={category === 'linkedin' ? 'bg-neon-cyan text-primary-foreground' : 'border-neon-cyan/50'}
+            onClick={() => setCategory('linkedin')}
+          >
+            LinkedIn
+          </Badge>
+        </div>
+      </CardHeader>
+      
+      <CardContent className="space-y-6">
+        <div className="space-y-4">
+          <div className="flex justify-between items-center">
+            <span className="text-sm font-medium text-foreground">Overall Score</span>
+            <StarRating value={overall} onChange={setOverall} size="lg" />
+          </div>
+          
+          <div className="flex justify-between items-center">
+            <span className="text-sm font-medium text-foreground">Presentation</span>
+            <StarRating value={presentation} onChange={setPresentation} size="lg" />
+          </div>
+          
+          <div className="flex justify-between items-center">
+            <span className="text-sm font-medium text-foreground">Content Quality</span>
+            <StarRating value={content} onChange={setContent} size="lg" />
+          </div>
+        </div>
+
+        {averageRating > 0 && (
+          <div className="text-center p-4 rounded-lg bg-gradient-to-r from-neon-purple/20 to-neon-pink/20 border border-neon-purple/30">
+            <div className="text-2xl font-bold text-neon-orange">
+              {averageRating.toFixed(1)}/5
+            </div>
+            <div className="text-sm text-muted-foreground">Average Score</div>
+          </div>
+        )}
+
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-foreground">
+            Optional Feedback
+          </label>
+          <Textarea
+            placeholder="Share your thoughts... (This will appear on stream!)"
+            value={feedback}
+            onChange={(e) => setFeedback(e.target.value)}
+            className="bg-input/50 border-neon-purple/30 focus:border-neon-purple"
+            rows={3}
+          />
+        </div>
+
+        <Button
+          onClick={handleSubmit}
+          disabled={isSubmitting || overall === 0 || presentation === 0 || content === 0}
+          className="w-full bg-gradient-to-r from-neon-purple to-neon-pink hover:from-neon-pink hover:to-neon-purple text-primary-foreground font-bold py-3 glow-effect"
+        >
+          {isSubmitting ? (
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+              Sending...
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <Send className="w-4 h-4" />
+              Submit Rating
+              <Zap className="w-4 h-4" />
+            </div>
+          )}
+        </Button>
+      </CardContent>
+    </Card>
+  );
+}

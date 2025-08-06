@@ -8,35 +8,52 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --background: 220 13% 9%;
+    --foreground: 220 9% 96%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card: 220 13% 11%;
+    --card-foreground: 220 9% 96%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover: 220 13% 11%;
+    --popover-foreground: 220 9% 96%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 280 100% 70%;
+    --primary-foreground: 220 13% 9%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 190 100% 50%;
+    --secondary-foreground: 220 13% 9%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 220 13% 15%;
+    --muted-foreground: 220 9% 65%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 340 100% 60%;
+    --accent-foreground: 220 9% 96%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 220 9% 96%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 220 13% 20%;
+    --input: 220 13% 15%;
+    --ring: 280 100% 70%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
+
+    /* Gaming/Stream colors */
+    --neon-purple: 280 100% 70%;
+    --neon-cyan: 190 100% 50%;
+    --neon-pink: 340 100% 60%;
+    --neon-green: 120 100% 50%;
+    --neon-orange: 30 100% 60%;
+    
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--neon-purple)), hsl(var(--neon-pink)));
+    --gradient-secondary: linear-gradient(135deg, hsl(var(--neon-cyan)), hsl(var(--neon-green)));
+    --gradient-accent: linear-gradient(45deg, hsl(var(--neon-pink)), hsl(var(--neon-orange)));
+    
+    /* Animations */
+    --glow-purple: 0 0 20px hsl(var(--neon-purple) / 0.5);
+    --glow-cyan: 0 0 20px hsl(var(--neon-cyan) / 0.5);
+    --glow-pink: 0 0 20px hsl(var(--neon-pink) / 0.5);
 
     --sidebar-background: 0 0% 98%;
 
@@ -100,6 +117,41 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground overflow-x-hidden;
+  }
+}
+
+@layer components {
+  .glow-effect {
+    box-shadow: var(--glow-purple);
+    transition: all 0.3s ease;
+  }
+  
+  .glow-effect:hover {
+    box-shadow: 0 0 30px hsl(var(--neon-purple) / 0.8);
+    transform: translateY(-2px);
+  }
+  
+  .rating-glow {
+    background: var(--gradient-primary);
+    animation: pulse-glow 2s ease-in-out infinite alternate;
+  }
+  
+  @keyframes pulse-glow {
+    from {
+      box-shadow: 0 0 20px hsl(var(--neon-purple) / 0.4);
+    }
+    to {
+      box-shadow: 0 0 40px hsl(var(--neon-purple) / 0.8);
+    }
+  }
+  
+  .star-animation {
+    animation: star-twinkle 1.5s ease-in-out;
+  }
+  
+  @keyframes star-twinkle {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
   }
 }
