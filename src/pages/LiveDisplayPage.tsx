@@ -56,13 +56,21 @@ const LiveDisplayPage = () => {
       setCurrentTarget(targetData?.target_person || null);
 
       // Get uploaded resumes
-      const { data: resumesData } = await supabase
-        .from('resumes' as any)
-        .select('*')
-        .order('created_at', { ascending: false });
-      
-      console.log('LiveDisplayPage: Resumes fetched:', resumesData?.length || 0);
-      setResumes((resumesData as unknown as Resume[]) || []);
+      try {
+        const { data: resumesData, error: resumesError } = await supabase
+          .from('resumes' as any)
+          .select('*')
+          .order('created_at', { ascending: false });
+        
+        if (resumesError) {
+          console.error('LiveDisplayPage: Error fetching resumes:', resumesError);
+        } else {
+          console.log('LiveDisplayPage: Resumes fetched successfully:', resumesData?.length || 0, resumesData);
+          setResumes((resumesData as unknown as Resume[]) || []);
+        }
+      } catch (error) {
+        console.error('LiveDisplayPage: Exception while fetching resumes:', error);
+      }
 
       // Get ratings for current target (only real ratings, not quick reactions)
       if (targetData?.target_person) {
@@ -153,25 +161,38 @@ const LiveDisplayPage = () => {
   }, [currentTarget]);
 
   const handleSetTarget = async () => {
-    if (!selectedResumeId) return;
+    if (!selectedResumeId) {
+      console.log('LiveDisplayPage: No resume selected');
+      return;
+    }
     
     const resume = resumes.find(r => r.id === selectedResumeId);
-    if (!resume) return;
+    if (!resume) {
+      console.log('LiveDisplayPage: Resume not found for ID:', selectedResumeId);
+      return;
+    }
 
+    console.log('LiveDisplayPage: Setting target for resume:', resume.name);
     setSelectedResume(resume);
     // Automatically show the resume view when a target is set via resume selection
     setShowResumeView(true);
     
     // Update the current target in the database
-    await supabase
-      .from('current_target')
-      .update({ target_person: resume.name })
-      .eq('id', 1);
+    try {
+      await supabase
+        .from('current_target')
+        .update({ target_person: resume.name })
+        .eq('id', 1);
+      console.log('LiveDisplayPage: Target updated in database');
+    } catch (error) {
+      console.error('LiveDisplayPage: Error updating target:', error);
+    }
   };
 
   // Auto-show resume when one is selected and target is set
   useEffect(() => {
     if (selectedResume && currentTarget) {
+      console.log('LiveDisplayPage: Auto-showing resume view for:', selectedResume.name);
       setShowResumeView(true);
     }
   }, [selectedResume, currentTarget]);
@@ -263,28 +284,34 @@ const LiveDisplayPage = () => {
             <CardTitle className="text-center text-neon-purple">Currently Reviewing</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div>
-              <label className="text-sm font-medium mb-2 block">Select Resume to Review</label>
-              <Select value={selectedResumeId} onValueChange={setSelectedResumeId}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Choose a resume from uploaded files" />
-                </SelectTrigger>
-                <SelectContent>
-                  {resumes.map((resume) => (
-                    <SelectItem key={resume.id} value={resume.id}>
-                      {resume.name} ({resume.file_type === 'application/pdf' ? 'PDF' : 'Image'})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            {resumes.length === 0 ? (
+              <div className="text-center p-4 bg-muted/20 rounded-lg">
+                <p className="text-muted-foreground">No resumes found. Please upload resumes on the home page first.</p>
+              </div>
+            ) : (
+              <div>
+                <label className="text-sm font-medium mb-2 block">Select Resume to Review ({resumes.length} available)</label>
+                <Select value={selectedResumeId} onValueChange={setSelectedResumeId}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Choose a resume from uploaded files" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {resumes.map((resume) => (
+                      <SelectItem key={resume.id} value={resume.id}>
+                        {resume.name} ({resume.file_type === 'application/pdf' ? 'PDF' : 'Image'})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
             
             <Button 
               onClick={handleSetTarget}
-              disabled={!selectedResumeId}
+              disabled={!selectedResumeId || resumes.length === 0}
               className="w-full bg-neon-purple hover:bg-neon-purple/90"
             >
-              Start Review Session
+              {resumes.length === 0 ? 'No Resumes Available' : 'Start Review Session'}
             </Button>
 
             {currentTarget && (
