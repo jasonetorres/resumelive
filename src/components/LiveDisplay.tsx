@@ -50,30 +50,33 @@ export function LiveDisplay({ ratings }: LiveDisplayProps) {
   const linkedinRatings = displayedRatings.filter(r => r.category === 'linkedin');
 
   const calculateStats = (ratings: Rating[]) => {
-    if (ratings.length === 0) return { average: 0, presentation: 0, content: 0 };
+    // Filter out quick reactions (ratings with overall = 0)
+    const realRatings = ratings.filter(r => r.overall > 0);
+    if (realRatings.length === 0) return { average: 0, presentation: 0, content: 0 };
     
-    const sum = ratings.reduce((acc, r) => ({
+    const sum = realRatings.reduce((acc, r) => ({
       overall: acc.overall + r.overall,
       presentation: acc.presentation + r.presentation,
       content: acc.content + r.content
     }), { overall: 0, presentation: 0, content: 0 });
     
     return {
-      average: sum.overall / ratings.length,
-      presentation: sum.presentation / ratings.length,
-      content: sum.content / ratings.length
+      average: sum.overall / realRatings.length,
+      presentation: sum.presentation / realRatings.length,
+      content: sum.content / realRatings.length
     };
   };
 
-  const resumeStats = calculateStats(resumeRatings);
-  const linkedinStats = calculateStats(linkedinRatings);
-  const allStats = calculateStats(displayedRatings);
+  const resumeRatings = displayedRatings.filter(r => r.category === 'resume' && r.overall > 0);
+  const linkedinRatings = displayedRatings.filter(r => r.category === 'linkedin' && r.overall > 0);
+  const allStats = calculateStats(displayedRatings.filter(r => r.overall > 0));
 
   // Calculate agreement stats
+  const realRatingsWithAgreement = displayedRatings.filter(r => r.overall > 0);
   const agreementStats = {
-    total: displayedRatings.filter(r => r.agreement).length,
-    agree: displayedRatings.filter(r => r.agreement === 'agree').length,
-    disagree: displayedRatings.filter(r => r.agreement === 'disagree').length
+    total: realRatingsWithAgreement.filter(r => r.agreement).length,
+    agree: realRatingsWithAgreement.filter(r => r.agreement === 'agree').length,
+    disagree: realRatingsWithAgreement.filter(r => r.agreement === 'disagree').length
   };
 
   // Calculate reaction stats
@@ -124,7 +127,7 @@ export function LiveDisplay({ ratings }: LiveDisplayProps) {
         <div className="flex justify-center items-center gap-6 flex-wrap">
           <div className="flex items-center gap-2 text-neon-cyan">
             <Users className="w-5 h-5" />
-            <span className="text-lg font-semibold">{displayedRatings.length} Anonymous Votes</span>
+            <span className="text-lg font-semibold">{displayedRatings.filter(r => r.overall > 0).length} Anonymous Votes</span>
           </div>
           
           {agreementStats.total > 0 && (
@@ -327,7 +330,7 @@ export function LiveDisplay({ ratings }: LiveDisplayProps) {
         </div>
 
         {/* Recent Ratings Stream */}
-        {displayedRatings.length > 0 && (
+        {displayedRatings.filter(r => r.overall > 0).length > 0 && (
           <Card className={`mt-6 border-neon-pink/30 transition-all duration-700 delay-300 ${
             isRevealed ? 'animate-fade-in' : 'opacity-30'
           }`}>
@@ -339,7 +342,7 @@ export function LiveDisplay({ ratings }: LiveDisplayProps) {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 max-h-40 overflow-y-auto">
-                {displayedRatings.slice(0, 20).map((rating, index) => (
+                {displayedRatings.filter(r => r.overall > 0).slice(0, 20).map((rating, index) => (
                   <div
                     key={rating.id}
                     className={`flex items-center gap-2 p-2 rounded-lg bg-muted/50 border border-border/50 transition-all duration-500 ${
@@ -359,9 +362,6 @@ export function LiveDisplay({ ratings }: LiveDisplayProps) {
                     <span className="text-sm font-semibold text-neon-orange">
                       {isRevealed ? rating.overall : '?'}
                     </span>
-                    {rating.reaction && isRevealed && (
-                      <span className="text-lg">{rating.reaction}</span>
-                    )}
                   </div>
                 ))}
               </div>
@@ -371,7 +371,7 @@ export function LiveDisplay({ ratings }: LiveDisplayProps) {
       </div>
 
       {/* Unrevealed State Message */}
-      {!isRevealed && displayedRatings.length > 0 && (
+      {!isRevealed && displayedRatings.filter(r => r.overall > 0).length > 0 && (
         <div className="text-center mt-8">
           <Card className="border-neon-orange/30 bg-neon-orange/5 max-w-md mx-auto">
             <CardContent className="p-6">

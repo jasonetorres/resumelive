@@ -49,12 +49,12 @@ export function RatingInput({ onSubmit, currentTarget }: RatingInputProps) {
         .from('ratings')
         .insert({
           target_person: currentTarget,
-          overall: 1, // Dummy values for required fields
-          presentation: 1,
-          content: 1,
+          overall: 0, // Use 0 to indicate this is not a real rating
+          presentation: 0,
+          content: 0,
           category: 'resume',
           reaction: emoji,
-          feedback: `Quick reaction: ${emoji}`
+          feedback: null // No feedback for quick reactions
         });
 
       if (error) throw error;
