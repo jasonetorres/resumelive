@@ -139,9 +139,7 @@ export function LiveDisplay({ ratings }: LiveDisplayProps) {
               isRevealed 
                 ? 'bg-neon-purple/20 border-neon-purple text-neon-purple' 
                 : 'bg-neon-orange/20 border-neon-orange text-neon-orange'
-            } hover:scale-105 transition-all duration-300 ${
-              !isRevealed ? 'animate-pulse' : ''
-            }`}
+            } hover:scale-105 transition-all duration-300`}
           >
             {isRevealed ? (
               <>
