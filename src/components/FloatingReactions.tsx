@@ -18,7 +18,7 @@ export function FloatingReactions({ currentTarget }: FloatingReactionsProps) {
   const processedReactions = useRef<Set<string>>(new Set());
 
   const addFloatingReaction = (emoji: string, timestamp: string) => {
-    const reactionId = `${emoji}-${timestamp}`;
+    const reactionId = `${emoji}-${timestamp}-${Math.random()}`;
     
     // Prevent duplicates
     if (processedReactions.current.has(reactionId)) {
@@ -30,8 +30,8 @@ export function FloatingReactions({ currentTarget }: FloatingReactionsProps) {
     const newFloatingReaction: FloatingReaction = {
       id: reactionId,
       emoji: emoji,
-      x: Math.random() * 80 + 10, // Random position between 10% and 90%
-      y: Math.random() * 60 + 20, // Random position between 20% and 80%
+      x: Math.random() * 70 + 15, // Random position between 15% and 85%
+      y: Math.random() * 50 + 25, // Random position between 25% and 75%
       timestamp: Date.now()
     };
 
@@ -40,8 +40,7 @@ export function FloatingReactions({ currentTarget }: FloatingReactionsProps) {
     // Remove the reaction after 4 seconds
     setTimeout(() => {
       setFloatingReactions(prev => prev.filter(fr => fr.id !== reactionId));
-      processedReactions.current.delete(reactionId);
-    }, 4000);
+    }, 3000);
   };
 
   useEffect(() => {
@@ -60,8 +59,8 @@ export function FloatingReactions({ currentTarget }: FloatingReactionsProps) {
         },
         (payload) => {
           const newRating = payload.new;
-          if (newRating.reaction) {
-            console.log('Real-time reaction received:', newRating.reaction, newRating.created_at);
+          if (newRating.reaction && newRating.target_person === currentTarget) {
+            console.log('Real-time reaction received:', newRating.reaction);
             addFloatingReaction(newRating.reaction, newRating.created_at);
           }
         }
@@ -78,7 +77,7 @@ export function FloatingReactions({ currentTarget }: FloatingReactionsProps) {
       {floatingReactions.map((reaction) => (
         <div
           key={reaction.id}
-          className="absolute animate-float-up"
+          className="absolute animate-float-up pointer-events-none"
           style={{
             left: `${reaction.x}%`,
             top: `${reaction.y}%`,
@@ -86,7 +85,7 @@ export function FloatingReactions({ currentTarget }: FloatingReactionsProps) {
             animationTimingFunction: 'ease-out'
           }}
         >
-          <div className="text-6xl filter drop-shadow-lg animate-pulse-scale">
+          <div className="text-8xl filter drop-shadow-2xl animate-pulse-scale">
             {reaction.emoji}
           </div>
         </div>

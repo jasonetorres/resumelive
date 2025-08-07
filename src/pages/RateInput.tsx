@@ -104,7 +104,7 @@ const RateInputPage = () => {
           )}
         </div>
         {currentTarget ? (
-          <RatingInput onSubmit={handleSubmitRating} />
+          <RatingInput onSubmit={handleSubmitRating} currentTarget={currentTarget} />
         ) : (
           <div className="text-center p-8 border-2 border-dashed border-muted-foreground/20 rounded-lg">
             <p className="text-muted-foreground">
