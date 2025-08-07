@@ -15,6 +15,7 @@ interface RatingInputProps {
     feedback?: string;
     category: 'resume' | 'linkedin';
     agreement?: 'agree' | 'disagree';
+    reaction?: string;
   }) => Promise<void>;
 }
 
@@ -25,6 +26,7 @@ export function RatingInput({ onSubmit }: RatingInputProps) {
   const [feedback, setFeedback] = useState('');
   const [category, setCategory] = useState<'resume' | 'linkedin'>('resume');
   const [agreement, setAgreement] = useState<'agree' | 'disagree' | undefined>();
+  const [reaction, setReaction] = useState<string | undefined>();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
@@ -47,7 +49,8 @@ export function RatingInput({ onSubmit }: RatingInputProps) {
         content,
         feedback: feedback.trim() || undefined,
         category,
-        agreement
+        agreement,
+        reaction
       });
       
       // Reset form
@@ -56,6 +59,7 @@ export function RatingInput({ onSubmit }: RatingInputProps) {
       setContent(0);
       setFeedback('');
       setAgreement(undefined);
+      setReaction(undefined);
       
       toast({
         title: "Vote Submitted! 🎉",
@@ -136,6 +140,34 @@ export function RatingInput({ onSubmit }: RatingInputProps) {
             className="bg-input/50 border-neon-purple/30 focus:border-neon-purple transition-all duration-300 hover:shadow-lg hover:shadow-neon-purple/20"
             rows={3}
           />
+        </div>
+
+        {/* Quick Reactions */}
+        <div className="space-y-3">
+          <label className="text-sm font-medium text-foreground">Quick Reaction</label>
+          <div className="grid grid-cols-4 gap-2">
+            {[
+              { emoji: '👍', label: 'Like' },
+              { emoji: '🔥', label: 'Fire' },
+              { emoji: '💯', label: 'Perfect' },
+              { emoji: '👎', label: 'Dislike' }
+            ].map(({ emoji, label }) => (
+              <Button
+                key={emoji}
+                type="button"
+                variant={reaction === emoji ? 'default' : 'outline'}
+                onClick={() => setReaction(reaction === emoji ? undefined : emoji)}
+                className={`aspect-square text-2xl transition-all duration-200 hover:scale-110 ${
+                  reaction === emoji 
+                    ? 'bg-neon-orange/20 border-neon-orange text-neon-orange shadow-lg shadow-neon-orange/20' 
+                    : 'border-muted-foreground/30 hover:border-neon-orange/50 hover:bg-neon-orange/10'
+                }`}
+                title={label}
+              >
+                {emoji}
+              </Button>
+            ))}
+          </div>
         </div>
 
         {/* Agreement Section */}

@@ -42,6 +42,7 @@ export type Database = {
           id: string
           overall: number
           presentation: number
+          reaction: string | null
           target_person: string
         }
         Insert: {
@@ -53,6 +54,7 @@ export type Database = {
           id?: string
           overall: number
           presentation: number
+          reaction?: string | null
           target_person: string
         }
         Update: {
@@ -64,6 +66,7 @@ export type Database = {
           id?: string
           overall?: number
           presentation?: number
+          reaction?: string | null
           target_person?: string
         }
         Relationships: []

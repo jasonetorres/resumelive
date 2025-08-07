@@ -14,6 +14,7 @@ interface Rating {
   feedback?: string;
   category: 'resume' | 'linkedin';
   agreement?: 'agree' | 'disagree' | null;
+  reaction?: string;
   timestamp: string;
 }
 
@@ -75,6 +76,14 @@ export function LiveDisplay({ ratings }: LiveDisplayProps) {
     disagree: displayedRatings.filter(r => r.agreement === 'disagree').length
   };
 
+  // Calculate reaction stats
+  const reactionStats = displayedRatings
+    .filter(r => r.reaction)
+    .reduce((acc, r) => {
+      acc[r.reaction!] = (acc[r.reaction!] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
   const handleReveal = () => {
     if (!isRevealed) {
       setShowConfetti(true);
@@ -130,6 +139,19 @@ export function LiveDisplay({ ratings }: LiveDisplayProps) {
               </div>
             </div>
           )}
+          
+          {/* Reactions Display */}
+          {Object.keys(reactionStats).length > 0 && (
+            <div className="flex items-center gap-4">
+              {Object.entries(reactionStats).map(([emoji, count]) => (
+                <div key={emoji} className="flex items-center gap-1 text-neon-orange">
+                  <span className="text-lg">{emoji}</span>
+                  <span className="font-semibold">{count}</span>
+                </div>
+              ))}
+            </div>
+          )}
+          
           
           <Button
             onClick={handleReveal}
@@ -337,6 +359,9 @@ export function LiveDisplay({ ratings }: LiveDisplayProps) {
                     <span className="text-sm font-semibold text-neon-orange">
                       {isRevealed ? rating.overall : '?'}
                     </span>
+                    {rating.reaction && isRevealed && (
+                      <span className="text-lg">{rating.reaction}</span>
+                    )}
                   </div>
                 ))}
               </div>

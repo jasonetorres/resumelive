@@ -10,6 +10,7 @@ interface RatingData {
   feedback?: string;
   category: 'resume' | 'linkedin';
   agreement?: 'agree' | 'disagree';
+  reaction?: string;
 }
 
 const RateInputPage = () => {
@@ -71,6 +72,7 @@ const RateInputPage = () => {
         feedback: rating.feedback,
         category: rating.category,
         agreement: rating.agreement,
+        reaction: rating.reaction,
       });
 
     if (error) {
