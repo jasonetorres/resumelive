@@ -82,7 +82,18 @@ export function FloatingReactions({ currentTarget }: FloatingReactionsProps) {
           }
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log('FloatingReactions: Subscription status:', status);
+        if (status === 'SUBSCRIBED') {
+          console.log('FloatingReactions: Successfully subscribed to real-time updates!');
+        } else if (status === 'CHANNEL_ERROR') {
+          console.error('FloatingReactions: Channel subscription error');
+        } else if (status === 'TIMED_OUT') {
+          console.error('FloatingReactions: Subscription timed out');
+        } else if (status === 'CLOSED') {
+          console.log('FloatingReactions: Subscription closed');
+        }
+      });
 
     console.log('FloatingReactions: Subscription created for all ratings');
 

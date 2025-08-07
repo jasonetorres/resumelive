@@ -83,7 +83,12 @@ const LiveDisplayPage = () => {
           }
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log('LiveDisplayPage: Target subscription status:', status);
+        if (status === 'SUBSCRIBED') {
+          console.log('LiveDisplayPage: Successfully subscribed to target updates!');
+        }
+      });
 
     // Subscribe to new ratings
     const ratingsChannel = supabase
@@ -105,7 +110,12 @@ const LiveDisplayPage = () => {
           }
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log('LiveDisplayPage: Ratings subscription status:', status);
+        if (status === 'SUBSCRIBED') {
+          console.log('LiveDisplayPage: Successfully subscribed to rating updates!');
+        }
+      });
 
     return () => {
       console.log('LiveDisplayPage: Cleaning up subscriptions');

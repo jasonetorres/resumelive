@@ -36,36 +36,36 @@ export type Database = {
         Row: {
           agreement: string | null
           category: string
-          content: number
+          content: number | null
           created_at: string
           feedback: string | null
           id: string
-          overall: number
-          presentation: number
+          overall: number | null
+          presentation: number | null
           reaction: string | null
           target_person: string
         }
         Insert: {
           agreement?: string | null
           category: string
-          content: number
+          content?: number | null
           created_at?: string
           feedback?: string | null
           id?: string
-          overall: number
-          presentation: number
+          overall?: number | null
+          presentation?: number | null
           reaction?: string | null
           target_person: string
         }
         Update: {
           agreement?: string | null
           category?: string
-          content?: number
+          content?: number | null
           created_at?: string
           feedback?: string | null
           id?: string
-          overall?: number
-          presentation?: number
+          overall?: number | null
+          presentation?: number | null
           reaction?: string | null
           target_person?: string
         }
