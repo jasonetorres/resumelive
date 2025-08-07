@@ -23,6 +23,9 @@
          />
          <LiveDisplay ratings={transformedRatings} />
         {/* Global floating reactions - work regardless of target */}
+        <div className="fixed top-0 right-0 bg-yellow-500 text-black p-2 z-50">
+          FloatingReactions should be here
+        </div>
         <FloatingReactions currentTarget={null} />
        </div>
      </div>
