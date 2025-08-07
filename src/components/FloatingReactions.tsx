@@ -59,7 +59,8 @@ export function FloatingReactions({ currentTarget }: FloatingReactionsProps) {
         },
         (payload) => {
           const newRating = payload.new;
-          if (newRating.reaction && newRating.target_person === currentTarget) {
+          // Only process quick reactions (ratings with null overall values)
+          if (newRating.reaction && newRating.target_person === currentTarget && newRating.overall === null) {
             console.log('Real-time reaction received:', newRating.reaction);
             addFloatingReaction(newRating.reaction, newRating.created_at);
           }

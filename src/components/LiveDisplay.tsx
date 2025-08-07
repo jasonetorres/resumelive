@@ -67,6 +67,8 @@ export function LiveDisplay({ ratings }: LiveDisplayProps) {
   const resumeRatings = displayedRatings.filter(r => r.category === 'resume' && r.overall !== null);
   const linkedinRatings = displayedRatings.filter(r => r.category === 'linkedin' && r.overall !== null);
   const allStats = calculateStats(displayedRatings.filter(r => r.overall > 0));
+  const resumeStats = calculateStats(resumeRatings);
+  const linkedinStats = calculateStats(linkedinRatings);
 
   // Calculate agreement stats
   const realRatingsWithAgreement = displayedRatings.filter(r => r.overall > 0);
@@ -75,14 +77,6 @@ export function LiveDisplay({ ratings }: LiveDisplayProps) {
     agree: realRatingsWithAgreement.filter(r => r.agreement === 'agree').length,
     disagree: realRatingsWithAgreement.filter(r => r.agreement === 'disagree').length
   };
-
-  // Calculate reaction stats
-  const reactionStats = displayedRatings
-    .filter(r => r.reaction)
-    .reduce((acc, r) => {
-      acc[r.reaction!] = (acc[r.reaction!] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
 
   const handleReveal = () => {
     if (!isRevealed) {
@@ -139,19 +133,6 @@ export function LiveDisplay({ ratings }: LiveDisplayProps) {
               </div>
             </div>
           )}
-          
-          {/* Reactions Display */}
-          {Object.keys(reactionStats).length > 0 && (
-            <div className="flex items-center gap-4">
-              {Object.entries(reactionStats).map(([emoji, count]) => (
-                <div key={emoji} className="flex items-center gap-1 text-neon-orange">
-                  <span className="text-lg">{emoji}</span>
-                  <span className="font-semibold">{count}</span>
-                </div>
-              ))}
-            </div>
-          )}
-          
           
           <Button
             onClick={handleReveal}
