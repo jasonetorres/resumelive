@@ -11,9 +11,21 @@ const Index = () => {
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-6xl font-bold bg-gradient-to-r from-neon-purple via-neon-pink to-neon-orange bg-clip-text text-transparent mb-4">
-            ⚡ Stream Ratings ⚡
-          </h1>
+          <div className="flex items-center justify-center gap-4 mb-4">
+            <img 
+              src="/lovable-uploads/47be24da-2929-4836-b53c-587b774ca249.png" 
+              alt="Stream Ratings Logo" 
+              className="w-16 h-16"
+            />
+            <h1 className="text-6xl font-bold bg-gradient-to-r from-neon-purple via-neon-pink to-neon-orange bg-clip-text text-transparent">
+              Stream Ratings
+            </h1>
+            <img 
+              src="/lovable-uploads/47be24da-2929-4836-b53c-587b774ca249.png" 
+              alt="Stream Ratings Logo" 
+              className="w-16 h-16"
+            />
+          </div>
           <p className="text-xl text-muted-foreground mb-8">
             Anonymous feedback tool for resume & LinkedIn reviews on stream
           </p>
