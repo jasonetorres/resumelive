@@ -33,6 +33,8 @@ interface Resume {
 }
 
 const LiveDisplayPage = () => {
+  console.log('LiveDisplayPage: Component is rendering');
+  
   const [ratings, setRatings] = useState<Rating[]>([]);
   const [currentTarget, setCurrentTarget] = useState<string | null>(null);
   const [resumes, setResumes] = useState<Resume[]>([]);
