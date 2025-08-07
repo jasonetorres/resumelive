@@ -44,11 +44,9 @@ export function FloatingReactions({ currentTarget }: FloatingReactionsProps) {
   };
 
   useEffect(() => {
-    if (!currentTarget) return;
+    console.log('Setting up global floating reactions subscription');
 
-    console.log('Setting up floating reactions subscription for target:', currentTarget);
-
-    // Subscribe to real-time rating inserts with reactions
+    // Subscribe to real-time global reactions
     const channel = supabase
       .channel('floating-reactions')
       .on(
@@ -57,13 +55,13 @@ export function FloatingReactions({ currentTarget }: FloatingReactionsProps) {
           event: 'INSERT',
           schema: 'public',
           table: 'ratings',
-          filter: `target_person=eq.${currentTarget}`
+          filter: `target_person=eq.GLOBAL_REACTIONS`
         },
         (payload) => {
           const newRating = payload.new;
           console.log('Received rating insert:', newRating);
-          // Only process quick reactions (ratings with null overall values)
-          if (newRating.reaction && newRating.target_person === currentTarget && newRating.overall === null) {
+          // Only process global quick reactions (ratings with null overall values)
+          if (newRating.reaction && newRating.target_person === 'GLOBAL_REACTIONS' && newRating.overall === null) {
             console.log('Real-time reaction received:', newRating.reaction);
             addFloatingReaction(newRating.reaction, newRating.created_at);
           } else {
@@ -79,7 +77,7 @@ export function FloatingReactions({ currentTarget }: FloatingReactionsProps) {
       console.log('Cleaning up floating reactions subscription');
       supabase.removeChannel(channel);
     };
-  }, [currentTarget]);
+  }, []); // No dependencies - global reactions work regardless of target
 
   return (
     <div className="fixed inset-0 pointer-events-none z-40 overflow-hidden">

@@ -34,23 +34,14 @@ export function RatingInput({ onSubmit, currentTarget }: RatingInputProps) {
 
   // Handle immediate reaction sending
   const handleQuickReaction = async (emoji: string) => {
-    if (!currentTarget) {
-      toast({
-        title: "No Target Set",
-        description: "Please wait for a target to be set before sending reactions.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    console.log('Sending quick reaction:', emoji, 'for target:', currentTarget);
+    console.log('Sending global quick reaction:', emoji);
 
     try {
       // Send reaction immediately to database for real-time display
       const { error } = await supabase
         .from('ratings')
         .insert({
-          target_person: currentTarget,
+          target_person: 'GLOBAL_REACTIONS', // Use a special identifier for global reactions
           overall: null, // NULL indicates this is a quick reaction, not a rating
           presentation: null,
           content: null,
@@ -154,7 +145,6 @@ export function RatingInput({ onSubmit, currentTarget }: RatingInputProps) {
                 type="button"
                 variant="outline"
                 onClick={() => handleQuickReaction(emoji)}
-                disabled={!currentTarget}
                 className="aspect-square text-3xl transition-all duration-200 hover:scale-110 hover:bg-neon-orange/20 hover:border-neon-orange/50 active:scale-95"
                 title={label}
               >

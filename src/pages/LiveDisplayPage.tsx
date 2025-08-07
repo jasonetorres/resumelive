@@ -17,3 +17,13 @@
            }
          }
        )
+         <TargetManager 
+           currentTarget={currentTarget}
+           onTargetChange={setCurrentTarget}
+         />
+         <LiveDisplay ratings={transformedRatings} />
+        {/* Global floating reactions - work regardless of target */}
+        <FloatingReactions currentTarget={null} />
+       </div>
+     </div>
+   );
