@@ -64,8 +64,8 @@ export function LiveDisplay({ ratings }: LiveDisplayProps) {
     };
   };
 
-  const resumeRatings = displayedRatings.filter(r => r.category === 'resume' && r.overall > 0);
-  const linkedinRatings = displayedRatings.filter(r => r.category === 'linkedin' && r.overall > 0);
+  const resumeRatings = displayedRatings.filter(r => r.category === 'resume' && r.overall !== null);
+  const linkedinRatings = displayedRatings.filter(r => r.category === 'linkedin' && r.overall !== null);
   const allStats = calculateStats(displayedRatings.filter(r => r.overall > 0));
 
   // Calculate agreement stats
