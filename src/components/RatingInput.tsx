@@ -58,8 +58,8 @@ export function RatingInput({ onSubmit }: RatingInputProps) {
       setAgreement(undefined);
       
       toast({
-        title: "Rating Submitted! ⭐",
-        description: "Your anonymous feedback has been sent to the stream!"
+        title: "Vote Submitted! 🎉",
+        description: "Your anonymous vote has been cast and will appear on stream!"
       });
     } catch (error) {
       toast({
@@ -78,7 +78,7 @@ export function RatingInput({ onSubmit }: RatingInputProps) {
     <Card className="glow-effect border-neon-purple/30 bg-card/90 backdrop-blur">
       <CardHeader className="text-center">
         <CardTitle className="text-2xl bg-gradient-to-r from-neon-purple to-neon-pink bg-clip-text text-transparent">
-          Rate Anonymously ⚡
+          Cast Your Vote ⚡
         </CardTitle>
         <div className="flex justify-center gap-2 mt-2">
           <Badge 
@@ -130,10 +130,10 @@ export function RatingInput({ onSubmit }: RatingInputProps) {
             Optional Feedback
           </label>
           <Textarea
-            placeholder="Share your thoughts... (This will appear on stream!)"
+            placeholder="Add your voice to the conversation... (This will appear on stream! 💬)"
             value={feedback}
             onChange={(e) => setFeedback(e.target.value)}
-            className="bg-input/50 border-neon-purple/30 focus:border-neon-purple"
+            className="bg-input/50 border-neon-purple/30 focus:border-neon-purple transition-all duration-300 hover:shadow-lg hover:shadow-neon-purple/20"
             rows={3}
           />
         </div>
@@ -174,17 +174,17 @@ export function RatingInput({ onSubmit }: RatingInputProps) {
         <Button
           onClick={handleSubmit}
           disabled={isSubmitting || overall === 0 || presentation === 0 || content === 0}
-          className="w-full bg-gradient-to-r from-neon-purple to-neon-pink hover:from-neon-pink hover:to-neon-purple text-primary-foreground font-bold py-3 glow-effect"
+          className="w-full bg-gradient-to-r from-neon-purple to-neon-pink hover:from-neon-pink hover:to-neon-purple text-primary-foreground font-bold py-3 glow-effect transform transition-all duration-200 hover:scale-105 active:scale-95"
         >
           {isSubmitting ? (
             <div className="flex items-center gap-2">
               <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-              Sending...
+              Casting Vote...
             </div>
           ) : (
             <div className="flex items-center gap-2">
               <Send className="w-4 h-4" />
-              Submit Rating
+              Cast Your Vote! 🗳️
               <Zap className="w-4 h-4" />
             </div>
           )}

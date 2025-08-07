@@ -84,7 +84,7 @@ const RateInputPage = () => {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold bg-gradient-to-r from-neon-purple to-neon-pink bg-clip-text text-transparent mb-2">
-            Stream Feedback
+            User Vote 🗳️
           </h1>
           {currentTarget ? (
             <div>
