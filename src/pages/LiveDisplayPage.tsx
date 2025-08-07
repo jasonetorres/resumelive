@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { LiveDisplay } from '@/components/LiveDisplay';
 import { TargetManager } from '@/components/TargetManager';
 import { FloatingReactions } from '@/components/FloatingReactions';
+import { ResumeViewer } from '@/components/ResumeViewer';
+import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
 import { supabase } from '@/integrations/supabase/client';
 
 interface Rating {
@@ -139,12 +141,30 @@ const LiveDisplayPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 p-4">
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-7xl mx-auto mb-4">
         <TargetManager 
           currentTarget={currentTarget}
           onTargetChange={setCurrentTarget}
         />
-        <LiveDisplay ratings={transformedRatings} />
+      </div>
+      
+      <div className="h-[calc(100vh-8rem)] max-w-7xl mx-auto">
+        <ResizablePanelGroup direction="horizontal" className="border border-border/50 rounded-lg">
+          {/* Resume Viewer Panel */}
+          <ResizablePanel defaultSize={40} minSize={30}>
+            <ResumeViewer className="h-full" />
+          </ResizablePanel>
+          
+          <ResizableHandle withHandle />
+          
+          {/* Live Display Panel */}
+          <ResizablePanel defaultSize={60} minSize={40}>
+            <div className="h-full overflow-auto">
+              <LiveDisplay ratings={transformedRatings} />
+            </div>
+          </ResizablePanel>
+        </ResizablePanelGroup>
+        
         {/* Global floating reactions - work regardless of target */}
         <FloatingReactions currentTarget={null} />
       </div>
