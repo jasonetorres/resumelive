@@ -33,7 +33,8 @@ export function TargetManager({ currentTarget, onTargetChange }: TargetManagerPr
     const { count } = await supabase
       .from('ratings')
       .select('*', { count: 'exact', head: true })
-      .eq('target_person', currentTarget);
+      .eq('target_person', currentTarget)
+      .not('overall', 'is', null);
     
     setRatingsCount(count || 0);
   };
