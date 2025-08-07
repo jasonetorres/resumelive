@@ -4,7 +4,7 @@ import { StarRating } from './StarRating';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
-import { FloatingReactions } from './FloatingReactions';
+
 import { TrendingUp, Users, MessageSquare, Star, Eye, EyeOff, Sparkles, ThumbsUp, ThumbsDown } from 'lucide-react';
 
 interface Rating {
@@ -28,8 +28,6 @@ export function LiveDisplay({ ratings }: LiveDisplayProps) {
   const [currentFeedback, setCurrentFeedback] = useState<string>('');
   const [isRevealed, setIsRevealed] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
-  const [recentReactions, setRecentReactions] = useState<{ emoji: string; timestamp: string }[]>([]);
-
   useEffect(() => {
     // Add new ratings with animation
     const newRatings = ratings.filter(
@@ -44,15 +42,6 @@ export function LiveDisplay({ ratings }: LiveDisplayProps) {
       if (latestWithFeedback?.feedback) {
         setCurrentFeedback(latestWithFeedback.feedback);
         setTimeout(() => setCurrentFeedback(''), 10000); // Clear after 10 seconds
-      }
-
-      // Add new reactions to floating reactions
-      const newReactionsFromRatings = newRatings
-        .filter(r => r.reaction)
-        .map(r => ({ emoji: r.reaction!, timestamp: r.timestamp }));
-      
-      if (newReactionsFromRatings.length > 0) {
-        setRecentReactions(prev => [...newReactionsFromRatings, ...prev.slice(0, 9)]);
       }
     }
   }, [ratings]);
@@ -105,8 +94,6 @@ export function LiveDisplay({ ratings }: LiveDisplayProps) {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-background/80 p-6 relative overflow-hidden">
-      {/* Floating Reactions */}
-      <FloatingReactions reactions={recentReactions} />
       {/* Confetti Animation */}
       {showConfetti && (
         <div className="absolute inset-0 pointer-events-none z-50">

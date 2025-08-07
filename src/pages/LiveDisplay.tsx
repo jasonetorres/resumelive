@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { LiveDisplay } from '@/components/LiveDisplay';
 import { TargetManager } from '@/components/TargetManager';
+import { FloatingReactions } from '@/components/FloatingReactions';
 import { supabase } from '@/integrations/supabase/client';
 
 interface Rating {
@@ -138,6 +139,8 @@ const LiveDisplayPage = () => {
           onTargetChange={setCurrentTarget}
         />
         <LiveDisplay ratings={transformedRatings} />
+        {/* Direct floating reactions with current target */}
+        <FloatingReactions currentTarget={currentTarget} />
       </div>
     </div>
   );

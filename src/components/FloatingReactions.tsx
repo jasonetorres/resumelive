@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 
 interface FloatingReaction {
   id: string;
@@ -9,36 +10,68 @@ interface FloatingReaction {
 }
 
 interface FloatingReactionsProps {
-  reactions: { emoji: string; timestamp: string }[];
+  currentTarget: string | null;
 }
 
-export function FloatingReactions({ reactions }: FloatingReactionsProps) {
+export function FloatingReactions({ currentTarget }: FloatingReactionsProps) {
   const [floatingReactions, setFloatingReactions] = useState<FloatingReaction[]>([]);
+  const processedReactions = useRef<Set<string>>(new Set());
+
+  const addFloatingReaction = (emoji: string, timestamp: string) => {
+    const reactionId = `${emoji}-${timestamp}`;
+    
+    // Prevent duplicates
+    if (processedReactions.current.has(reactionId)) {
+      return;
+    }
+    
+    processedReactions.current.add(reactionId);
+    
+    const newFloatingReaction: FloatingReaction = {
+      id: reactionId,
+      emoji: emoji,
+      x: Math.random() * 80 + 10, // Random position between 10% and 90%
+      y: Math.random() * 60 + 20, // Random position between 20% and 80%
+      timestamp: Date.now()
+    };
+
+    setFloatingReactions(prev => [...prev, newFloatingReaction]);
+
+    // Remove the reaction after 4 seconds
+    setTimeout(() => {
+      setFloatingReactions(prev => prev.filter(fr => fr.id !== reactionId));
+      processedReactions.current.delete(reactionId);
+    }, 4000);
+  };
 
   useEffect(() => {
-    // Add new reactions as floating elements
-    reactions.forEach(reaction => {
-      const reactionId = `${reaction.emoji}-${reaction.timestamp}`;
-      
-      // Check if we already added this reaction
-      if (!floatingReactions.find(fr => fr.id === reactionId)) {
-        const newFloatingReaction: FloatingReaction = {
-          id: reactionId,
-          emoji: reaction.emoji,
-          x: Math.random() * 80 + 10, // Random position between 10% and 90%
-          y: Math.random() * 60 + 20, // Random position between 20% and 80%
-          timestamp: Date.now()
-        };
+    if (!currentTarget) return;
 
-        setFloatingReactions(prev => [...prev, newFloatingReaction]);
+    // Subscribe to real-time rating inserts with reactions
+    const channel = supabase
+      .channel('floating-reactions')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'ratings',
+          filter: `target_person=eq.${currentTarget}`
+        },
+        (payload) => {
+          const newRating = payload.new;
+          if (newRating.reaction) {
+            console.log('Real-time reaction received:', newRating.reaction, newRating.created_at);
+            addFloatingReaction(newRating.reaction, newRating.created_at);
+          }
+        }
+      )
+      .subscribe();
 
-        // Remove the reaction after 4 seconds
-        setTimeout(() => {
-          setFloatingReactions(prev => prev.filter(fr => fr.id !== reactionId));
-        }, 4000);
-      }
-    });
-  }, [reactions]);
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [currentTarget]);
 
   return (
     <div className="fixed inset-0 pointer-events-none z-40 overflow-hidden">
