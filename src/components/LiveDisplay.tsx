@@ -46,9 +46,6 @@ export function LiveDisplay({ ratings }: LiveDisplayProps) {
     }
   }, [ratings]);
 
-  const resumeRatings = displayedRatings.filter(r => r.category === 'resume');
-  const linkedinRatings = displayedRatings.filter(r => r.category === 'linkedin');
-
   const calculateStats = (ratings: Rating[]) => {
     // Filter out quick reactions (ratings with overall = 0)
     const realRatings = ratings.filter(r => r.overall > 0);
