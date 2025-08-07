@@ -129,7 +129,7 @@ export function TargetManager({ currentTarget, onTargetChange }: TargetManagerPr
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-neon-purple">
           <Users className="w-5 h-5" />
-          Current Speaker
+          Currently Reviewing
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
