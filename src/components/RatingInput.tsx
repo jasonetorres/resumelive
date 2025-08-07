@@ -49,9 +49,9 @@ export function RatingInput({ onSubmit, currentTarget }: RatingInputProps) {
         .from('ratings')
         .insert({
           target_person: currentTarget,
-          overall: 0, // Use 0 to indicate this is not a real rating
-          presentation: 0,
-          content: 0,
+          overall: null, // Use null to indicate this is not a real rating
+          presentation: null,
+          content: null,
           category: 'resume',
           reaction: emoji,
           feedback: null // No feedback for quick reactions
