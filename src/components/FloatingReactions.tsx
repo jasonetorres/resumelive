@@ -52,36 +52,39 @@ export function FloatingReactions({ currentTarget }: FloatingReactionsProps) {
   useEffect(() => {
     console.log('FloatingReactions: Setting up global floating reactions subscription');
 
-    // Subscribe to real-time global reactions
+    // Subscribe to ALL rating inserts and filter in code for better debugging
     const channel = supabase
-      .channel('floating-reactions')
+      .channel('floating-reactions-all')
       .on(
         'postgres_changes',
         {
           event: 'INSERT',
           schema: 'public',
-          table: 'ratings',
-          filter: `target_person=eq.GLOBAL_REACTIONS`
+          table: 'ratings'
         },
         (payload) => {
           const newRating = payload.new;
-          console.log('FloatingReactions: Received rating insert:', newRating);
-          // Only process global quick reactions (ratings with null overall values)
+          console.log('FloatingReactions: Received ANY rating insert:', newRating);
+          
+          // Process global quick reactions (ratings with GLOBAL_REACTIONS target and null overall)
           if (newRating.reaction && newRating.target_person === 'GLOBAL_REACTIONS' && newRating.overall === null) {
-            console.log('FloatingReactions: Processing reaction:', newRating.reaction);
+            console.log('FloatingReactions: Processing global reaction:', newRating.reaction);
             addFloatingReaction(newRating.reaction, newRating.created_at);
           } else {
-            console.log('FloatingReactions: Not a quick reaction, ignoring:', {
+            console.log('FloatingReactions: Not a global quick reaction, ignoring:', {
               reaction: newRating.reaction,
               target: newRating.target_person,
-              overall: newRating.overall
+              overall: newRating.overall,
+              isGlobalTarget: newRating.target_person === 'GLOBAL_REACTIONS',
+              hasReaction: !!newRating.reaction,
+              hasNullOverall: newRating.overall === null
             });
           }
         }
       )
       .subscribe();
 
-    console.log('FloatingReactions: Subscription created');
+    console.log('FloatingReactions: Subscription created for all ratings');
 
     return () => {
       console.log('FloatingReactions: Cleaning up subscription');
