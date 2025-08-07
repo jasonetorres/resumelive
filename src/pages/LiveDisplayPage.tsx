@@ -6,6 +6,7 @@ import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/componen
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 
 interface Rating {
@@ -157,6 +158,7 @@ const LiveDisplayPage = () => {
     if (!resume) return;
 
     setSelectedResume(resume);
+    // Automatically show the resume view when a target is set via resume selection
     setShowResumeView(true);
     
     // Update the current target in the database
@@ -165,6 +167,13 @@ const LiveDisplayPage = () => {
       .update({ target_person: resume.name })
       .eq('id', 1);
   };
+
+  // Auto-show resume when one is selected and target is set
+  useEffect(() => {
+    if (selectedResume && currentTarget) {
+      setShowResumeView(true);
+    }
+  }, [selectedResume, currentTarget]);
 
   // Transform ratings to match the LiveDisplay component's expected format
   const transformedRatings = ratings.map(rating => ({
@@ -235,9 +244,9 @@ const LiveDisplayPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 p-4">
       <div className="max-w-4xl mx-auto">
-        <Card className="mb-6">
+        <Card className="mb-6 border-2 border-neon-purple/20 bg-card/50 backdrop-blur">
           <CardHeader>
-            <CardTitle className="text-center">Resume Review Setup</CardTitle>
+            <CardTitle className="text-center text-neon-purple">Currently Reviewing</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
@@ -259,27 +268,20 @@ const LiveDisplayPage = () => {
             <Button 
               onClick={handleSetTarget}
               disabled={!selectedResumeId}
-              className="w-full"
+              className="w-full bg-neon-purple hover:bg-neon-purple/90"
             >
-              Set Target & Start Review
+              Start Review Session
             </Button>
 
             {currentTarget && (
-              <div className="text-center text-sm text-muted-foreground">
-                Currently reviewing: <span className="font-medium">{currentTarget}</span>
+              <div className="text-center p-4 bg-neon-green/10 border border-neon-green/30 rounded-lg">
+                <Badge className="bg-neon-green text-primary-foreground mb-2">Currently Reviewing</Badge>
+                <p className="font-medium text-neon-green">{currentTarget}</p>
               </div>
             )}
           </CardContent>
         </Card>
 
-        {/* Target Manager for manual input */}
-        <div className="mb-6">
-          <TargetManager 
-            currentTarget={currentTarget}
-            onTargetChange={setCurrentTarget}
-          />
-        </div>
-        
         {/* Live Display Preview */}
         <Card>
           <CardHeader>
