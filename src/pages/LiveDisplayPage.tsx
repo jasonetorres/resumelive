@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { FileText } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
 interface Rating {
@@ -208,11 +209,24 @@ const LiveDisplayPage = () => {
                 </div>
                 <div className="flex-1 p-4">
                   {selectedResume.file_type === 'application/pdf' ? (
-                    <iframe
-                      src={`https://kpufipcunkgfpxhnhxxl.supabase.co/storage/v1/object/public/resumes/${selectedResume.file_path}`}
-                      className="w-full h-full border-0 rounded"
-                      title={selectedResume.name}
-                    />
+                    <div className="w-full h-full flex flex-col items-center justify-center">
+                      <FileText className="w-24 h-24 text-neon-purple mb-6" />
+                      <h3 className="text-2xl font-semibold mb-4">PDF Resume Display</h3>
+                      <p className="text-muted-foreground mb-6 text-center max-w-md">
+                        This PDF will open in a new tab to avoid browser restrictions. 
+                        Position it alongside this window for the best streaming experience.
+                      </p>
+                      <Button
+                        onClick={() => window.open(`https://kpufipcunkgfpxhnhxxl.supabase.co/storage/v1/object/public/resumes/${selectedResume.file_path}`, '_blank')}
+                        className="bg-neon-purple text-primary-foreground hover:bg-neon-purple/90 mb-4"
+                        size="lg"
+                      >
+                        Open PDF in New Tab
+                      </Button>
+                      <p className="text-sm text-muted-foreground">
+                        Tip: Use your browser's window snapping to position the PDF next to this ratings panel
+                      </p>
+                    </div>
                   ) : (
                     <img
                       src={`https://kpufipcunkgfpxhnhxxl.supabase.co/storage/v1/object/public/resumes/${selectedResume.file_path}`}

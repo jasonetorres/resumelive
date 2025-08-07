@@ -337,11 +337,19 @@ export function ResumeManager({ className }: ResumeManagerProps) {
                         </DialogHeader>
                         <div className="flex-1 bg-muted/20 rounded-lg overflow-hidden border border-border/50 h-96">
                           {resume.file_type === 'application/pdf' ? (
-                            <iframe
-                              src={getFileUrl(resume.file_path)}
-                              className="w-full h-full"
-                              title="Resume Preview"
-                            />
+                            <div className="w-full h-full flex flex-col items-center justify-center p-4">
+                              <FileText className="w-16 h-16 text-neon-purple mb-4" />
+                              <p className="text-lg font-semibold mb-2">PDF Resume</p>
+                              <p className="text-sm text-muted-foreground mb-4 text-center">
+                                Click the button below to open the PDF in a new tab
+                              </p>
+                              <Button
+                                onClick={() => window.open(getFileUrl(resume.file_path), '_blank')}
+                                className="bg-neon-purple text-primary-foreground hover:bg-neon-purple/90"
+                              >
+                                Open PDF in New Tab
+                              </Button>
+                            </div>
                           ) : (
                             <div className="w-full h-full flex items-center justify-center">
                               <img
