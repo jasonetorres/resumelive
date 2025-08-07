@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Link } from 'react-router-dom';
 import { Star, Users, Monitor, Smartphone, Zap, TrendingUp, Upload } from 'lucide-react';
-import { ResumeViewer } from '@/components/ResumeViewer';
+import { ResumeManager } from '@/components/ResumeManager';
 
 const Index = () => {
   return (
@@ -46,9 +46,9 @@ const Index = () => {
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground text-center mb-4">
-              Upload your resume to review on stream
+              Upload and manage your resumes for stream reviews
             </p>
-            <ResumeViewer className="max-w-2xl mx-auto" />
+            <ResumeManager className="max-w-4xl mx-auto" />
           </CardContent>
         </Card>
 
