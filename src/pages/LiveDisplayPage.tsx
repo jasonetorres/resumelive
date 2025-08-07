@@ -11,8 +11,8 @@
          },
          (payload) => {
            const newRating = payload.new as Rating;
-           // Only add real ratings (not quick reactions) if it's for the current target
-           if (newRating.target_person === currentTarget && newRating.overall !== null) {
+          // Only add if it's for the current target AND it's a real rating (not a quick reaction)
+          if (newRating.target_person === currentTarget && newRating.overall !== null && newRating.overall > 0) {
              setRatings(prev => [newRating, ...prev]);
            }
          }

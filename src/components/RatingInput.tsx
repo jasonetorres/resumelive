@@ -43,13 +43,15 @@ export function RatingInput({ onSubmit, currentTarget }: RatingInputProps) {
       return;
     }
 
+    console.log('Sending quick reaction:', emoji, 'for target:', currentTarget);
+
     try {
       // Send reaction immediately to database for real-time display
       const { error } = await supabase
         .from('ratings')
         .insert({
           target_person: currentTarget,
-          overall: null, // Use null to indicate this is not a real rating
+          overall: null, // NULL indicates this is a quick reaction, not a rating
           presentation: null,
           content: null,
           category: 'resume',
@@ -58,6 +60,8 @@ export function RatingInput({ onSubmit, currentTarget }: RatingInputProps) {
         });
 
       if (error) throw error;
+
+      console.log('Quick reaction sent successfully');
 
       toast({
         title: "Reaction Sent! 🎉",

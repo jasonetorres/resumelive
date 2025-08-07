@@ -46,6 +46,8 @@ export function FloatingReactions({ currentTarget }: FloatingReactionsProps) {
   useEffect(() => {
     if (!currentTarget) return;
 
+    console.log('Setting up floating reactions subscription for target:', currentTarget);
+
     // Subscribe to real-time rating inserts with reactions
     const channel = supabase
       .channel('floating-reactions')
@@ -59,16 +61,22 @@ export function FloatingReactions({ currentTarget }: FloatingReactionsProps) {
         },
         (payload) => {
           const newRating = payload.new;
+          console.log('Received rating insert:', newRating);
           // Only process quick reactions (ratings with null overall values)
           if (newRating.reaction && newRating.target_person === currentTarget && newRating.overall === null) {
             console.log('Real-time reaction received:', newRating.reaction);
             addFloatingReaction(newRating.reaction, newRating.created_at);
+          } else {
+            console.log('Not a quick reaction, ignoring for floating animation');
           }
         }
       )
       .subscribe();
 
+    console.log('Floating reactions subscription created');
+
     return () => {
+      console.log('Cleaning up floating reactions subscription');
       supabase.removeChannel(channel);
     };
   }, [currentTarget]);
