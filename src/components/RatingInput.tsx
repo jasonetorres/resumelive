@@ -138,7 +138,12 @@ export function RatingInput({ onSubmit, currentTarget }: RatingInputProps) {
               { emoji: '🔥', label: 'Fire' },
               { emoji: '💯', label: 'Perfect' },
               { emoji: '👎', label: 'Dislike' },
-              { emoji: '💩', label: 'Poop' }
+              { emoji: '💩', label: 'Poop' },
+              { emoji: '😍', label: 'Love' },
+              { emoji: '😂', label: 'Laughing' },
+              { emoji: '🤔', label: 'Thinking' },
+              { emoji: '👏', label: 'Clap' },
+              { emoji: '⚡', label: 'Lightning' }
             ].map(({ emoji, label }) => (
               <Button
                 key={emoji}
