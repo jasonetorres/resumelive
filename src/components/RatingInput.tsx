@@ -125,23 +125,20 @@ export function RatingInput({ onSubmit, currentTarget }: RatingInputProps) {
       <Card className="glow-effect border-neon-orange/30 bg-card/90 backdrop-blur">
         <CardHeader className="text-center pb-4">
           <CardTitle className="text-xl bg-gradient-to-r from-neon-orange to-neon-pink bg-clip-text text-transparent">
-            Quick Reactions 🎭
+            Quick Reactions
           </CardTitle>
           <p className="text-sm text-muted-foreground">
             Tap to send instant reactions that float on stream!
           </p>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-4 gap-3">
+          <div className="grid grid-cols-5 gap-3">
             {[
               { emoji: '👍', label: 'Like' },
               { emoji: '🔥', label: 'Fire' },
               { emoji: '💯', label: 'Perfect' },
               { emoji: '👎', label: 'Dislike' },
-              { emoji: '😍', label: 'Love' },
-              { emoji: '🤔', label: 'Thinking' },
-              { emoji: '👏', label: 'Clap' },
-              { emoji: '⚡', label: 'Energy' }
+              { emoji: '💩', label: 'Poop' }
             ].map(({ emoji, label }) => (
               <Button
                 key={emoji}
@@ -163,7 +160,7 @@ export function RatingInput({ onSubmit, currentTarget }: RatingInputProps) {
       <Card className="glow-effect border-neon-purple/30 bg-card/90 backdrop-blur">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl bg-gradient-to-r from-neon-purple to-neon-pink bg-clip-text text-transparent">
-            Cast Your Vote ⚡
+            Cast Your Vote
           </CardTitle>
           <div className="flex justify-center gap-2 mt-2">
             <Badge 
