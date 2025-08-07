@@ -169,4 +169,40 @@ All colors MUST be HSL.
       opacity: 0;
     }
   }
+
+  .animate-float-up {
+    animation: float-up 4s ease-out forwards;
+  }
+
+  .animate-pulse-scale {
+    animation: pulse-scale 2s ease-in-out infinite;
+  }
+
+  @keyframes float-up {
+    0% {
+      transform: translateY(0) scale(0);
+      opacity: 0;
+    }
+    10% {
+      transform: translateY(-10px) scale(1);
+      opacity: 1;
+    }
+    50% {
+      transform: translateY(-100px) scale(1.2);
+      opacity: 0.8;
+    }
+    100% {
+      transform: translateY(-200px) scale(0.8);
+      opacity: 0;
+    }
+  }
+
+  @keyframes pulse-scale {
+    0%, 100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.1);
+    }
+  }
 }
