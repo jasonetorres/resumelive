@@ -215,7 +215,7 @@ const LiveDisplayPage = () => {
   if (showResumeView && selectedResume) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 p-4">
-        <div className="h-[calc(100vh-2rem)] max-w-7xl mx-auto">
+        <div className="h-[calc(100vh-2rem)] max-w-[95vw] mx-auto">
           <ResizablePanelGroup direction="horizontal" className="border border-border/50 rounded-lg">
             {/* Resume Display Panel - 2/3 */}
             <ResizablePanel defaultSize={67} minSize={60}>
@@ -268,7 +268,7 @@ const LiveDisplayPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 p-4">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-[90vw] mx-auto">
         <Card className="mb-6 border-2 border-neon-purple/20 bg-card/50 backdrop-blur">
           <CardHeader>
             <CardTitle className="text-center text-neon-purple">Currently Reviewing</CardTitle>
