@@ -233,11 +233,10 @@ const LiveDisplayPage = () => {
                 <div className="flex-1 p-4">
                   {selectedResume.file_type === 'application/pdf' ? (
                     <iframe
-                      src={`https://kpufipcunkgfpxhnhxxl.supabase.co/storage/v1/object/public/resumes/${selectedResume.file_path}#view=FitH`}
+                      src={`https://docs.google.com/viewer?url=${encodeURIComponent(`https://kpufipcunkgfpxhnhxxl.supabase.co/storage/v1/object/public/resumes/${selectedResume.file_path}`)}&embedded=true`}
                       className="w-full h-full border-0 rounded"
                       title={selectedResume.name}
                       style={{ minHeight: '600px' }}
-                      sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
                     />
                   ) : (
                     <img
