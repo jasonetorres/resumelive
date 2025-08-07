@@ -232,26 +232,13 @@ const LiveDisplayPage = () => {
                 </div>
                 <div className="flex-1 p-4">
                   {selectedResume.file_type === 'application/pdf' ? (
-                    <object
-                      data={`https://kpufipcunkgfpxhnhxxl.supabase.co/storage/v1/object/public/resumes/${selectedResume.file_path}`}
-                      type="application/pdf"
+                    <iframe
+                      src={`https://kpufipcunkgfpxhnhxxl.supabase.co/storage/v1/object/public/resumes/${selectedResume.file_path}#view=FitH`}
                       className="w-full h-full border-0 rounded"
                       title={selectedResume.name}
-                    >
-                      <div className="w-full h-full flex flex-col items-center justify-center bg-muted/20 rounded">
-                        <FileText className="w-16 h-16 text-neon-purple mb-4" />
-                        <p className="text-lg font-semibold mb-2">PDF Display</p>
-                        <p className="text-sm text-muted-foreground mb-4 text-center max-w-md">
-                          Your browser doesn't support inline PDF viewing.
-                        </p>
-                        <Button
-                          onClick={() => window.open(`https://kpufipcunkgfpxhnhxxl.supabase.co/storage/v1/object/public/resumes/${selectedResume.file_path}`, '_blank')}
-                          className="bg-neon-purple text-primary-foreground hover:bg-neon-purple/90"
-                        >
-                          Open PDF in New Tab
-                        </Button>
-                      </div>
-                    </object>
+                      style={{ minHeight: '600px' }}
+                      sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
+                    />
                   ) : (
                     <img
                       src={`https://kpufipcunkgfpxhnhxxl.supabase.co/storage/v1/object/public/resumes/${selectedResume.file_path}`}
