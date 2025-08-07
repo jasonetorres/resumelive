@@ -16,21 +16,26 @@ interface RatingData {
 const RateInputPage = () => {
   const [currentTarget, setCurrentTarget] = useState<string | null>(null);
   const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     // Fetch current target
     const fetchCurrentTarget = async () => {
+      console.log('RateInputPage: Fetching current target...');
       const { data } = await supabase
         .from('current_target')
         .select('target_person')
         .eq('id', 1)
         .single();
       
+      console.log('RateInputPage: Current target fetched:', data?.target_person);
       setCurrentTarget(data?.target_person || null);
+      setIsLoading(false);
     };
 
     fetchCurrentTarget();
 
+    console.log('RateInputPage: Setting up target subscription...');
     // Subscribe to target changes
     const channel = supabase
       .channel('target-changes')
@@ -42,12 +47,29 @@ const RateInputPage = () => {
           table: 'current_target'
         },
         (payload) => {
+          console.log('RateInputPage: Target changed via subscription:', payload.new.target_person);
           setCurrentTarget(payload.new.target_person);
+          
+          // Show toast notification when target changes
+          if (payload.new.target_person) {
+            toast({
+              title: "New Target Set! 🎯",
+              description: `Now rating: ${payload.new.target_person}`,
+            });
+          } else {
+            toast({
+              title: "Target Cleared",
+              description: "No target is currently set",
+            });
+          }
         }
       )
       .subscribe();
 
+    console.log('RateInputPage: Subscription created');
+
     return () => {
+      console.log('RateInputPage: Cleaning up subscription');
       supabase.removeChannel(channel);
     };
   }, []);
@@ -88,7 +110,12 @@ const RateInputPage = () => {
           <h1 className="text-3xl font-bold bg-gradient-to-r from-neon-purple to-neon-pink bg-clip-text text-transparent mb-2">
             User Vote
           </h1>
-          {currentTarget ? (
+          {isLoading ? (
+            <div className="flex items-center justify-center gap-2">
+              <div className="w-4 h-4 border-2 border-neon-purple border-t-transparent rounded-full animate-spin" />
+              <p className="text-muted-foreground">Loading...</p>
+            </div>
+          ) : currentTarget ? (
             <div>
               <p className="text-muted-foreground mb-2">
                 Rate the content for
@@ -96,11 +123,20 @@ const RateInputPage = () => {
               <p className="text-2xl font-bold text-neon-green">
                 {currentTarget}
               </p>
+              <div className="mt-2 text-xs text-muted-foreground bg-neon-green/10 px-2 py-1 rounded">
+                ✅ Live - Updates automatically
+              </div>
             </div>
           ) : (
-            <p className="text-muted-foreground">
-              Waiting for target to be set...
-            </p>
+            <div>
+              <p className="text-muted-foreground mb-2">
+                Waiting for target to be set...
+              </p>
+              <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
+                <div className="w-2 h-2 bg-neon-orange rounded-full animate-pulse" />
+                Listening for updates
+              </div>
+            </div>
           )}
         </div>
         <RatingInput onSubmit={handleSubmitRating} currentTarget={currentTarget} />
