@@ -34,7 +34,7 @@ export function RatingInput({ onSubmit, currentTarget }: RatingInputProps) {
 
   // Handle immediate reaction sending
   const handleQuickReaction = async (emoji: string) => {
-    console.log('Sending global quick reaction:', emoji);
+    console.log('RatingInput: Sending global quick reaction:', emoji);
 
     try {
       // Send reaction immediately to database for real-time display
@@ -52,14 +52,14 @@ export function RatingInput({ onSubmit, currentTarget }: RatingInputProps) {
 
       if (error) throw error;
 
-      console.log('Quick reaction sent successfully');
+      console.log('RatingInput: Quick reaction sent successfully');
 
       toast({
         title: "Reaction Sent! 🎉",
         description: `Your ${emoji} reaction is now floating on the stream!`
       });
     } catch (error) {
-      console.error('Error sending reaction:', error);
+      console.error('RatingInput: Error sending reaction:', error);
       toast({
         title: "Failed to Send Reaction",
         description: "Please try again!",

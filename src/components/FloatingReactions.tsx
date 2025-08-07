@@ -16,12 +16,17 @@ interface FloatingReactionsProps {
 export function FloatingReactions({ currentTarget }: FloatingReactionsProps) {
   const [floatingReactions, setFloatingReactions] = useState<FloatingReaction[]>([]);
   const processedReactions = useRef<Set<string>>(new Set());
+  
+  // Debug: Log current state
+  console.log('FloatingReactions component rendered, reactions count:', floatingReactions.length);
 
   const addFloatingReaction = (emoji: string, timestamp: string) => {
     const reactionId = `${emoji}-${timestamp}-${Math.random()}`;
+    console.log('Adding floating reaction:', { emoji, timestamp, reactionId });
     
     // Prevent duplicates
     if (processedReactions.current.has(reactionId)) {
+      console.log('Duplicate reaction prevented:', reactionId);
       return;
     }
     
@@ -35,6 +40,7 @@ export function FloatingReactions({ currentTarget }: FloatingReactionsProps) {
       timestamp: Date.now()
     };
 
+    console.log('New floating reaction created:', newFloatingReaction);
     setFloatingReactions(prev => [...prev, newFloatingReaction]);
 
     // Remove the reaction after 4 seconds
@@ -44,7 +50,7 @@ export function FloatingReactions({ currentTarget }: FloatingReactionsProps) {
   };
 
   useEffect(() => {
-    console.log('Setting up global floating reactions subscription');
+    console.log('FloatingReactions: Setting up global floating reactions subscription');
 
     // Subscribe to real-time global reactions
     const channel = supabase
@@ -59,32 +65,41 @@ export function FloatingReactions({ currentTarget }: FloatingReactionsProps) {
         },
         (payload) => {
           const newRating = payload.new;
-          console.log('Received rating insert:', newRating);
+          console.log('FloatingReactions: Received rating insert:', newRating);
           // Only process global quick reactions (ratings with null overall values)
           if (newRating.reaction && newRating.target_person === 'GLOBAL_REACTIONS' && newRating.overall === null) {
-            console.log('Real-time reaction received:', newRating.reaction);
+            console.log('FloatingReactions: Processing reaction:', newRating.reaction);
             addFloatingReaction(newRating.reaction, newRating.created_at);
           } else {
-            console.log('Not a quick reaction, ignoring for floating animation');
+            console.log('FloatingReactions: Not a quick reaction, ignoring:', {
+              reaction: newRating.reaction,
+              target: newRating.target_person,
+              overall: newRating.overall
+            });
           }
         }
       )
       .subscribe();
 
-    console.log('Floating reactions subscription created');
+    console.log('FloatingReactions: Subscription created');
 
     return () => {
-      console.log('Cleaning up floating reactions subscription');
+      console.log('FloatingReactions: Cleaning up subscription');
       supabase.removeChannel(channel);
     };
   }, []); // No dependencies - global reactions work regardless of target
 
+  console.log('FloatingReactions: Rendering with reactions:', floatingReactions);
+
   return (
     <div className="fixed inset-0 pointer-events-none z-40 overflow-hidden">
+      <div className="absolute top-4 left-4 bg-black/50 text-white p-2 rounded text-sm z-50">
+        Debug: {floatingReactions.length} reactions
+      </div>
       {floatingReactions.map((reaction) => (
         <div
           key={reaction.id}
-          className="absolute animate-float-up pointer-events-none"
+          className="absolute animate-float-up pointer-events-none bg-red-500/20 border border-red-500"
           style={{
             left: `${reaction.x}%`,
             top: `${reaction.y}%`,
@@ -92,7 +107,7 @@ export function FloatingReactions({ currentTarget }: FloatingReactionsProps) {
             animationTimingFunction: 'ease-out'
           }}
         >
-          <div className="text-8xl filter drop-shadow-2xl animate-pulse-scale">
+          <div className="text-8xl filter drop-shadow-2xl animate-pulse-scale bg-blue-500/20 border border-blue-500">
             {reaction.emoji}
           </div>
         </div>
