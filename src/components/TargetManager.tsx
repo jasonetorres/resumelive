@@ -128,8 +128,8 @@ export function TargetManager({ currentTarget, onTargetChange }: TargetManagerPr
     <Card className="mb-6 border-2 border-neon-purple/20 bg-card/50 backdrop-blur">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-neon-purple">
-          <Target className="w-5 h-5" />
-          Target Management
+          <Users className="w-5 h-5" />
+          Current Speaker
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
