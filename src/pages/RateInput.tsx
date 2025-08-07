@@ -103,15 +103,7 @@ const RateInputPage = () => {
             </p>
           )}
         </div>
-        {currentTarget ? (
-          <RatingInput onSubmit={handleSubmitRating} currentTarget={currentTarget} />
-        ) : (
-          <div className="text-center p-8 border-2 border-dashed border-muted-foreground/20 rounded-lg">
-            <p className="text-muted-foreground">
-              No active rating session
-            </p>
-          </div>
-        )}
+        <RatingInput onSubmit={handleSubmitRating} currentTarget={currentTarget} />
       </div>
     </div>
   );
