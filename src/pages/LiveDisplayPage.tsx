@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { LiveDisplay } from '@/components/LiveDisplay';
 import { TargetManager } from '@/components/TargetManager';
 import { FloatingReactions } from '@/components/FloatingReactions';
-import { ResumeViewer } from '@/components/ResumeViewer';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
+import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { supabase } from '@/integrations/supabase/client';
 
 interface Rating {
@@ -19,9 +21,22 @@ interface Rating {
   created_at: string;
 }
 
+interface Resume {
+  id: string;
+  name: string;
+  file_path: string;
+  file_type: string;
+  file_size: number;
+  created_at: string;
+}
+
 const LiveDisplayPage = () => {
   const [ratings, setRatings] = useState<Rating[]>([]);
   const [currentTarget, setCurrentTarget] = useState<string | null>(null);
+  const [resumes, setResumes] = useState<Resume[]>([]);
+  const [selectedResumeId, setSelectedResumeId] = useState<string>('');
+  const [selectedResume, setSelectedResume] = useState<Resume | null>(null);
+  const [showResumeView, setShowResumeView] = useState(false);
 
   useEffect(() => {
     console.log('LiveDisplayPage: Setting up subscriptions and fetching data');
@@ -37,6 +52,15 @@ const LiveDisplayPage = () => {
       
       console.log('LiveDisplayPage: Initial target fetched:', targetData?.target_person);
       setCurrentTarget(targetData?.target_person || null);
+
+      // Get uploaded resumes
+      const { data: resumesData } = await supabase
+        .from('resumes' as any)
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      console.log('LiveDisplayPage: Resumes fetched:', resumesData?.length || 0);
+      setResumes((resumesData as unknown as Resume[]) || []);
 
       // Get ratings for current target (only real ratings, not quick reactions)
       if (targetData?.target_person) {
@@ -126,6 +150,22 @@ const LiveDisplayPage = () => {
     };
   }, [currentTarget]);
 
+  const handleSetTarget = async () => {
+    if (!selectedResumeId) return;
+    
+    const resume = resumes.find(r => r.id === selectedResumeId);
+    if (!resume) return;
+
+    setSelectedResume(resume);
+    setShowResumeView(true);
+    
+    // Update the current target in the database
+    await supabase
+      .from('current_target')
+      .update({ target_person: resume.name })
+      .eq('id', 1);
+  };
+
   // Transform ratings to match the LiveDisplay component's expected format
   const transformedRatings = ratings.map(rating => ({
     id: rating.id,
@@ -139,34 +179,121 @@ const LiveDisplayPage = () => {
     timestamp: rating.created_at
   }));
 
+  if (showResumeView && selectedResume) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 p-4">
+        <div className="h-[calc(100vh-2rem)] max-w-7xl mx-auto">
+          <ResizablePanelGroup direction="horizontal" className="border border-border/50 rounded-lg">
+            {/* Resume Display Panel - 2/3 */}
+            <ResizablePanel defaultSize={67} minSize={60}>
+              <div className="h-full flex flex-col bg-card">
+                <div className="p-4 border-b border-border flex items-center justify-between">
+                  <h2 className="text-lg font-semibold">Currently Reviewing: {selectedResume.name}</h2>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setShowResumeView(false)}
+                  >
+                    Back to Selection
+                  </Button>
+                </div>
+                <div className="flex-1 p-4">
+                  {selectedResume.file_type === 'application/pdf' ? (
+                    <iframe
+                      src={`https://kpufipcunkgfpxhnhxxl.supabase.co/storage/v1/object/public/resumes/${selectedResume.file_path}`}
+                      className="w-full h-full border-0 rounded"
+                      title={selectedResume.name}
+                    />
+                  ) : (
+                    <img
+                      src={`https://kpufipcunkgfpxhnhxxl.supabase.co/storage/v1/object/public/resumes/${selectedResume.file_path}`}
+                      alt={selectedResume.name}
+                      className="w-full h-full object-contain rounded"
+                    />
+                  )}
+                </div>
+              </div>
+            </ResizablePanel>
+            
+            <ResizableHandle withHandle />
+            
+            {/* Live Ratings Panel - 1/3 */}
+            <ResizablePanel defaultSize={33} minSize={25}>
+              <div className="h-full overflow-auto">
+                <LiveDisplay ratings={transformedRatings} />
+              </div>
+            </ResizablePanel>
+          </ResizablePanelGroup>
+          
+          {/* Global floating reactions */}
+          <FloatingReactions currentTarget={currentTarget} />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 p-4">
-      <div className="max-w-7xl mx-auto mb-4">
-        <TargetManager 
-          currentTarget={currentTarget}
-          onTargetChange={setCurrentTarget}
-        />
-      </div>
-      
-      <div className="h-[calc(100vh-8rem)] max-w-7xl mx-auto">
-        <ResizablePanelGroup direction="horizontal" className="border border-border/50 rounded-lg">
-          {/* Resume Viewer Panel */}
-          <ResizablePanel defaultSize={40} minSize={30}>
-            <ResumeViewer className="h-full" />
-          </ResizablePanel>
-          
-          <ResizableHandle withHandle />
-          
-          {/* Live Display Panel */}
-          <ResizablePanel defaultSize={60} minSize={40}>
-            <div className="h-full overflow-auto">
+      <div className="max-w-4xl mx-auto">
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="text-center">Resume Review Setup</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <label className="text-sm font-medium mb-2 block">Select Resume to Review</label>
+              <Select value={selectedResumeId} onValueChange={setSelectedResumeId}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Choose a resume from uploaded files" />
+                </SelectTrigger>
+                <SelectContent>
+                  {resumes.map((resume) => (
+                    <SelectItem key={resume.id} value={resume.id}>
+                      {resume.name} ({resume.file_type === 'application/pdf' ? 'PDF' : 'Image'})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <Button 
+              onClick={handleSetTarget}
+              disabled={!selectedResumeId}
+              className="w-full"
+            >
+              Set Target & Start Review
+            </Button>
+
+            {currentTarget && (
+              <div className="text-center text-sm text-muted-foreground">
+                Currently reviewing: <span className="font-medium">{currentTarget}</span>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Target Manager for manual input */}
+        <div className="mb-6">
+          <TargetManager 
+            currentTarget={currentTarget}
+            onTargetChange={setCurrentTarget}
+          />
+        </div>
+        
+        {/* Live Display Preview */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-center">Live Ratings Preview</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="h-96 overflow-auto">
               <LiveDisplay ratings={transformedRatings} />
             </div>
-          </ResizablePanel>
-        </ResizablePanelGroup>
+          </CardContent>
+        </Card>
         
-        {/* Global floating reactions - work regardless of target */}
-        <FloatingReactions currentTarget={null} />
+        {/* Global floating reactions */}
+        <FloatingReactions currentTarget={currentTarget} />
       </div>
     </div>
   );

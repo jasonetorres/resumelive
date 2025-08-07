@@ -2,7 +2,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Link } from 'react-router-dom';
-import { Star, Users, Monitor, Smartphone, Zap, TrendingUp } from 'lucide-react';
+import { Star, Users, Monitor, Smartphone, Zap, TrendingUp, Upload } from 'lucide-react';
+import { ResumeViewer } from '@/components/ResumeViewer';
 
 const Index = () => {
   return (
@@ -22,6 +23,22 @@ const Index = () => {
             <Badge className="bg-neon-pink text-primary-foreground">Real-time</Badge>
           </div>
         </div>
+
+        {/* Resume Upload Section */}
+        <Card className="glow-effect border-neon-orange/50 hover:border-neon-orange transition-all duration-300 mb-8">
+          <CardHeader className="text-center">
+            <div className="mx-auto mb-4 w-16 h-16 bg-gradient-to-r from-neon-orange to-neon-pink rounded-full flex items-center justify-center">
+              <Upload className="w-8 h-8 text-white" />
+            </div>
+            <CardTitle className="text-2xl text-neon-orange">Upload Resume</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground text-center mb-4">
+              Upload your resume to review on stream
+            </p>
+            <ResumeViewer className="max-w-2xl mx-auto" />
+          </CardContent>
+        </Card>
 
         {/* Main Cards */}
         <div className="grid md:grid-cols-2 gap-8 mb-12">
