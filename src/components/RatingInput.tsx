@@ -90,10 +90,11 @@ export function RatingInput({ onSubmit, currentTarget }: RatingInputProps) {
         agreement
       });
       
-      // Reset form (but keep feedback)
+      // Reset form
       setOverall(0);
       setPresentation(0);
       setContent(0);
+      setFeedback('');
       setAgreement(undefined);
       
       toast({
