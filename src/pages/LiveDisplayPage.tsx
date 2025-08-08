@@ -284,10 +284,10 @@ const LiveDisplayPage = () => {
           <ResizablePanelGroup direction="horizontal" className="border border-border/50 rounded-lg">
             {/* Resume Display Panel - 2/3 */}
             <ResizablePanel defaultSize={67} minSize={60}>
-              <div className="h-full flex flex-col bg-card">
-                <div className="p-4 border-b border-border flex flex-wrap items-center justify-between gap-2">
+              <div className="h-full flex flex-col bg-white dark:bg-gray-800">
+                <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex flex-wrap items-center justify-between gap-2">
                   <div className="flex items-center gap-2 min-w-0">
-                    <h2 className="text-sm sm:text-lg font-semibold truncate">Currently Reviewing: {selectedResume.name}</h2>
+                    <h2 className="text-sm sm:text-lg font-semibold truncate text-gray-900 dark:text-gray-100">Currently Reviewing: {selectedResume.name}</h2>
                     <LiveParticipantCounter currentTarget={currentTarget} />
                   </div>
                   <div className="flex items-center gap-2">
@@ -295,7 +295,7 @@ const LiveDisplayPage = () => {
                       variant="outline" 
                       size="sm"
                       onClick={handleClearStats}
-                      className="border-destructive text-destructive hover:bg-destructive/10"
+                      className="border-red-500 text-red-600 hover:bg-red-50 dark:hover:bg-red-950"
                     >
                       <RotateCcw className="w-4 h-4 mr-1" />
                       Clear Stats
@@ -304,6 +304,7 @@ const LiveDisplayPage = () => {
                       variant="outline" 
                       size="sm"
                       onClick={() => setShowResumeView(false)}
+                      className="border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800"
                     >
                       Back to Selection
                     </Button>
@@ -351,16 +352,16 @@ const LiveDisplayPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 p-4">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4">
       <div className="max-w-[90vw] mx-auto">
-        <Card className="mb-6 border-2 border-neon-purple/20 bg-card/50 backdrop-blur">
+        <Card className="mb-6 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
           <CardHeader>
-            <CardTitle className="text-center text-neon-purple">Currently Reviewing</CardTitle>
+            <CardTitle className="text-center text-gray-900 dark:text-gray-100">Currently Reviewing</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {resumes.length === 0 ? (
-              <div className="text-center p-4 bg-muted/20 rounded-lg">
-                <p className="text-muted-foreground">No resumes found. Please upload resumes on the home page first.</p>
+              <div className="text-center p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">
+                <p className="text-gray-600 dark:text-gray-400">No resumes found. Please upload resumes on the home page first.</p>
               </div>
             ) : (
               <div>
@@ -383,15 +384,15 @@ const LiveDisplayPage = () => {
             <Button 
               onClick={handleSetTarget}
               disabled={!selectedResumeId || resumes.length === 0}
-              className="w-full bg-neon-purple hover:bg-neon-purple/90"
+              className="w-full bg-[#0044ff] hover:bg-[#0033cc] text-white"
             >
               {resumes.length === 0 ? 'No Resumes Available' : 'Start Review Session'}
             </Button>
 
             {currentTarget && (
-              <div className="text-center p-4 bg-neon-green/10 border border-neon-green/30 rounded-lg">
-                <Badge className="bg-neon-green text-primary-foreground mb-2">Currently Reviewing</Badge>
-                <p className="font-medium text-neon-green">{currentTarget}</p>
+              <div className="text-center p-4 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg">
+                <Badge className="bg-[#0044ff] text-white mb-2">Currently Reviewing</Badge>
+                <p className="font-medium text-[#0044ff]">{currentTarget}</p>
               </div>
             )}
           </CardContent>
@@ -400,8 +401,8 @@ const LiveDisplayPage = () => {
         {/* Live Display Preview */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-center flex items-center gap-2">
-              <Bell className="w-5 h-5 text-neon-pink" />
+            <CardTitle className="text-center flex items-center gap-2 text-gray-900 dark:text-gray-100">
+              <Bell className="w-5 h-5 text-[#0044ff]" />
               Live Ratings Preview
             </CardTitle>
             {currentTarget && (

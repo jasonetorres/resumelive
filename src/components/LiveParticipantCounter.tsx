@@ -66,10 +66,10 @@ export function LiveParticipantCounter({ currentTarget }: LiveParticipantCounter
   return (
     <Badge 
       variant="outline" 
-      className="border-neon-green text-neon-green bg-neon-green/10 flex items-center gap-2"
+      className="border-[#0044ff] text-[#0044ff] bg-blue-50 dark:bg-blue-950 flex items-center gap-2"
     >
       <div className="flex items-center gap-1">
-        <div className="w-2 h-2 bg-neon-green rounded-full animate-pulse" />
+        <div className="w-2 h-2 bg-[#0044ff] rounded-full animate-pulse" />
         <Eye className="w-3 h-3" />
       </div>
       <span className="font-semibold">{participantCount}</span>
