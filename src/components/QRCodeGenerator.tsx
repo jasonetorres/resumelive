@@ -16,8 +16,8 @@ export function QRCodeGenerator({ url, title = "Scan to Rate" }: QRCodeGenerator
     const generateQR = async () => {
       try {
         const qrUrl = await QRCode.toDataURL(url, {
-          width: 200,
-          margin: 2,
+          width: 120,
+          margin: 1,
           color: {
             dark: '#000000',
             light: '#FFFFFF'
@@ -34,27 +34,27 @@ export function QRCodeGenerator({ url, title = "Scan to Rate" }: QRCodeGenerator
 
   return (
     <Card className="border-neon-purple/30 bg-card/50 backdrop-blur">
-      <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2 text-center justify-center">
-          <QrCode className="w-5 h-5 text-neon-purple" />
+      <CardHeader className="pb-2">
+        <CardTitle className="flex items-center gap-2 text-center justify-center text-sm">
+          <QrCode className="w-4 h-4 text-neon-purple" />
           <span className="text-neon-purple">{title}</span>
         </CardTitle>
       </CardHeader>
-      <CardContent className="flex flex-col items-center space-y-4">
+      <CardContent className="flex flex-col items-center space-y-2 pb-3">
         {qrCodeUrl && (
-          <div className="p-4 bg-white rounded-lg shadow-lg">
-            <img src={qrCodeUrl} alt="QR Code" className="w-48 h-48" />
+          <div className="p-2 bg-white rounded-lg shadow-lg">
+            <img src={qrCodeUrl} alt="QR Code" className="w-24 h-24" />
           </div>
         )}
-        <div className="text-center space-y-2">
-          <div className="flex items-center gap-2 justify-center">
-            <Smartphone className="w-4 h-4 text-neon-cyan" />
-            <Badge variant="outline" className="border-neon-cyan text-neon-cyan">
-              Mobile Optimized
+        <div className="text-center">
+          <div className="flex items-center gap-1 justify-center mb-1">
+            <Smartphone className="w-3 h-3 text-neon-cyan" />
+            <Badge variant="outline" className="border-neon-cyan text-neon-cyan text-xs">
+              Mobile Ready
             </Badge>
           </div>
-          <p className="text-sm text-muted-foreground max-w-xs">
-            Scan with your phone camera to quickly access the rating page
+          <p className="text-xs text-muted-foreground">
+            Scan to rate instantly
           </p>
         </div>
       </CardContent>

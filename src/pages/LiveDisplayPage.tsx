@@ -330,10 +330,18 @@ const LiveDisplayPage = () => {
             
             <ResizableHandle withHandle />
             
-            {/* Live Ratings Panel - 1/3 */}
+            {/* Live Ratings Panel with QR Code - 1/3 */}
             <ResizablePanel defaultSize={33} minSize={25}>
-              <div className="h-full overflow-auto">
-                <LiveDisplay ratings={transformedRatings} />
+              <div className="h-full flex flex-col">
+                <div className="p-4 border-b border-border">
+                  <QRCodeGenerator 
+                    url={ratingPageUrl} 
+                    title="Scan to Rate"
+                  />
+                </div>
+                <div className="flex-1 overflow-hidden">
+                  <LiveDisplay ratings={transformedRatings} />
+                </div>
               </div>
             </ResizablePanel>
           </ResizablePanelGroup>
@@ -389,36 +397,23 @@ const LiveDisplayPage = () => {
           </CardContent>
         </Card>
 
-        {/* QR Code and Live Display Preview */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* QR Code */}
-          <div className="lg:col-span-1">
-            <QRCodeGenerator 
-              url={ratingPageUrl} 
-              title="Scan to Rate"
-            />
-          </div>
-          
-          {/* Live Display Preview */}
-          <div className="lg:col-span-2">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle className="text-center flex items-center gap-2">
-                  <Bell className="w-5 h-5 text-neon-pink" />
-                  Live Ratings Preview
-                </CardTitle>
-                {currentTarget && (
-                  <LiveParticipantCounter currentTarget={currentTarget} />
-                )}
-              </CardHeader>
-              <CardContent>
-                <div className="h-96 overflow-auto">
-                  <LiveDisplay ratings={transformedRatings} />
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
+        {/* Live Display Preview */}
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="text-center flex items-center gap-2">
+              <Bell className="w-5 h-5 text-neon-pink" />
+              Live Ratings Preview
+            </CardTitle>
+            {currentTarget && (
+              <LiveParticipantCounter currentTarget={currentTarget} />
+            )}
+          </CardHeader>
+          <CardContent>
+            <div className="h-96">
+              <LiveDisplay ratings={transformedRatings} />
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
