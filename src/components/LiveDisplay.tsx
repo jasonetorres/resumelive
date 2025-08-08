@@ -159,20 +159,6 @@ export function LiveDisplay({ ratings }: LiveDisplayProps) {
         </div>
       </div>
 
-      {/* Current Feedback Banner */}
-      {currentFeedback && (
-        <Card className="mb-6 rating-glow border-neon-pink">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <MessageSquare className="w-6 h-6 text-neon-pink" />
-              <div className="text-lg font-medium text-foreground">
-                "{currentFeedback}"
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
       {/* Results Section */}
       <div className={`flex-1 transition-all duration-700 transform overflow-hidden ${
         isRevealed ? 'opacity-100 translate-y-0 scale-100' : 'opacity-30 translate-y-4 scale-95 pointer-events-none'
@@ -306,6 +292,22 @@ export function LiveDisplay({ ratings }: LiveDisplayProps) {
             </CardContent>
           </Card>
         </div>
+
+        {/* Current Feedback Box - spans full width under score boxes */}
+        {currentFeedback && (
+          <Card className={`mb-4 rating-glow border-neon-pink transition-all duration-700 delay-400 ${
+            isRevealed ? 'animate-fade-in' : 'opacity-30'
+          }`}>
+            <CardContent className="p-3">
+              <div className="flex items-center gap-3">
+                <MessageSquare className="w-5 h-5 text-neon-pink flex-shrink-0" />
+                <div className="text-sm font-medium text-foreground">
+                  "{currentFeedback}"
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Recent Ratings Stream - Compact */}
         {displayedRatings.filter(r => r.overall > 0).length > 0 && (
