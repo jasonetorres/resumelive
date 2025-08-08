@@ -163,18 +163,28 @@ const LiveDisplayPage = () => {
   }, [currentTarget]);
 
   const handleClearStats = async () => {
-    if (!currentTarget) return;
+    if (!currentTarget) {
+      console.log('LiveDisplayPage: No current target to clear stats for');
+      return;
+    }
     
     try {
-      await supabase
+      console.log('LiveDisplayPage: Attempting to clear stats for target:', currentTarget);
+      const { data, error } = await supabase
         .from('ratings')
         .delete()
         .eq('target_person', currentTarget);
       
+      if (error) {
+        console.error('LiveDisplayPage: Error clearing stats from database:', error);
+        return;
+      }
+      
+      console.log('LiveDisplayPage: Successfully deleted ratings from database:', data);
       setRatings([]);
-      console.log('LiveDisplayPage: Stats cleared for target:', currentTarget);
+      console.log('LiveDisplayPage: Local ratings state cleared');
     } catch (error) {
-      console.error('LiveDisplayPage: Error clearing stats:', error);
+      console.error('LiveDisplayPage: Exception while clearing stats:', error);
     }
   };
 
@@ -191,8 +201,13 @@ const LiveDisplayPage = () => {
     }
 
     console.log('LiveDisplayPage: Setting target for resume:', resume.name);
+    
+    // Clear stats FIRST, before updating target to avoid race condition
+    if (currentTarget) {
+      await handleClearStats();
+    }
+    
     setSelectedResume(resume);
-    // Automatically show the resume view when a target is set via resume selection
     setShowResumeView(true);
     
     // Update the current target in the database
@@ -202,9 +217,6 @@ const LiveDisplayPage = () => {
         .update({ target_person: resume.name })
         .eq('id', 1);
       console.log('LiveDisplayPage: Target updated in database');
-      
-      // Clear existing stats when setting a new target
-      await handleClearStats();
     } catch (error) {
       console.error('LiveDisplayPage: Error updating target:', error);
     }
