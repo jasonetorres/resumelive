@@ -32,10 +32,6 @@ export function DrawableResumeCanvas({ resumeUrl, resumeType, resumeName }: Draw
       selection: true,
     });
 
-    // Initialize the freeDrawingBrush right after canvas creation
-    canvas.freeDrawingBrush.color = activeColor;
-    canvas.freeDrawingBrush.width = brushSize;
-
     setFabricCanvas(canvas);
 
     // Resize canvas to fit container
@@ -61,7 +57,8 @@ export function DrawableResumeCanvas({ resumeUrl, resumeType, resumeName }: Draw
 
     fabricCanvas.isDrawingMode = activeTool === 'draw';
     
-    if (fabricCanvas.freeDrawingBrush) {
+    // Only set brush properties when in drawing mode and brush exists
+    if (activeTool === 'draw' && fabricCanvas.freeDrawingBrush) {
       fabricCanvas.freeDrawingBrush.color = activeColor;
       fabricCanvas.freeDrawingBrush.width = brushSize;
     }
