@@ -3,6 +3,7 @@ import { LiveDisplay } from '@/components/LiveDisplay';
 import { TargetManager } from '@/components/TargetManager';
 import { QRCodeGenerator } from '@/components/QRCodeGenerator';
 import { LiveParticipantCounter } from '@/components/LiveParticipantCounter';
+import { FloatingReactions } from '@/components/FloatingReactions';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -346,6 +347,7 @@ const LiveDisplayPage = () => {
             </ResizablePanel>
           </ResizablePanelGroup>
         </div>
+        <FloatingReactions currentTarget={currentTarget} />
       </div>
     );
   }
@@ -415,6 +417,7 @@ const LiveDisplayPage = () => {
           </CardContent>
         </Card>
       </div>
+      <FloatingReactions currentTarget={currentTarget} />
     </div>
   );
 };
