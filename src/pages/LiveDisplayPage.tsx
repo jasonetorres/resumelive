@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { LiveDisplay } from '@/components/LiveDisplay';
 import { TargetManager } from '@/components/TargetManager';
-import { DrawableResumeCanvas } from '@/components/DrawableResumeCanvas';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -163,24 +162,45 @@ const LiveDisplayPage = () => {
   }, [currentTarget]);
 
   const handleClearStats = async () => {
+    console.log('LiveDisplayPage: handleClearStats called');
+    console.log('LiveDisplayPage: Current target:', currentTarget);
+    console.log('LiveDisplayPage: Current ratings count:', ratings.length);
+    
     if (!currentTarget) {
       console.log('LiveDisplayPage: No current target to clear stats for');
       return;
     }
     
     try {
-      console.log('LiveDisplayPage: Attempting to clear stats for target:', currentTarget);
-      const { data, error } = await supabase
+      console.log('LiveDisplayPage: Attempting to delete ratings for target:', currentTarget);
+      
+      // First, let's see what ratings exist
+      const { data: existingRatings, error: fetchError } = await supabase
+        .from('ratings')
+        .select('*')
+        .eq('target_person', currentTarget);
+      
+      console.log('LiveDisplayPage: Existing ratings in database:', existingRatings);
+      if (fetchError) {
+        console.error('LiveDisplayPage: Error fetching existing ratings:', fetchError);
+      }
+      
+      // Now delete them
+      const { data, error, count } = await supabase
         .from('ratings')
         .delete()
-        .eq('target_person', currentTarget);
+        .eq('target_person', currentTarget)
+        .select();
       
       if (error) {
         console.error('LiveDisplayPage: Error clearing stats from database:', error);
         return;
       }
       
-      console.log('LiveDisplayPage: Successfully deleted ratings from database:', data);
+      console.log('LiveDisplayPage: Delete result - data:', data);
+      console.log('LiveDisplayPage: Delete result - count:', count);
+      
+      // Clear local state
       setRatings([]);
       console.log('LiveDisplayPage: Local ratings state cleared');
     } catch (error) {
@@ -272,12 +292,21 @@ const LiveDisplayPage = () => {
                     </Button>
                   </div>
                 </div>
-                <div className="flex-1">
-                  <DrawableResumeCanvas
-                    resumeUrl={`https://docs.google.com/viewer?url=${encodeURIComponent(`https://kpufipcunkgfpxhnhxxl.supabase.co/storage/v1/object/public/resumes/${selectedResume.file_path}`)}&embedded=true`}
-                    resumeType={selectedResume.file_type}
-                    resumeName={selectedResume.name}
-                  />
+                <div className="flex-1 p-4">
+                  {selectedResume.file_type === 'application/pdf' ? (
+                    <iframe
+                      src={`https://docs.google.com/viewer?url=${encodeURIComponent(`https://kpufipcunkgfpxhnhxxl.supabase.co/storage/v1/object/public/resumes/${selectedResume.file_path}`)}&embedded=true`}
+                      className="w-full h-full border-0 rounded"
+                      title={selectedResume.name}
+                      style={{ minHeight: '600px' }}
+                    />
+                  ) : (
+                    <img
+                      src={`https://kpufipcunkgfpxhnhxxl.supabase.co/storage/v1/object/public/resumes/${selectedResume.file_path}`}
+                      alt={selectedResume.name}
+                      className="w-full h-full object-contain rounded"
+                    />
+                  )}
                 </div>
               </div>
             </ResizablePanel>
