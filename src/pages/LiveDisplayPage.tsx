@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { LiveDisplay } from '@/components/LiveDisplay';
 import { TargetManager } from '@/components/TargetManager';
+import { QRCodeGenerator } from '@/components/QRCodeGenerator';
+import { LiveParticipantCounter } from '@/components/LiveParticipantCounter';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { FileText, RotateCcw } from 'lucide-react';
+import { FileText, RotateCcw, Users, Bell } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 interface Rating {
   id: string;
@@ -34,12 +37,16 @@ interface Resume {
 const LiveDisplayPage = () => {
   console.log('LiveDisplayPage: Component is rendering');
   
+  const { toast } = useToast();
   const [ratings, setRatings] = useState<Rating[]>([]);
   const [currentTarget, setCurrentTarget] = useState<string | null>(null);
   const [resumes, setResumes] = useState<Resume[]>([]);
   const [selectedResumeId, setSelectedResumeId] = useState<string>('');
   const [selectedResume, setSelectedResume] = useState<Resume | null>(null);
   const [showResumeView, setShowResumeView] = useState(false);
+
+  // Get the rating page URL for QR code
+  const ratingPageUrl = `${window.location.origin}/rate`;
 
   useEffect(() => {
     console.log('LiveDisplayPage: Setting up subscriptions and fetching data');
@@ -140,10 +147,17 @@ const LiveDisplayPage = () => {
         (payload) => {
           const newRating = payload.new as Rating;
           console.log('LiveDisplayPage: New rating received:', newRating);
-          // Only add if it's for the current target AND it's a real rating (not a quick reaction)
+          
+          // Show real-time notification for new ratings
           if (newRating.target_person === currentTarget && newRating.overall !== null && newRating.overall > 0) {
             console.log('LiveDisplayPage: Adding rating to display');
             setRatings(prev => [newRating, ...prev]);
+            
+            // Show toast notification
+            toast({
+              title: "New Rating Received! ⭐",
+              description: `${newRating.overall}/5 stars for ${newRating.category}`,
+            });
           }
         }
       )
@@ -271,8 +285,11 @@ const LiveDisplayPage = () => {
             {/* Resume Display Panel - 2/3 */}
             <ResizablePanel defaultSize={67} minSize={60}>
               <div className="h-full flex flex-col bg-card">
-                <div className="p-4 border-b border-border flex items-center justify-between">
-                  <h2 className="text-lg font-semibold">Currently Reviewing: {selectedResume.name}</h2>
+                <div className="p-4 border-b border-border flex flex-wrap items-center justify-between gap-2">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <h2 className="text-sm sm:text-lg font-semibold truncate">Currently Reviewing: {selectedResume.name}</h2>
+                    <LiveParticipantCounter currentTarget={currentTarget} />
+                  </div>
                   <div className="flex items-center gap-2">
                     <Button 
                       variant="outline" 
@@ -372,17 +389,36 @@ const LiveDisplayPage = () => {
           </CardContent>
         </Card>
 
-        {/* Live Display Preview */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-center">Live Ratings Preview</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-96 overflow-auto">
-              <LiveDisplay ratings={transformedRatings} />
-            </div>
-          </CardContent>
-        </Card>
+        {/* QR Code and Live Display Preview */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* QR Code */}
+          <div className="lg:col-span-1">
+            <QRCodeGenerator 
+              url={ratingPageUrl} 
+              title="Scan to Rate"
+            />
+          </div>
+          
+          {/* Live Display Preview */}
+          <div className="lg:col-span-2">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <CardTitle className="text-center flex items-center gap-2">
+                  <Bell className="w-5 h-5 text-neon-pink" />
+                  Live Ratings Preview
+                </CardTitle>
+                {currentTarget && (
+                  <LiveParticipantCounter currentTarget={currentTarget} />
+                )}
+              </CardHeader>
+              <CardContent>
+                <div className="h-96 overflow-auto">
+                  <LiveDisplay ratings={transformedRatings} />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       </div>
     </div>
   );
