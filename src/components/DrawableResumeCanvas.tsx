@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Canvas as FabricCanvas, PencilBrush } from 'fabric';
+import { Canvas as FabricCanvas } from 'fabric';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Pencil, Eraser, Square, Circle, Palette, RotateCcw } from 'lucide-react';
+import { Pencil, RotateCcw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface DrawableResumeCanvasProps {
@@ -29,11 +29,10 @@ export function DrawableResumeCanvas({ resumeUrl, resumeType, resumeName }: Draw
       width: 800,
       height: 600,
       backgroundColor: 'transparent',
-      selection: false,
+      selection: true,
     });
 
-    // Set up drawing brush
-    canvas.freeDrawingBrush = new PencilBrush(canvas);
+    // Initialize the freeDrawingBrush right after canvas creation
     canvas.freeDrawingBrush.color = activeColor;
     canvas.freeDrawingBrush.width = brushSize;
 

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { LiveDisplay } from '@/components/LiveDisplay';
 import { TargetManager } from '@/components/TargetManager';
-import { FloatingReactions } from '@/components/FloatingReactions';
 import { DrawableResumeCanvas } from '@/components/DrawableResumeCanvas';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
 import { Button } from '@/components/ui/button';
@@ -280,9 +279,6 @@ const LiveDisplayPage = () => {
               </div>
             </ResizablePanel>
           </ResizablePanelGroup>
-          
-          {/* Global floating reactions */}
-          <FloatingReactions currentTarget={currentTarget} />
         </div>
       </div>
     );
@@ -346,9 +342,6 @@ const LiveDisplayPage = () => {
             </div>
           </CardContent>
         </Card>
-        
-        {/* Global floating reactions */}
-        <FloatingReactions currentTarget={currentTarget} />
       </div>
     </div>
   );
