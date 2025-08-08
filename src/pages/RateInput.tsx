@@ -151,21 +151,21 @@ const RateInputPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-3 sm:p-4">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 flex items-center justify-center p-3 sm:p-4">
       <div className="w-full max-w-sm sm:max-w-md">
         <div className="text-center mb-6 sm:mb-8">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+          <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-neon-purple to-neon-pink bg-clip-text text-transparent mb-2">
             User Vote
           </h1>
           
           {/* Live Status Indicators */}
           <div className="flex flex-wrap justify-center gap-2 mb-4">
-            <Badge variant="outline" className="border-[#0044ff] text-[#0044ff] bg-blue-50 dark:bg-blue-950 flex items-center gap-1 text-xs">
+            <Badge variant="outline" className="border-neon-green text-neon-green bg-neon-green/10 flex items-center gap-1 text-xs">
               <Wifi className="w-3 h-3" />
               Live
             </Badge>
             {currentTarget && participantCount > 0 && (
-              <Badge variant="outline" className="border-gray-500 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 flex items-center gap-1 text-xs">
+              <Badge variant="outline" className="border-neon-cyan text-neon-cyan bg-neon-cyan/10 flex items-center gap-1 text-xs">
                 <Users className="w-3 h-3" />
                 {participantCount} rating{participantCount !== 1 ? 's' : ''}
               </Badge>
@@ -174,28 +174,28 @@ const RateInputPage = () => {
 
           {isLoading ? (
             <div className="flex items-center justify-center gap-2">
-              <div className="w-4 h-4 border-2 border-[#0044ff] border-t-transparent rounded-full animate-spin" />
-              <p className="text-gray-600 dark:text-gray-400 text-sm">Loading...</p>
+              <div className="w-4 h-4 border-2 border-neon-purple border-t-transparent rounded-full animate-spin" />
+              <p className="text-muted-foreground text-sm">Loading...</p>
             </div>
           ) : currentTarget ? (
             <div>
-              <p className="text-gray-600 dark:text-gray-400 mb-2 text-sm sm:text-base">
+              <p className="text-muted-foreground mb-2 text-sm sm:text-base">
                 Rate the content for
               </p>
-              <p className="text-lg sm:text-2xl font-bold text-[#0044ff] px-2 break-words">
+              <p className="text-lg sm:text-2xl font-bold text-neon-green px-2 break-words">
                 {currentTarget}
               </p>
-              <div className="mt-2 text-xs text-gray-600 dark:text-gray-400 bg-blue-50 dark:bg-blue-950 px-2 py-1 rounded mx-auto inline-block">
+              <div className="mt-2 text-xs text-muted-foreground bg-neon-green/10 px-2 py-1 rounded mx-auto inline-block">
                 ✅ Updates automatically
               </div>
             </div>
           ) : (
             <div>
-              <p className="text-gray-600 dark:text-gray-400 mb-2 text-sm sm:text-base">
+              <p className="text-muted-foreground mb-2 text-sm sm:text-base">
                 Waiting for target to be set...
               </p>
-              <div className="flex items-center justify-center gap-2 text-xs text-gray-600 dark:text-gray-400">
-                <div className="w-2 h-2 bg-[#0044ff] rounded-full animate-pulse" />
+              <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
+                <div className="w-2 h-2 bg-neon-orange rounded-full animate-pulse" />
                 Listening for updates
               </div>
             </div>
