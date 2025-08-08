@@ -2,12 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { LiveDisplay } from '@/components/LiveDisplay';
 import { TargetManager } from '@/components/TargetManager';
 import { FloatingReactions } from '@/components/FloatingReactions';
+import { DrawableResumeCanvas } from '@/components/DrawableResumeCanvas';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { FileText } from 'lucide-react';
+import { FileText, RotateCcw } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
 interface Rating {
@@ -162,6 +163,22 @@ const LiveDisplayPage = () => {
     };
   }, [currentTarget]);
 
+  const handleClearStats = async () => {
+    if (!currentTarget) return;
+    
+    try {
+      await supabase
+        .from('ratings')
+        .delete()
+        .eq('target_person', currentTarget);
+      
+      setRatings([]);
+      console.log('LiveDisplayPage: Stats cleared for target:', currentTarget);
+    } catch (error) {
+      console.error('LiveDisplayPage: Error clearing stats:', error);
+    }
+  };
+
   const handleSetTarget = async () => {
     if (!selectedResumeId) {
       console.log('LiveDisplayPage: No resume selected');
@@ -186,6 +203,9 @@ const LiveDisplayPage = () => {
         .update({ target_person: resume.name })
         .eq('id', 1);
       console.log('LiveDisplayPage: Target updated in database');
+      
+      // Clear existing stats when setting a new target
+      await handleClearStats();
     } catch (error) {
       console.error('LiveDisplayPage: Error updating target:', error);
     }
@@ -222,29 +242,31 @@ const LiveDisplayPage = () => {
               <div className="h-full flex flex-col bg-card">
                 <div className="p-4 border-b border-border flex items-center justify-between">
                   <h2 className="text-lg font-semibold">Currently Reviewing: {selectedResume.name}</h2>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => setShowResumeView(false)}
-                  >
-                    Back to Selection
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={handleClearStats}
+                      className="border-destructive text-destructive hover:bg-destructive/10"
+                    >
+                      <RotateCcw className="w-4 h-4 mr-1" />
+                      Clear Stats
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => setShowResumeView(false)}
+                    >
+                      Back to Selection
+                    </Button>
+                  </div>
                 </div>
-                <div className="flex-1 p-4">
-                  {selectedResume.file_type === 'application/pdf' ? (
-                    <iframe
-                      src={`https://docs.google.com/viewer?url=${encodeURIComponent(`https://kpufipcunkgfpxhnhxxl.supabase.co/storage/v1/object/public/resumes/${selectedResume.file_path}`)}&embedded=true`}
-                      className="w-full h-full border-0 rounded"
-                      title={selectedResume.name}
-                      style={{ minHeight: '600px' }}
-                    />
-                  ) : (
-                    <img
-                      src={`https://kpufipcunkgfpxhnhxxl.supabase.co/storage/v1/object/public/resumes/${selectedResume.file_path}`}
-                      alt={selectedResume.name}
-                      className="w-full h-full object-contain rounded"
-                    />
-                  )}
+                <div className="flex-1">
+                  <DrawableResumeCanvas
+                    resumeUrl={`https://docs.google.com/viewer?url=${encodeURIComponent(`https://kpufipcunkgfpxhnhxxl.supabase.co/storage/v1/object/public/resumes/${selectedResume.file_path}`)}&embedded=true`}
+                    resumeType={selectedResume.file_type}
+                    resumeName={selectedResume.name}
+                  />
                 </div>
               </div>
             </ResizablePanel>
