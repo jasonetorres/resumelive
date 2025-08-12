@@ -36,8 +36,8 @@ export function ResumeManager({ className }: ResumeManagerProps) {
 
   const fetchResumes = async () => {
     try {
-      const { data, error } = await supabase
-        .from('resumes' as any)
+      const { data, error } = await (supabase as any)
+        .from('resumes')
         .select('*')
         .order('created_at', { ascending: false });
 
@@ -94,8 +94,8 @@ export function ResumeManager({ className }: ResumeManagerProps) {
       if (uploadError) throw uploadError;
 
       // Save metadata to database
-      const { error: dbError } = await supabase
-        .from('resumes' as any)
+      const { error: dbError } = await (supabase as any)
+        .from('resumes')
         .insert({
           name: file.name,
           file_path: fileName,
@@ -136,8 +136,8 @@ export function ResumeManager({ className }: ResumeManagerProps) {
       if (storageError) throw storageError;
 
       // Delete from database
-      const { error: dbError } = await supabase
-        .from('resumes' as any)
+      const { error: dbError } = await (supabase as any)
+        .from('resumes')
         .delete()
         .eq('id', resume.id);
 
@@ -171,8 +171,8 @@ export function ResumeManager({ className }: ResumeManagerProps) {
     }
 
     try {
-      const { error } = await supabase
-        .from('resumes' as any)
+      const { error } = await (supabase as any)
+        .from('resumes')
         .update({ name: editName.trim() })
         .eq('id', id);
 

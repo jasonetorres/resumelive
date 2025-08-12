@@ -25,17 +25,17 @@ const LiveDisplayPage = () => {
     // Fetch initial data
     const fetchInitialData = async () => {
       // Get current target
-      const { data: targetData } = await supabase
+      const { data: targetData } = await (supabase as any)
         .from('current_target')
         .select('target_person')
         .eq('id', 1)
-        .single();
+        .maybeSingle();
       
       setCurrentTarget(targetData?.target_person || null);
 
       // Get ratings for current target
       if (targetData?.target_person) {
-        const { data: ratingsData } = await supabase
+        const { data: ratingsData } = await (supabase as any)
           .from('ratings')
           .select('*')
           .eq('target_person', targetData.target_person)
@@ -63,7 +63,7 @@ const LiveDisplayPage = () => {
           
           // Fetch ratings for new target
           if (newTarget) {
-            const { data: ratingsData } = await supabase
+            const { data: ratingsData } = await (supabase as any)
               .from('ratings')
               .select('*')
               .eq('target_person', newTarget)

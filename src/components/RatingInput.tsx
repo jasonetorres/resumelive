@@ -38,7 +38,7 @@ export function RatingInput({ onSubmit, currentTarget }: RatingInputProps) {
 
     try {
       // Send reaction immediately to database for real-time display
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('ratings')
         .insert({
           target_person: 'GLOBAL_REACTIONS', // Use a special identifier for global reactions

@@ -30,7 +30,7 @@ export function TargetManager({ currentTarget, onTargetChange }: TargetManagerPr
   const fetchRatingsCount = async () => {
     if (!currentTarget) return;
     
-    const { count } = await supabase
+    const { count } = await (supabase as any)
       .from('ratings')
       .select('*', { count: 'exact', head: true })
       .eq('target_person', currentTarget)
@@ -44,9 +44,9 @@ export function TargetManager({ currentTarget, onTargetChange }: TargetManagerPr
     
     setIsUpdating(true);
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('current_target')
-        .update({ 
+        .update({
           target_person: newTarget.trim(),
           updated_at: new Date().toISOString()
         })
@@ -76,7 +76,7 @@ export function TargetManager({ currentTarget, onTargetChange }: TargetManagerPr
     if (!currentTarget) return;
     
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('ratings')
         .delete()
         .eq('target_person', currentTarget);
@@ -100,9 +100,9 @@ export function TargetManager({ currentTarget, onTargetChange }: TargetManagerPr
 
   const handleClearTarget = async () => {
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('current_target')
-        .update({ 
+        .update({
           target_person: null,
           updated_at: new Date().toISOString()
         })

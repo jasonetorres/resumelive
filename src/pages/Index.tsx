@@ -111,6 +111,12 @@ const Index = () => {
                   <Monitor className="w-4 h-4 ml-2" />
                 </Button>
               </Link>
+              <Link to="/formdisplay">
+                <Button variant="outline" className="w-full mt-2">
+                  Conference Leads Dashboard
+                  <Users className="w-4 h-4 ml-2" />
+                </Button>
+              </Link>
             </CardContent>
           </Card>
         </div>

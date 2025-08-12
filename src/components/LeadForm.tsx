@@ -40,26 +40,47 @@ export const LeadForm: React.FC<LeadFormProps> = ({ onSuccess }) => {
     setIsSubmitting(true);
     
     try {
-      // For now, we'll just store in session storage until the leads table is created
-      // TODO: Add database storage once leads table is set up
-      
-      // Store in session storage for this session
-      sessionStorage.setItem('leadData', JSON.stringify(data));
-      
-      // Simulate API call delay for UX
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Store in Supabase leads table
+      const { error } = await (supabase as any)
+        .from('leads')
+        .insert([
+          {
+            name: data.name,
+            email: data.email,
+            job_title: data.jobTitle,
+          }
+        ]);
+
+      if (error) {
+        if (error.code === '23505') { // Unique constraint violation
+          toast({
+            title: "Email already registered",
+            description: "This email has already been used to join the session.",
+            variant: "destructive",
+          });
+        } else {
+          throw error;
+        }
+        return;
+      }
+
+      // Also store in session storage as backup
+      sessionStorage.setItem('leadData', JSON.stringify({
+        ...data,
+        submittedAt: new Date().toISOString(),
+      }));
       
       toast({
         title: "Welcome! 🎉",
-        description: "Thanks for joining! You can now access the rating system.",
+        description: "Thanks for joining! Your information has been saved.",
       });
 
       onSuccess(data);
     } catch (error) {
-      console.error('Unexpected error:', error);
+      console.error('Error submitting lead:', error);
       toast({
         title: "Error",
-        description: "Something went wrong. Please try again.",
+        description: "Failed to save your information. Please try again.",
         variant: "destructive",
       });
     } finally {

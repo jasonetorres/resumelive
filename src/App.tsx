@@ -7,6 +7,7 @@ import Index from "./pages/Index";
 import RateInputPage from "./pages/RateInput";
 import LeadGatedRate from "./pages/LeadGatedRate";
 import LiveDisplayPage from "./pages/LiveDisplayPage";
+import FormDisplay from "./pages/FormDisplay";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -22,6 +23,7 @@ const App = () => (
           <Route path="/rate" element={<LeadGatedRate />} />
           <Route path="/rate-direct" element={<RateInputPage />} />
           <Route path="/display" element={<LiveDisplayPage />} />
+          <Route path="/formdisplay" element={<FormDisplay />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
