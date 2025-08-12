@@ -274,34 +274,34 @@ const RateInputPage = () => {
         {renderStepIndicator()}
 
         {/* Step Content */}
-        <Card className="border-2 border-neon-purple/20 bg-card/50 backdrop-blur">
-          <CardContent className="p-6">
+        <Card className="border border-neon-purple/20 bg-card/50 backdrop-blur">
+          <CardContent className="p-4">
             {currentStep === 'lead' && (
               <div>
-                <CardHeader className="px-0 pt-0">
-                  <CardTitle className="text-center text-neon-purple">Step 1: Contact Information</CardTitle>
-                  <p className="text-center text-sm text-muted-foreground">
+                <div className="text-center mb-4">
+                  <h3 className="text-lg font-semibold text-neon-purple mb-1">Contact Information</h3>
+                  <p className="text-sm text-muted-foreground">
                     Please provide your contact details to participate
                   </p>
-                </CardHeader>
+                </div>
                 <LeadForm onSuccess={handleSubmitLead} />
               </div>
             )}
 
             {currentStep === 'rating' && currentTarget && (
               <div>
-                <CardHeader className="px-0 pt-0">
-                  <CardTitle className="text-center text-neon-purple">Step 2: Rate the Resume</CardTitle>
-                  <p className="text-center text-sm text-muted-foreground">
+                <div className="text-center mb-4">
+                  <h3 className="text-lg font-semibold text-neon-purple mb-1">Rate the Resume</h3>
+                  <p className="text-sm text-muted-foreground">
                     Share your feedback on <span className="font-medium text-neon-green">{currentTarget}</span>
                   </p>
-                </CardHeader>
+                </div>
                 <RatingInput onSubmit={handleSubmitRating} currentTarget={currentTarget} />
               </div>
             )}
 
             {currentStep === 'rating' && !currentTarget && (
-              <div className="text-center py-8">
+              <div className="text-center py-6">
                 <div className="text-muted-foreground">
                   <Users className="w-12 h-12 mx-auto mb-4 opacity-50" />
                   <p className="mb-2">No resume is currently being reviewed</p>
@@ -312,14 +312,14 @@ const RateInputPage = () => {
 
             {currentStep === 'upload' && (
               <div>
-                <CardHeader className="px-0 pt-0">
-                  <CardTitle className="text-center text-neon-purple">Step 3: Upload Your Resume</CardTitle>
-                  <p className="text-center text-sm text-muted-foreground">
+                <div className="text-center mb-4">
+                  <h3 className="text-lg font-semibold text-neon-purple mb-1">Upload Your Resume</h3>
+                  <p className="text-sm text-muted-foreground">
                     Upload your resume to be considered for future reviews
                   </p>
-                </CardHeader>
+                </div>
                 <ResumeManager />
-                <div className="mt-4 text-center">
+                <div className="mt-3 text-center">
                   <Button 
                     variant="outline" 
                     onClick={handleCompleteFlow}
@@ -332,7 +332,7 @@ const RateInputPage = () => {
             )}
 
             {currentStep === 'complete' && (
-              <div className="text-center py-8">
+              <div className="text-center py-6">
                 <CheckCircle className="w-16 h-16 mx-auto mb-4 text-neon-green" />
                 <h3 className="text-xl font-bold text-neon-green mb-2">Thank You!</h3>
                 <p className="text-muted-foreground mb-4">
