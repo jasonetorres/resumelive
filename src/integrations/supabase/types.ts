@@ -14,63 +14,7 @@ export type Database = {
   }
   public: {
     Tables: {
-      current_target: {
-        Row: {
-          id: number
-          target_person: string | null
-          updated_at: string
-        }
-        Insert: {
-          id?: number
-          target_person?: string | null
-          updated_at?: string
-        }
-        Update: {
-          id?: number
-          target_person?: string | null
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ratings: {
-        Row: {
-          agreement: string | null
-          category: string
-          content: number | null
-          created_at: string
-          feedback: string | null
-          id: string
-          overall: number | null
-          presentation: number | null
-          reaction: string | null
-          target_person: string
-        }
-        Insert: {
-          agreement?: string | null
-          category: string
-          content?: number | null
-          created_at?: string
-          feedback?: string | null
-          id?: string
-          overall?: number | null
-          presentation?: number | null
-          reaction?: string | null
-          target_person: string
-        }
-        Update: {
-          agreement?: string | null
-          category?: string
-          content?: number | null
-          created_at?: string
-          feedback?: string | null
-          id?: string
-          overall?: number | null
-          presentation?: number | null
-          reaction?: string | null
-          target_person?: string
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Views: {
       [_ in never]: never
