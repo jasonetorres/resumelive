@@ -363,82 +363,9 @@ const LiveDisplayPage = () => {
                         <Badge variant="outline" className="text-xs">Real-time</Badge>
                       </div>
                     </div>
-                    <div className="flex-1 overflow-auto">
-                      {transformedRatings.length === 0 ? (
-                        <div className="h-full flex items-center justify-center p-4">
-                          <div className="text-center text-muted-foreground">
-                            <Users className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                            <p className="text-sm">Waiting for ratings...</p>
-                            <p className="text-xs">Scan QR to rate</p>
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="p-3 space-y-3">
-                          {transformedRatings.map((rating, index) => (
-                            <div 
-                              key={rating.id} 
-                              className="bg-muted/30 rounded-lg p-3 border border-border/30"
-                            >
-                              <div className="flex items-center justify-between mb-2">
-                                <Badge variant="outline" className="text-xs">
-                                  {rating.category}
-                                </Badge>
-                                <span className="text-xs text-muted-foreground">
-                                  #{index + 1}
-                                </span>
-                              </div>
-                              
-                              <div className="mb-2">
-                                <div className="flex items-center gap-2 mb-1">
-                                  <span className="text-lg font-bold text-neon-purple">
-                                    {rating.overall}/5
-                                  </span>
-                                  <div className="flex">
-                                    {[1, 2, 3, 4, 5].map((star) => (
-                                      <span
-                                        key={star}
-                                        className={`text-sm ${
-                                          star <= rating.overall
-                                            ? 'text-yellow-400'
-                                            : 'text-muted-foreground/30'
-                                        }`}
-                                      >
-                                        ★
-                                      </span>
-                                    ))}
-                                  </div>
-                                </div>
-                                <div className="grid grid-cols-2 gap-1 text-xs">
-                                  <div>
-                                    <span className="text-muted-foreground">Presentation:</span>
-                                    <span className="ml-1 font-medium">{rating.presentation}/5</span>
-                                  </div>
-                                  <div>
-                                    <span className="text-muted-foreground">Content:</span>
-                                    <span className="ml-1 font-medium">{rating.content}/5</span>
-                                  </div>
-                                </div>
-                              </div>
-                              
-                              {rating.feedback && (
-                                <div className="mb-2">
-                                  <p className="text-xs text-muted-foreground mb-1">Feedback:</p>
-                                  <p className="text-xs bg-background/50 rounded p-2 text-foreground line-clamp-2">
-                                    {rating.feedback}
-                                  </p>
-                                </div>
-                              )}
-                              
-                              {rating.reaction && (
-                                <div className="text-center">
-                                  <span className="text-lg">{rating.reaction}</span>
-                                </div>
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
+                <div className="flex-1 overflow-auto">
+                  <LiveDisplay ratings={transformedRatings} />
+                </div>
                   </div>
                 </div>
               </div>
