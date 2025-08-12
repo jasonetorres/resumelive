@@ -504,37 +504,6 @@ const LiveDisplayPage = () => {
           </CardContent>
         </Card>
 
-        {/* Instructions for Conference Use */}
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="text-center flex items-center gap-2 justify-center">
-              <FileText className="w-5 h-5 text-neon-cyan" />
-              Conference Setup Instructions
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="grid md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <h4 className="font-medium text-neon-purple">For Organizers:</h4>
-                <ul className="text-sm space-y-1 text-muted-foreground">
-                  <li>• Upload resumes and select one to review</li>
-                  <li>• Click "Start Conference Display" to show on big screen</li>
-                  <li>• Monitor live ratings and participant count</li>
-                  <li>• Use "Clear Stats" to reset between sessions</li>
-                </ul>
-              </div>
-              <div className="space-y-2">
-                <h4 className="font-medium text-neon-pink">For Attendees:</h4>
-                <ul className="text-sm space-y-1 text-muted-foreground">
-                  <li>• Scan QR code on display to access rating form</li>
-                  <li>• Fill out contact info first</li>
-                  <li>• Rate the current resume being reviewed</li>
-                  <li>• Upload your own resume for future review</li>
-                </ul>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
 
         {/* Live Display Preview */}
         <Card>
