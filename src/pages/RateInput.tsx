@@ -29,6 +29,15 @@ const RateInputPage = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    // Check if user has already submitted lead data in this session
+    const leadData = sessionStorage.getItem('leadData');
+    if (leadData) {
+      setHasSubmittedLead(true);
+      setCurrentStep('rating');
+    }
+  }, []);
+
+  useEffect(() => {
     // Fetch current target
     const fetchCurrentTarget = async () => {
       console.log('RateInputPage: Fetching current target...');
@@ -36,7 +45,7 @@ const RateInputPage = () => {
         .from('current_target')
         .select('target_person')
         .eq('id', 1)
-        .single();
+        .maybeSingle();
       
       console.log('RateInputPage: Current target fetched:', data?.target_person);
       setCurrentTarget(data?.target_person || null);
