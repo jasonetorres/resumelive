@@ -280,35 +280,58 @@ const LiveDisplayPage = () => {
 
   if (showResumeView && selectedResume) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 p-4">
-        <div className="h-[calc(100vh-2rem)] max-w-[95vw] mx-auto">
-          <ResizablePanelGroup direction="horizontal" className="border border-border/50 rounded-lg">
-            {/* Resume Display Panel - 2/3 */}
-            <ResizablePanel defaultSize={67} minSize={60}>
-              <div className="h-full flex flex-col bg-card">
-                <div className="p-4 border-b border-border flex flex-wrap items-center justify-between gap-2">
-                  <div className="flex items-center gap-2 min-w-0">
-                    <h2 className="text-sm sm:text-lg font-semibold truncate">Currently Reviewing: {selectedResume.name}</h2>
-                    <LiveParticipantCounter currentTarget={currentTarget} />
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={handleClearStats}
-                      className="border-destructive text-destructive hover:bg-destructive/10"
-                    >
-                      <RotateCcw className="w-4 h-4 mr-1" />
-                      Clear Stats
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => setShowResumeView(false)}
-                    >
-                      Back to Selection
-                    </Button>
-                  </div>
+      <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
+        {/* Header with controls and QR codes */}
+        <div className="p-4 border-b border-border bg-card/50 backdrop-blur">
+          <div className="max-w-[95vw] mx-auto flex items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <h1 className="text-2xl font-bold text-neon-purple">Conference Resume Review</h1>
+              <div className="flex items-center gap-2">
+                <Badge className="bg-neon-green text-primary-foreground">Live Session</Badge>
+                <LiveParticipantCounter currentTarget={currentTarget} />
+              </div>
+            </div>
+            
+            {/* QR Code Section */}
+            <div className="flex items-center gap-4">
+              <div className="text-center">
+                <QRCodeGenerator 
+                  url={ratingPageUrl} 
+                  title="Scan to Rate & Upload Resume"
+                  size={160}
+                />
+                <p className="text-sm mt-2 text-muted-foreground">Scan to participate</p>
+              </div>
+              <div className="flex gap-2">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={handleClearStats}
+                  className="border-destructive text-destructive hover:bg-destructive/10"
+                >
+                  <RotateCcw className="w-4 h-4 mr-1" />
+                  Clear Stats
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => setShowResumeView(false)}
+                >
+                  Back to Selection
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Main Content Area */}
+        <div className="h-[calc(100vh-120px)] p-4">
+          <div className="h-full max-w-[95vw] mx-auto flex flex-col gap-4">
+            {/* Resume Display - Top 70% */}
+            <div className="flex-[7] bg-card rounded-lg border border-border/50 overflow-hidden">
+              <div className="h-full flex flex-col">
+                <div className="p-4 border-b border-border bg-card/80">
+                  <h2 className="text-xl font-semibold text-center">Currently Reviewing: {selectedResume.name}</h2>
                 </div>
                 <div className="flex-1 p-4">
                   {selectedResume.file_type === 'application/pdf' ? (
@@ -316,7 +339,6 @@ const LiveDisplayPage = () => {
                       src={`https://docs.google.com/viewer?url=${encodeURIComponent(`https://kpufipcunkgfpxhnhxxl.supabase.co/storage/v1/object/public/resumes/${selectedResume.file_path}`)}&embedded=true`}
                       className="w-full h-full border-0 rounded"
                       title={selectedResume.name}
-                      style={{ minHeight: '600px' }}
                     />
                   ) : (
                     <img
@@ -327,25 +349,105 @@ const LiveDisplayPage = () => {
                   )}
                 </div>
               </div>
-            </ResizablePanel>
+            </div>
             
-            <ResizableHandle withHandle />
-            
-            {/* Live Ratings Panel with QR Code - 1/3 */}
-            <ResizablePanel defaultSize={33} minSize={25}>
+            {/* Live Ratings - Bottom 30% in horizontal layout */}
+            <div className="flex-[3] bg-card rounded-lg border border-border/50 overflow-hidden">
               <div className="h-full flex flex-col">
-                <div className="p-4 border-b border-border">
-                  <QRCodeGenerator 
-                    url={ratingPageUrl} 
-                    title="Scan to Rate"
-                  />
+                <div className="p-3 border-b border-border bg-card/80">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-semibold flex items-center gap-2">
+                      <Bell className="w-5 h-5 text-neon-pink" />
+                      Live Ratings ({transformedRatings.length})
+                    </h3>
+                    <div className="text-sm text-muted-foreground">
+                      Updates in real-time
+                    </div>
+                  </div>
                 </div>
-                <div className="flex-1 overflow-hidden">
-                  <LiveDisplay ratings={transformedRatings} />
+                <div className="flex-1 p-4">
+                  {transformedRatings.length === 0 ? (
+                    <div className="h-full flex items-center justify-center">
+                      <div className="text-center text-muted-foreground">
+                        <Users className="w-12 h-12 mx-auto mb-2 opacity-50" />
+                        <p>Waiting for ratings...</p>
+                        <p className="text-sm">Scan the QR code to submit your rating</p>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="h-full overflow-x-auto">
+                      <div className="flex gap-4 h-full min-w-max">
+                        {transformedRatings.map((rating, index) => (
+                          <div 
+                            key={rating.id} 
+                            className="flex-shrink-0 w-80 bg-muted/30 rounded-lg p-4 border border-border/30"
+                          >
+                            <div className="h-full flex flex-col">
+                              <div className="flex items-center justify-between mb-2">
+                                <Badge variant="outline" className="text-xs">
+                                  {rating.category}
+                                </Badge>
+                                <span className="text-xs text-muted-foreground">
+                                  #{index + 1}
+                                </span>
+                              </div>
+                              
+                              <div className="mb-3">
+                                <div className="flex items-center gap-2 mb-1">
+                                  <span className="text-2xl font-bold text-neon-purple">
+                                    {rating.overall}/5
+                                  </span>
+                                  <div className="flex">
+                                    {[1, 2, 3, 4, 5].map((star) => (
+                                      <span
+                                        key={star}
+                                        className={`text-lg ${
+                                          star <= rating.overall
+                                            ? 'text-yellow-400'
+                                            : 'text-muted-foreground/30'
+                                        }`}
+                                      >
+                                        ★
+                                      </span>
+                                    ))}
+                                  </div>
+                                </div>
+                                <div className="grid grid-cols-2 gap-2 text-xs">
+                                  <div>
+                                    <span className="text-muted-foreground">Presentation:</span>
+                                    <span className="ml-1 font-medium">{rating.presentation}/5</span>
+                                  </div>
+                                  <div>
+                                    <span className="text-muted-foreground">Content:</span>
+                                    <span className="ml-1 font-medium">{rating.content}/5</span>
+                                  </div>
+                                </div>
+                              </div>
+                              
+                              {rating.feedback && (
+                                <div className="flex-1">
+                                  <p className="text-xs text-muted-foreground mb-1">Feedback:</p>
+                                  <p className="text-sm bg-background/50 rounded p-2 text-foreground line-clamp-3">
+                                    {rating.feedback}
+                                  </p>
+                                </div>
+                              )}
+                              
+                              {rating.reaction && (
+                                <div className="mt-2 text-center">
+                                  <span className="text-2xl">{rating.reaction}</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
-            </ResizablePanel>
-          </ResizablePanelGroup>
+            </div>
+          </div>
         </div>
         <FloatingReactions currentTarget={currentTarget} />
       </div>
@@ -357,7 +459,7 @@ const LiveDisplayPage = () => {
       <div className="max-w-[90vw] mx-auto">
         <Card className="mb-6 border-2 border-neon-purple/20 bg-card/50 backdrop-blur">
           <CardHeader>
-            <CardTitle className="text-center text-neon-purple">Currently Reviewing</CardTitle>
+            <CardTitle className="text-center text-neon-purple">Conference Resume Review Setup</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {resumes.length === 0 ? (
@@ -387,15 +489,50 @@ const LiveDisplayPage = () => {
               disabled={!selectedResumeId || resumes.length === 0}
               className="w-full bg-neon-purple hover:bg-neon-purple/90"
             >
-              {resumes.length === 0 ? 'No Resumes Available' : 'Start Review Session'}
+              {resumes.length === 0 ? 'No Resumes Available' : 'Start Conference Display'}
             </Button>
 
             {currentTarget && (
               <div className="text-center p-4 bg-neon-green/10 border border-neon-green/30 rounded-lg">
                 <Badge className="bg-neon-green text-primary-foreground mb-2">Currently Reviewing</Badge>
                 <p className="font-medium text-neon-green">{currentTarget}</p>
+                <p className="text-sm text-muted-foreground mt-2">
+                  This will be displayed on the conference monitor
+                </p>
               </div>
             )}
+          </CardContent>
+        </Card>
+
+        {/* Instructions for Conference Use */}
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="text-center flex items-center gap-2 justify-center">
+              <FileText className="w-5 h-5 text-neon-cyan" />
+              Conference Setup Instructions
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <h4 className="font-medium text-neon-purple">For Organizers:</h4>
+                <ul className="text-sm space-y-1 text-muted-foreground">
+                  <li>• Upload resumes and select one to review</li>
+                  <li>• Click "Start Conference Display" to show on big screen</li>
+                  <li>• Monitor live ratings and participant count</li>
+                  <li>• Use "Clear Stats" to reset between sessions</li>
+                </ul>
+              </div>
+              <div className="space-y-2">
+                <h4 className="font-medium text-neon-pink">For Attendees:</h4>
+                <ul className="text-sm space-y-1 text-muted-foreground">
+                  <li>• Scan QR code on display to access rating form</li>
+                  <li>• Fill out contact info first</li>
+                  <li>• Rate the current resume being reviewed</li>
+                  <li>• Upload your own resume for future review</li>
+                </ul>
+              </div>
+            </div>
           </CardContent>
         </Card>
 

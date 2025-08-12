@@ -7,16 +7,17 @@ import { QrCode, Smartphone } from 'lucide-react';
 interface QRCodeGeneratorProps {
   url: string;
   title?: string;
+  size?: number;
 }
 
-export function QRCodeGenerator({ url, title = "Scan to Rate" }: QRCodeGeneratorProps) {
+export function QRCodeGenerator({ url, title = "Scan to Rate", size = 120 }: QRCodeGeneratorProps) {
   const [qrCodeUrl, setQrCodeUrl] = useState<string>('');
 
   useEffect(() => {
     const generateQR = async () => {
       try {
         const qrUrl = await QRCode.toDataURL(url, {
-          width: 120,
+          width: size,
           margin: 1,
           color: {
             dark: '#000000',
@@ -30,7 +31,7 @@ export function QRCodeGenerator({ url, title = "Scan to Rate" }: QRCodeGenerator
     };
 
     generateQR();
-  }, [url]);
+  }, [url, size]);
 
   return (
     <Card className="border-neon-purple/30 bg-card/50 backdrop-blur">
@@ -43,7 +44,7 @@ export function QRCodeGenerator({ url, title = "Scan to Rate" }: QRCodeGenerator
       <CardContent className="flex flex-col items-center space-y-2 pb-3">
         {qrCodeUrl && (
           <div className="p-2 bg-white rounded-lg shadow-lg">
-            <img src={qrCodeUrl} alt="QR Code" className="w-24 h-24" />
+            <img src={qrCodeUrl} alt="QR Code" style={{ width: size, height: size }} className="rounded" />
           </div>
         )}
         <div className="text-center">

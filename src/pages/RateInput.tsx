@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { RatingInput } from '@/components/RatingInput';
+import { LeadForm } from '@/components/LeadForm';
+import { ResumeManager } from '@/components/ResumeManager';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
-import { Users, Wifi } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Users, Wifi, CheckCircle, Upload, Star } from 'lucide-react';
 
 interface RatingData {
   overall: number;
@@ -18,6 +22,9 @@ interface RatingData {
 const RateInputPage = () => {
   const [currentTarget, setCurrentTarget] = useState<string | null>(null);
   const [participantCount, setParticipantCount] = useState(0);
+  const [currentStep, setCurrentStep] = useState<'lead' | 'rating' | 'upload' | 'complete'>('lead');
+  const [hasSubmittedLead, setHasSubmittedLead] = useState(false);
+  const [hasSubmittedRating, setHasSubmittedRating] = useState(false);
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
 
@@ -121,6 +128,15 @@ const RateInputPage = () => {
     };
   }, [currentTarget]);
 
+  const handleSubmitLead = () => {
+    setHasSubmittedLead(true);
+    setCurrentStep('rating');
+    toast({
+      title: "Contact Info Saved! ✅",
+      description: "You can now rate the current resume",
+    });
+  };
+
   const handleSubmitRating = async (rating: RatingData) => {
     if (!currentTarget) {
       toast({
@@ -148,14 +164,70 @@ const RateInputPage = () => {
       console.error('Error submitting rating:', error);
       throw error;
     }
+
+    setHasSubmittedRating(true);
+    setCurrentStep('upload');
+    toast({
+      title: "Rating Submitted! ⭐",
+      description: "Thank you for your feedback. You can now upload your resume.",
+    });
+  };
+
+  const handleCompleteFlow = () => {
+    setCurrentStep('complete');
+    toast({
+      title: "All Done! 🎉",
+      description: "Thank you for participating in the conference!",
+    });
+  };
+
+  const renderStepIndicator = () => {
+    const steps = [
+      { key: 'lead', label: 'Contact Info', icon: Users },
+      { key: 'rating', label: 'Rate Resume', icon: Star },
+      { key: 'upload', label: 'Upload Resume', icon: Upload },
+      { key: 'complete', label: 'Complete', icon: CheckCircle }
+    ];
+
+    return (
+      <div className="flex justify-center mb-6">
+        <div className="flex items-center gap-2 bg-card/50 rounded-full p-2 border border-border/50">
+          {steps.map((step, index) => {
+            const Icon = step.icon;
+            const isActive = currentStep === step.key;
+            const isCompleted = 
+              (step.key === 'lead' && hasSubmittedLead) ||
+              (step.key === 'rating' && hasSubmittedRating) ||
+              (step.key === 'upload' && currentStep === 'complete') ||
+              (step.key === 'complete' && currentStep === 'complete');
+            
+            return (
+              <div
+                key={step.key}
+                className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs transition-all ${
+                  isActive
+                    ? 'bg-neon-purple text-primary-foreground'
+                    : isCompleted
+                    ? 'bg-neon-green text-primary-foreground'
+                    : 'text-muted-foreground'
+                }`}
+              >
+                <Icon className="w-3 h-3" />
+                <span className="hidden sm:inline">{step.label}</span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 flex items-center justify-center p-3 sm:p-4">
-      <div className="w-full max-w-sm sm:max-w-md">
+      <div className="w-full max-w-lg">
         <div className="text-center mb-6 sm:mb-8">
           <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-neon-purple to-neon-pink bg-clip-text text-transparent mb-2">
-            User Vote
+            Conference Participation
           </h1>
           
           {/* Live Status Indicators */}
@@ -167,7 +239,7 @@ const RateInputPage = () => {
             {currentTarget && participantCount > 0 && (
               <Badge variant="outline" className="border-neon-cyan text-neon-cyan bg-neon-cyan/10 flex items-center gap-1 text-xs">
                 <Users className="w-3 h-3" />
-                {participantCount} rating{participantCount !== 1 ? 's' : ''}
+                {participantCount} participant{participantCount !== 1 ? 's' : ''}
               </Badge>
             )}
           </div>
@@ -180,28 +252,124 @@ const RateInputPage = () => {
           ) : currentTarget ? (
             <div>
               <p className="text-muted-foreground mb-2 text-sm sm:text-base">
-                Rate the content for
+                Currently reviewing
               </p>
-              <p className="text-lg sm:text-2xl font-bold text-neon-green px-2 break-words">
+              <p className="text-lg sm:text-xl font-bold text-neon-green px-2 break-words">
                 {currentTarget}
               </p>
-              <div className="mt-2 text-xs text-muted-foreground bg-neon-green/10 px-2 py-1 rounded mx-auto inline-block">
-                ✅ Updates automatically
-              </div>
             </div>
           ) : (
             <div>
               <p className="text-muted-foreground mb-2 text-sm sm:text-base">
-                Waiting for target to be set...
+                No session active...
               </p>
               <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
                 <div className="w-2 h-2 bg-neon-orange rounded-full animate-pulse" />
-                Listening for updates
+                Waiting for conference to begin
               </div>
             </div>
           )}
         </div>
-        <RatingInput onSubmit={handleSubmitRating} currentTarget={currentTarget} />
+
+        {renderStepIndicator()}
+
+        {/* Step Content */}
+        <Card className="border-2 border-neon-purple/20 bg-card/50 backdrop-blur">
+          <CardContent className="p-6">
+            {currentStep === 'lead' && (
+              <div>
+                <CardHeader className="px-0 pt-0">
+                  <CardTitle className="text-center text-neon-purple">Step 1: Contact Information</CardTitle>
+                  <p className="text-center text-sm text-muted-foreground">
+                    Please provide your contact details to participate
+                  </p>
+                </CardHeader>
+                <LeadForm onSuccess={handleSubmitLead} />
+              </div>
+            )}
+
+            {currentStep === 'rating' && currentTarget && (
+              <div>
+                <CardHeader className="px-0 pt-0">
+                  <CardTitle className="text-center text-neon-purple">Step 2: Rate the Resume</CardTitle>
+                  <p className="text-center text-sm text-muted-foreground">
+                    Share your feedback on <span className="font-medium text-neon-green">{currentTarget}</span>
+                  </p>
+                </CardHeader>
+                <RatingInput onSubmit={handleSubmitRating} currentTarget={currentTarget} />
+              </div>
+            )}
+
+            {currentStep === 'rating' && !currentTarget && (
+              <div className="text-center py-8">
+                <div className="text-muted-foreground">
+                  <Users className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                  <p className="mb-2">No resume is currently being reviewed</p>
+                  <p className="text-sm">Please wait for the session to begin</p>
+                </div>
+              </div>
+            )}
+
+            {currentStep === 'upload' && (
+              <div>
+                <CardHeader className="px-0 pt-0">
+                  <CardTitle className="text-center text-neon-purple">Step 3: Upload Your Resume</CardTitle>
+                  <p className="text-center text-sm text-muted-foreground">
+                    Upload your resume to be considered for future reviews
+                  </p>
+                </CardHeader>
+                <ResumeManager />
+                <div className="mt-4 text-center">
+                  <Button 
+                    variant="outline" 
+                    onClick={handleCompleteFlow}
+                    className="border-neon-cyan text-neon-cyan hover:bg-neon-cyan/10"
+                  >
+                    Skip Upload & Finish
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {currentStep === 'complete' && (
+              <div className="text-center py-8">
+                <CheckCircle className="w-16 h-16 mx-auto mb-4 text-neon-green" />
+                <h3 className="text-xl font-bold text-neon-green mb-2">Thank You!</h3>
+                <p className="text-muted-foreground mb-4">
+                  You've successfully participated in the conference resume review session.
+                </p>
+                <div className="space-y-2 text-sm">
+                  {hasSubmittedLead && (
+                    <div className="flex items-center justify-center gap-2 text-neon-green">
+                      <CheckCircle className="w-4 h-4" />
+                      Contact information saved
+                    </div>
+                  )}
+                  {hasSubmittedRating && (
+                    <div className="flex items-center justify-center gap-2 text-neon-green">
+                      <CheckCircle className="w-4 h-4" />
+                      Rating submitted
+                    </div>
+                  )}
+                  <div className="flex items-center justify-center gap-2 text-neon-cyan">
+                    <CheckCircle className="w-4 h-4" />
+                    Session completed
+                  </div>
+                </div>
+                <Button 
+                  className="mt-6 bg-neon-purple hover:bg-neon-purple/90"
+                  onClick={() => {
+                    setCurrentStep('lead');
+                    setHasSubmittedLead(false);
+                    setHasSubmittedRating(false);
+                  }}
+                >
+                  Start New Session
+                </Button>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
