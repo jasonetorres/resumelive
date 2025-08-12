@@ -274,13 +274,16 @@ export function RatingInput({ onSubmit, currentTarget }: RatingInputProps) {
           </CardContent>
         </Card>
       ) : (
-        <Card className="border-2 border-dashed border-muted-foreground/20 bg-card/50 backdrop-blur">
-          <CardContent className="text-center p-8">
-            <p className="text-muted-foreground mb-2">
-              No active rating session
+        <Card className="border border-neon-orange/20 bg-neon-orange/5">
+          <CardContent className="text-center py-6">
+            <h3 className="text-lg font-semibold text-neon-orange mb-2">
+              🎯 No Active Rating Session
+            </h3>
+            <p className="text-sm text-muted-foreground mb-2">
+              No resume is currently being reviewed, but you can still send quick reactions above!
             </p>
-            <p className="text-sm text-muted-foreground">
-              But you can still send reactions above! 👆
+            <p className="text-xs text-neon-orange">
+              Your reactions will appear live on the conference display ✨
             </p>
           </CardContent>
         </Card>

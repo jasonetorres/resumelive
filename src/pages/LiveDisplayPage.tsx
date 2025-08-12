@@ -55,7 +55,7 @@ const LiveDisplayPage = () => {
         .from('current_target')
         .select('target_person')
         .eq('id', 1)
-        .single();
+        .maybeSingle();
       
       setCurrentTarget(targetData?.target_person || null);
 
