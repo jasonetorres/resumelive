@@ -47,7 +47,7 @@ const LiveDisplayPage = () => {
   const [showResumeView, setShowResumeView] = useState(false);
 
   // Get the rating page URL for QR code
-  const ratingPageUrl = `${window.location.origin}/rate`;
+  const ratingPageUrl = `${window.location.origin}/rate-direct`;
 
   useEffect(() => {
     console.log('LiveDisplayPage: Setting up subscriptions and fetching data');

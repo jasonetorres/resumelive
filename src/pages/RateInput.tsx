@@ -22,7 +22,8 @@ interface RatingData {
 const RateInputPage = () => {
   const [currentTarget, setCurrentTarget] = useState<string | null>(null);
   const [participantCount, setParticipantCount] = useState(0);
-  const [currentStep, setCurrentStep] = useState<'rating' | 'upload' | 'complete'>('rating');
+  const [currentStep, setCurrentStep] = useState<'lead' | 'rating' | 'upload' | 'complete'>('lead');
+  const [hasSubmittedLead, setHasSubmittedLead] = useState(false);
   const [hasSubmittedRating, setHasSubmittedRating] = useState(false);
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
@@ -127,6 +128,15 @@ const RateInputPage = () => {
     };
   }, [currentTarget]);
 
+  const handleSubmitLead = () => {
+    setHasSubmittedLead(true);
+    setCurrentStep('rating');
+    toast({
+      title: "Contact Info Saved! ✅",
+      description: "You can now rate the current resume",
+    });
+  };
+
   const handleSubmitRating = async (rating: RatingData) => {
     if (!currentTarget) {
       toast({
@@ -173,6 +183,7 @@ const RateInputPage = () => {
 
   const renderStepIndicator = () => {
     const steps = [
+      { key: 'lead', label: 'Contact Info', icon: Users },
       { key: 'rating', label: 'Rate Resume', icon: Star },
       { key: 'upload', label: 'Upload Resume', icon: Upload },
       { key: 'complete', label: 'Complete', icon: CheckCircle }
@@ -185,6 +196,7 @@ const RateInputPage = () => {
             const Icon = step.icon;
             const isActive = currentStep === step.key;
             const isCompleted = 
+              (step.key === 'lead' && hasSubmittedLead) ||
               (step.key === 'rating' && hasSubmittedRating) ||
               (step.key === 'upload' && currentStep === 'complete') ||
               (step.key === 'complete' && currentStep === 'complete');
@@ -215,7 +227,7 @@ const RateInputPage = () => {
       <div className="w-full max-w-lg">
         <div className="text-center mb-6 sm:mb-8">
           <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-neon-purple to-neon-pink bg-clip-text text-transparent mb-2">
-            Rate & Upload
+            Conference Participation
           </h1>
           
           {/* Live Status Indicators */}
@@ -264,6 +276,18 @@ const RateInputPage = () => {
         {/* Step Content */}
         <Card className="border border-neon-purple/20 bg-card/50 backdrop-blur">
           <CardContent className="p-4">
+            {currentStep === 'lead' && (
+              <div>
+                <div className="text-center mb-4">
+                  <h3 className="text-lg font-semibold text-neon-purple mb-1">Contact Information</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Please provide your contact details to participate
+                  </p>
+                </div>
+                <LeadForm onSuccess={handleSubmitLead} />
+              </div>
+            )}
+
             {currentStep === 'rating' && currentTarget && (
               <div>
                 <div className="text-center mb-4">
@@ -322,6 +346,12 @@ const RateInputPage = () => {
                   You've successfully participated in the conference resume review session.
                 </p>
                 <div className="space-y-2 text-sm">
+                  {hasSubmittedLead && (
+                    <div className="flex items-center justify-center gap-2 text-neon-green">
+                      <CheckCircle className="w-4 h-4" />
+                      Contact information saved
+                    </div>
+                  )}
                   {hasSubmittedRating && (
                     <div className="flex items-center justify-center gap-2 text-neon-green">
                       <CheckCircle className="w-4 h-4" />
@@ -336,7 +366,8 @@ const RateInputPage = () => {
                 <Button 
                   className="mt-6 bg-neon-purple hover:bg-neon-purple/90"
                   onClick={() => {
-                    setCurrentStep('rating');
+                    setCurrentStep('lead');
+                    setHasSubmittedLead(false);
                     setHasSubmittedRating(false);
                   }}
                 >
