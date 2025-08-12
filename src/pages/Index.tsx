@@ -18,7 +18,7 @@ const Index = () => {
               className="w-16 h-16"
             />
             <h1 className="text-6xl font-bold bg-gradient-to-r from-neon-purple via-neon-pink to-neon-orange bg-clip-text text-transparent">
-              Stream Ratings
+              Resume Ratings
             </h1>
             <img 
               src="/lovable-uploads/47be24da-2929-4836-b53c-587b774ca249.png" 
