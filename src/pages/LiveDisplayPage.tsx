@@ -36,8 +36,6 @@ interface Resume {
 }
 
 const LiveDisplayPage = () => {
-  console.log('LiveDisplayPage: Component is rendering');
-  
   const { toast } = useToast();
   const [ratings, setRatings] = useState<Rating[]>([]);
   const [currentTarget, setCurrentTarget] = useState<string | null>(null);
@@ -50,8 +48,6 @@ const LiveDisplayPage = () => {
   const ratingPageUrl = `${window.location.origin}/rate-direct`;
 
   useEffect(() => {
-    console.log('LiveDisplayPage: Setting up subscriptions and fetching data');
-    
     // Fetch initial data
     const fetchInitialData = async () => {
       // Get current target
@@ -61,7 +57,6 @@ const LiveDisplayPage = () => {
         .eq('id', 1)
         .single();
       
-      console.log('LiveDisplayPage: Initial target fetched:', targetData?.target_person);
       setCurrentTarget(targetData?.target_person || null);
 
       // Get uploaded resumes
@@ -72,13 +67,12 @@ const LiveDisplayPage = () => {
           .order('created_at', { ascending: false });
         
         if (resumesError) {
-          console.error('LiveDisplayPage: Error fetching resumes:', resumesError);
+          console.error('Error fetching resumes:', resumesError);
         } else {
-          console.log('LiveDisplayPage: Resumes fetched successfully:', resumesData?.length || 0, resumesData);
           setResumes((resumesData as unknown as Resume[]) || []);
         }
       } catch (error) {
-        console.error('LiveDisplayPage: Exception while fetching resumes:', error);
+        console.error('Exception while fetching resumes:', error);
       }
 
       // Get ratings for current target (only real ratings, not quick reactions)
@@ -90,7 +84,6 @@ const LiveDisplayPage = () => {
           .not('overall', 'is', null)
           .order('created_at', { ascending: false });
         
-        console.log('LiveDisplayPage: Initial ratings fetched:', ratingsData?.length || 0);
         setRatings((ratingsData || []) as Rating[]);
       }
     };
@@ -109,7 +102,6 @@ const LiveDisplayPage = () => {
         },
         async (payload) => {
           const newTarget = payload.new.target_person;
-          console.log('LiveDisplayPage: Target changed to:', newTarget);
           setCurrentTarget(newTarget);
           
           // Fetch ratings for new target (only real ratings)
@@ -121,19 +113,13 @@ const LiveDisplayPage = () => {
               .not('overall', 'is', null)
               .order('created_at', { ascending: false });
             
-            console.log('LiveDisplayPage: New ratings fetched for target:', ratingsData?.length || 0);
             setRatings((ratingsData || []) as Rating[]);
           } else {
             setRatings([]);
           }
         }
       )
-      .subscribe((status) => {
-        console.log('LiveDisplayPage: Target subscription status:', status);
-        if (status === 'SUBSCRIBED') {
-          console.log('LiveDisplayPage: Successfully subscribed to target updates!');
-        }
-      });
+      .subscribe();
 
     // Subscribe to new ratings
     const ratingsChannel = supabase
@@ -147,11 +133,9 @@ const LiveDisplayPage = () => {
         },
         (payload) => {
           const newRating = payload.new as Rating;
-          console.log('LiveDisplayPage: New rating received:', newRating);
           
           // Show real-time notification for new ratings
           if (newRating.target_person === currentTarget && newRating.overall !== null && newRating.overall > 0) {
-            console.log('LiveDisplayPage: Adding rating to display');
             setRatings(prev => [newRating, ...prev]);
             
             // Show toast notification
@@ -162,42 +146,28 @@ const LiveDisplayPage = () => {
           }
         }
       )
-      .subscribe((status) => {
-        console.log('LiveDisplayPage: Ratings subscription status:', status);
-        if (status === 'SUBSCRIBED') {
-          console.log('LiveDisplayPage: Successfully subscribed to rating updates!');
-        }
-      });
+      .subscribe();
 
     return () => {
-      console.log('LiveDisplayPage: Cleaning up subscriptions');
       supabase.removeChannel(targetChannel);
       supabase.removeChannel(ratingsChannel);
     };
   }, [currentTarget]);
 
   const handleClearStats = async () => {
-    console.log('LiveDisplayPage: handleClearStats called');
-    console.log('LiveDisplayPage: Current target:', currentTarget);
-    console.log('LiveDisplayPage: Current ratings count:', ratings.length);
-    
     if (!currentTarget) {
-      console.log('LiveDisplayPage: No current target to clear stats for');
       return;
     }
     
     try {
-      console.log('LiveDisplayPage: Attempting to delete ratings for target:', currentTarget);
-      
       // First, let's see what ratings exist
       const { data: existingRatings, error: fetchError } = await (supabase as any)
         .from('ratings')
         .select('*')
         .eq('target_person', currentTarget);
       
-      console.log('LiveDisplayPage: Existing ratings in database:', existingRatings);
       if (fetchError) {
-        console.error('LiveDisplayPage: Error fetching existing ratings:', fetchError);
+        console.error('Error fetching existing ratings:', fetchError);
       }
       
       // Now delete them
@@ -208,34 +178,26 @@ const LiveDisplayPage = () => {
         .select();
       
       if (error) {
-        console.error('LiveDisplayPage: Error clearing stats from database:', error);
+        console.error('Error clearing stats from database:', error);
         return;
       }
       
-      console.log('LiveDisplayPage: Delete result - data:', data);
-      console.log('LiveDisplayPage: Delete result - count:', count);
-      
       // Clear local state
       setRatings([]);
-      console.log('LiveDisplayPage: Local ratings state cleared');
     } catch (error) {
-      console.error('LiveDisplayPage: Exception while clearing stats:', error);
+      console.error('Exception while clearing stats:', error);
     }
   };
 
   const handleSetTarget = async () => {
     if (!selectedResumeId) {
-      console.log('LiveDisplayPage: No resume selected');
       return;
     }
     
     const resume = resumes.find(r => r.id === selectedResumeId);
     if (!resume) {
-      console.log('LiveDisplayPage: Resume not found for ID:', selectedResumeId);
       return;
     }
-
-    console.log('LiveDisplayPage: Setting target for resume:', resume.name);
     
     // Clear stats FIRST, before updating target to avoid race condition
     if (currentTarget) {
@@ -251,16 +213,14 @@ const LiveDisplayPage = () => {
         .from('current_target')
         .update({ target_person: resume.name })
         .eq('id', 1);
-      console.log('LiveDisplayPage: Target updated in database');
     } catch (error) {
-      console.error('LiveDisplayPage: Error updating target:', error);
+      console.error('Error updating target:', error);
     }
   };
 
   // Auto-show resume when one is selected and target is set
   useEffect(() => {
     if (selectedResume && currentTarget) {
-      console.log('LiveDisplayPage: Auto-showing resume view for:', selectedResume.name);
       setShowResumeView(true);
     }
   }, [selectedResume, currentTarget]);
