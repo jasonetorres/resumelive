@@ -28,13 +28,19 @@ export function LiveDisplay({ ratings }: LiveDisplayProps) {
   const [currentFeedback, setCurrentFeedback] = useState<string>('');
   const [isRevealed, setIsRevealed] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
+  
+  console.log('LiveDisplay: Received ratings:', ratings.length, ratings);
+  
   useEffect(() => {
     // Add new ratings with animation
     const newRatings = ratings.filter(
       rating => !displayedRatings.find(dr => dr.id === rating.id)
     );
     
+    console.log('LiveDisplay: New ratings to display:', newRatings.length, newRatings);
+    
     if (newRatings.length > 0) {
+      console.log('LiveDisplay: Adding new ratings to displayed list');
       setDisplayedRatings(prev => [...newRatings, ...prev].slice(0, 50));
       
       // Show feedback if available

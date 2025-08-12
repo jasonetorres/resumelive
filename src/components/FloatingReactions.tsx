@@ -19,9 +19,11 @@ export function FloatingReactions({ currentTarget }: FloatingReactionsProps) {
 
   const addFloatingReaction = (emoji: string, timestamp: string) => {
     const reactionId = `${emoji}-${timestamp}-${Math.random()}`;
+    console.log('FloatingReactions: Adding reaction:', { emoji, timestamp, reactionId });
     
     // Prevent duplicates
     if (processedReactions.current.has(reactionId)) {
+      console.log('FloatingReactions: Duplicate prevented');
       return;
     }
     
@@ -35,15 +37,18 @@ export function FloatingReactions({ currentTarget }: FloatingReactionsProps) {
       timestamp: Date.now()
     };
 
+    console.log('FloatingReactions: New reaction created:', newFloatingReaction);
     setFloatingReactions(prev => [...prev, newFloatingReaction]);
 
-    // Remove the reaction after 4 seconds
+    // Remove the reaction after 3 seconds
     setTimeout(() => {
+      console.log('FloatingReactions: Removing reaction:', reactionId);
       setFloatingReactions(prev => prev.filter(fr => fr.id !== reactionId));
     }, 3000);
   };
 
   useEffect(() => {
+    console.log('FloatingReactions: Setting up subscription for global reactions');
     // Subscribe to ALL rating inserts and filter in code
     const channel = supabase
       .channel('floating-reactions-all')
@@ -56,16 +61,25 @@ export function FloatingReactions({ currentTarget }: FloatingReactionsProps) {
         },
         (payload) => {
           const newRating = payload.new;
+          console.log('FloatingReactions: Received rating insert:', newRating);
           
           // Process global quick reactions (ratings with GLOBAL_REACTIONS target and null overall)
           if (newRating.reaction && newRating.target_person === 'GLOBAL_REACTIONS' && newRating.overall === null) {
+            console.log('FloatingReactions: Processing global reaction:', newRating.reaction);
             addFloatingReaction(newRating.reaction, newRating.created_at);
+          } else {
+            console.log('FloatingReactions: Not a global reaction, ignoring');
           }
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log('FloatingReactions: Subscription status:', status);
+      });
+
+    console.log('FloatingReactions: Subscription created');
 
     return () => {
+      console.log('FloatingReactions: Cleaning up subscription');
       supabase.removeChannel(channel);
     };
   }, []);
