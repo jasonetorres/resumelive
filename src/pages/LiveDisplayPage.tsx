@@ -280,109 +280,105 @@ const LiveDisplayPage = () => {
 
   if (showResumeView && selectedResume) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
-        {/* Header with controls and QR codes */}
-        <div className="p-4 border-b border-border bg-card/50 backdrop-blur">
-          <div className="max-w-[95vw] mx-auto flex items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <h1 className="text-2xl font-bold text-neon-purple">Conference Resume Review</h1>
-              <div className="flex items-center gap-2">
-                <Badge className="bg-neon-green text-primary-foreground">Live Session</Badge>
-                <LiveParticipantCounter currentTarget={currentTarget} />
-              </div>
+      <div className="h-screen bg-gradient-to-br from-background via-background to-muted/20 flex flex-col">
+        {/* Compact Header */}
+        <div className="p-3 border-b border-border bg-card/50 backdrop-blur flex-shrink-0">
+          <div className="max-w-full mx-auto flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <h1 className="text-xl font-bold text-neon-purple">Conference Resume Review</h1>
+              <LiveParticipantCounter currentTarget={currentTarget} />
             </div>
             
-            {/* QR Code Section */}
-            <div className="flex items-center gap-4">
-              <div className="text-center">
-                <QRCodeGenerator 
-                  url={ratingPageUrl} 
-                  title="Scan to Rate & Upload Resume"
-                  size={160}
-                />
-                <p className="text-sm mt-2 text-muted-foreground">Scan to participate</p>
-              </div>
-              <div className="flex gap-2">
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={handleClearStats}
-                  className="border-destructive text-destructive hover:bg-destructive/10"
-                >
-                  <RotateCcw className="w-4 h-4 mr-1" />
-                  Clear Stats
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => setShowResumeView(false)}
-                >
-                  Back to Selection
-                </Button>
-              </div>
+            <div className="flex items-center gap-3">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={handleClearStats}
+                className="border-destructive text-destructive hover:bg-destructive/10"
+              >
+                <RotateCcw className="w-4 h-4 mr-1" />
+                Clear Stats
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setShowResumeView(false)}
+              >
+                Back to Selection
+              </Button>
             </div>
           </div>
         </div>
 
-        {/* Main Content Area */}
-        <div className="h-[calc(100vh-120px)] p-4">
-          <div className="h-full max-w-[95vw] mx-auto flex flex-col gap-4">
-            {/* Resume Display - Top 70% */}
-            <div className="flex-[7] bg-card rounded-lg border border-border/50 overflow-hidden">
-              <div className="h-full flex flex-col">
-                <div className="p-4 border-b border-border bg-card/80">
-                  <h2 className="text-xl font-semibold text-center">Currently Reviewing: {selectedResume.name}</h2>
+        {/* Main Content Area - Full Height */}
+        <div className="flex-1 overflow-hidden">
+          <ResizablePanelGroup direction="horizontal" className="h-full">
+            {/* Resume Display Panel - Left Side */}
+            <ResizablePanel defaultSize={70} minSize={60}>
+              <div className="h-full flex flex-col bg-card">
+                <div className="p-3 border-b border-border bg-card/80 flex-shrink-0">
+                  <h2 className="text-lg font-semibold text-center">Currently Reviewing: {selectedResume.name}</h2>
                 </div>
-                <div className="flex-1 p-4">
+                <div className="flex-1 p-4 overflow-hidden">
                   {selectedResume.file_type === 'application/pdf' ? (
                     <iframe
-                      src={`https://docs.google.com/viewer?url=${encodeURIComponent(`https://kpufipcunkgfpxhnhxxl.supabase.co/storage/v1/object/public/resumes/${selectedResume.file_path}`)}&embedded=true`}
+                      src={`https://docs.google.com/viewer?url=${encodeURIComponent(`https://kotkjuhregqhczxhsynd.supabase.co/storage/v1/object/public/resumes/${selectedResume.file_path}`)}&embedded=true`}
                       className="w-full h-full border-0 rounded"
                       title={selectedResume.name}
                     />
                   ) : (
                     <img
-                      src={`https://kpufipcunkgfpxhnhxxl.supabase.co/storage/v1/object/public/resumes/${selectedResume.file_path}`}
+                      src={`https://kotkjuhregqhczxhsynd.supabase.co/storage/v1/object/public/resumes/${selectedResume.file_path}`}
                       alt={selectedResume.name}
                       className="w-full h-full object-contain rounded"
                     />
                   )}
                 </div>
               </div>
-            </div>
+            </ResizablePanel>
             
-            {/* Live Ratings - Bottom 30% in horizontal layout */}
-            <div className="flex-[3] bg-card rounded-lg border border-border/50 overflow-hidden">
-              <div className="h-full flex flex-col">
-                <div className="p-3 border-b border-border bg-card/80">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-semibold flex items-center gap-2">
-                      <Bell className="w-5 h-5 text-neon-pink" />
-                      Live Ratings ({transformedRatings.length})
-                    </h3>
-                    <div className="text-sm text-muted-foreground">
-                      Updates in real-time
-                    </div>
-                  </div>
+            <ResizableHandle withHandle />
+            
+            {/* Live Ratings Panel - Right Side */}
+            <ResizablePanel defaultSize={30} minSize={25}>
+              <div className="h-full flex flex-col bg-card">
+                {/* QR Code Section */}
+                <div className="p-3 border-b border-border bg-card/80 flex-shrink-0">
+                  <QRCodeGenerator 
+                    url={ratingPageUrl} 
+                    title="Scan to Rate & Upload Resume"
+                    size={140}
+                  />
                 </div>
-                <div className="flex-1 p-4">
-                  {transformedRatings.length === 0 ? (
-                    <div className="h-full flex items-center justify-center">
-                      <div className="text-center text-muted-foreground">
-                        <Users className="w-12 h-12 mx-auto mb-2 opacity-50" />
-                        <p>Waiting for ratings...</p>
-                        <p className="text-sm">Scan the QR code to submit your rating</p>
+                
+                {/* Live Ratings */}
+                <div className="flex-1 overflow-hidden">
+                  <div className="h-full flex flex-col">
+                    <div className="p-3 border-b border-border bg-card/80 flex-shrink-0">
+                      <div className="flex items-center justify-between">
+                        <h3 className="font-semibold flex items-center gap-2">
+                          <Bell className="w-4 h-4 text-neon-pink" />
+                          Live Ratings ({transformedRatings.length})
+                        </h3>
+                        <Badge variant="outline" className="text-xs">Real-time</Badge>
                       </div>
                     </div>
-                  ) : (
-                    <div className="h-full overflow-x-auto">
-                      <div className="flex gap-4 h-full min-w-max">
-                        {transformedRatings.map((rating, index) => (
-                          <div 
-                            key={rating.id} 
-                            className="flex-shrink-0 w-80 bg-muted/30 rounded-lg p-4 border border-border/30"
-                          >
-                            <div className="h-full flex flex-col">
+                    <div className="flex-1 overflow-auto">
+                      {transformedRatings.length === 0 ? (
+                        <div className="h-full flex items-center justify-center p-4">
+                          <div className="text-center text-muted-foreground">
+                            <Users className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                            <p className="text-sm">Waiting for ratings...</p>
+                            <p className="text-xs">Scan QR to rate</p>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="p-3 space-y-3">
+                          {transformedRatings.map((rating, index) => (
+                            <div 
+                              key={rating.id} 
+                              className="bg-muted/30 rounded-lg p-3 border border-border/30"
+                            >
                               <div className="flex items-center justify-between mb-2">
                                 <Badge variant="outline" className="text-xs">
                                   {rating.category}
@@ -392,16 +388,16 @@ const LiveDisplayPage = () => {
                                 </span>
                               </div>
                               
-                              <div className="mb-3">
+                              <div className="mb-2">
                                 <div className="flex items-center gap-2 mb-1">
-                                  <span className="text-2xl font-bold text-neon-purple">
+                                  <span className="text-lg font-bold text-neon-purple">
                                     {rating.overall}/5
                                   </span>
                                   <div className="flex">
                                     {[1, 2, 3, 4, 5].map((star) => (
                                       <span
                                         key={star}
-                                        className={`text-lg ${
+                                        className={`text-sm ${
                                           star <= rating.overall
                                             ? 'text-yellow-400'
                                             : 'text-muted-foreground/30'
@@ -412,7 +408,7 @@ const LiveDisplayPage = () => {
                                     ))}
                                   </div>
                                 </div>
-                                <div className="grid grid-cols-2 gap-2 text-xs">
+                                <div className="grid grid-cols-2 gap-1 text-xs">
                                   <div>
                                     <span className="text-muted-foreground">Presentation:</span>
                                     <span className="ml-1 font-medium">{rating.presentation}/5</span>
@@ -425,29 +421,29 @@ const LiveDisplayPage = () => {
                               </div>
                               
                               {rating.feedback && (
-                                <div className="flex-1">
+                                <div className="mb-2">
                                   <p className="text-xs text-muted-foreground mb-1">Feedback:</p>
-                                  <p className="text-sm bg-background/50 rounded p-2 text-foreground line-clamp-3">
+                                  <p className="text-xs bg-background/50 rounded p-2 text-foreground line-clamp-2">
                                     {rating.feedback}
                                   </p>
                                 </div>
                               )}
                               
                               {rating.reaction && (
-                                <div className="mt-2 text-center">
-                                  <span className="text-2xl">{rating.reaction}</span>
+                                <div className="text-center">
+                                  <span className="text-lg">{rating.reaction}</span>
                                 </div>
                               )}
                             </div>
-                          </div>
-                        ))}
-                      </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
-                  )}
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
+            </ResizablePanel>
+          </ResizablePanelGroup>
         </div>
         <FloatingReactions currentTarget={currentTarget} />
       </div>
