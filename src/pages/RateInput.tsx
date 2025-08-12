@@ -175,10 +175,10 @@ const RateInputPage = () => {
     }
 
     setHasSubmittedRating(true);
-    setCurrentStep('upload');
+    // DON'T change step - keep user on rating form to vote again
     toast({
       title: "Rating Submitted! ⭐",
-      description: "Thank you for your feedback. You can now upload your resume.",
+      description: "Your vote has been cast! You can vote again with different ratings.",
     });
   };
 

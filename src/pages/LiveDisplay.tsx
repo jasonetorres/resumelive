@@ -89,9 +89,13 @@ const LiveDisplayPage = () => {
         },
         (payload) => {
           const newRating = payload.new as Rating;
-          // Only add if it's for the current target
-          if (newRating.target_person === currentTarget) {
+          console.log('LiveDisplayPage: New rating received:', newRating);
+          // Only add if it's for the current target and has actual rating data (not just quick reactions)
+          if (newRating.target_person === currentTarget && newRating.overall !== null) {
+            console.log('LiveDisplayPage: Adding rating to display');
             setRatings(prev => [newRating, ...prev]);
+          } else {
+            console.log('LiveDisplayPage: Ignoring rating - not for current target or is quick reaction');
           }
         }
       )
