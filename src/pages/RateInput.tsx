@@ -25,7 +25,7 @@ const RateInputPage = () => {
     // Fetch current target
     const fetchCurrentTarget = async () => {
       console.log('RateInputPage: Fetching current target...');
-      const { data } = await supabase
+      const { data } = await (supabase as any)
         .from('current_target')
         .select('target_person')
         .eq('id', 1)
@@ -131,7 +131,7 @@ const RateInputPage = () => {
       throw new Error('No target set');
     }
 
-    const { error } = await supabase
+    const { error } = await (supabase as any)
       .from('ratings')
       .insert({
         target_person: currentTarget,

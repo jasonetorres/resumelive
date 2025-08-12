@@ -55,7 +55,7 @@ const LiveDisplayPage = () => {
     // Fetch initial data
     const fetchInitialData = async () => {
       // Get current target
-      const { data: targetData } = await supabase
+      const { data: targetData } = await (supabase as any)
         .from('current_target')
         .select('target_person')
         .eq('id', 1)
@@ -66,8 +66,8 @@ const LiveDisplayPage = () => {
 
       // Get uploaded resumes
       try {
-        const { data: resumesData, error: resumesError } = await supabase
-          .from('resumes' as any)
+        const { data: resumesData, error: resumesError } = await (supabase as any)
+          .from('resumes')
           .select('*')
           .order('created_at', { ascending: false });
         
@@ -83,7 +83,7 @@ const LiveDisplayPage = () => {
 
       // Get ratings for current target (only real ratings, not quick reactions)
       if (targetData?.target_person) {
-        const { data: ratingsData } = await supabase
+        const { data: ratingsData } = await (supabase as any)
           .from('ratings')
           .select('*')
           .eq('target_person', targetData.target_person)
@@ -114,7 +114,7 @@ const LiveDisplayPage = () => {
           
           // Fetch ratings for new target (only real ratings)
           if (newTarget) {
-            const { data: ratingsData } = await supabase
+            const { data: ratingsData } = await (supabase as any)
               .from('ratings')
               .select('*')
               .eq('target_person', newTarget)
@@ -190,7 +190,7 @@ const LiveDisplayPage = () => {
       console.log('LiveDisplayPage: Attempting to delete ratings for target:', currentTarget);
       
       // First, let's see what ratings exist
-      const { data: existingRatings, error: fetchError } = await supabase
+      const { data: existingRatings, error: fetchError } = await (supabase as any)
         .from('ratings')
         .select('*')
         .eq('target_person', currentTarget);
@@ -201,7 +201,7 @@ const LiveDisplayPage = () => {
       }
       
       // Now delete them
-      const { data, error, count } = await supabase
+      const { data, error, count } = await (supabase as any)
         .from('ratings')
         .delete()
         .eq('target_person', currentTarget)
@@ -247,7 +247,7 @@ const LiveDisplayPage = () => {
     
     // Update the current target in the database
     try {
-      await supabase
+      await (supabase as any)
         .from('current_target')
         .update({ target_person: resume.name })
         .eq('id', 1);
