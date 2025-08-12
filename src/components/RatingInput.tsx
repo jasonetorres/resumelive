@@ -90,16 +90,14 @@ export function RatingInput({ onSubmit, currentTarget }: RatingInputProps) {
         agreement
       });
       
-      // Reset form
-      setOverall(0);
-      setPresentation(0);
-      setContent(0);
+      // Don't reset form - let users vote multiple times with same data
+      // Only clear feedback and agreement for next vote
       setFeedback('');
       setAgreement(undefined);
       
       toast({
         title: "Vote Submitted! 🎉",
-        description: "Your anonymous vote has been cast and will appear on stream!"
+        description: "Your vote has been cast! You can vote again with different ratings.",
       });
     } catch (error) {
       toast({
