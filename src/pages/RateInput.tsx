@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { RatingInput } from '@/components/RatingInput';
 import { LeadForm } from '@/components/LeadForm';
-import { ResumeManager } from '@/components/ResumeManager';
+import { PersonalResumeUploader } from '@/components/PersonalResumeUploader';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
@@ -325,14 +325,14 @@ const RateInputPage = () => {
                     Upload your resume to be considered for future reviews
                   </p>
                 </div>
-                <ResumeManager />
+                <PersonalResumeUploader onUploadSuccess={handleCompleteFlow} />
                 <div className="mt-3 text-center">
                   <Button 
                     variant="outline" 
                     onClick={handleCompleteFlow}
                     className="border-neon-cyan text-neon-cyan hover:bg-neon-cyan/10"
                   >
-                    Skip Upload & Finish
+                    Finish Without Upload
                   </Button>
                 </div>
               </div>
