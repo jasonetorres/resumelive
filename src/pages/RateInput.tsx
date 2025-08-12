@@ -301,12 +301,19 @@ const RateInputPage = () => {
             )}
 
             {currentStep === 'rating' && !currentTarget && (
-              <div className="text-center py-6">
-                <div className="text-muted-foreground">
-                  <Users className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                  <p className="mb-2">No resume is currently being reviewed</p>
-                  <p className="text-sm">Please wait for the session to begin</p>
+              <div>
+                <div className="text-center mb-4">
+                  <h3 className="text-lg font-semibold text-neon-orange mb-1">No Active Session</h3>
+                  <p className="text-sm text-muted-foreground">
+                    There's no resume being reviewed right now, but you can still upload your resume!
+                  </p>
                 </div>
+                <Button 
+                  onClick={() => setCurrentStep('upload')}
+                  className="w-full bg-neon-purple hover:bg-neon-purple/90"
+                >
+                  Continue to Upload Resume
+                </Button>
               </div>
             )}
 

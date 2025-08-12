@@ -14,7 +14,117 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      current_target: {
+        Row: {
+          id: number
+          target_person: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          id?: number
+          target_person?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: number
+          target_person?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      leads: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          job_title: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          job_title: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          job_title?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      ratings: {
+        Row: {
+          agreement: string | null
+          category: string
+          content: number | null
+          created_at: string
+          feedback: string | null
+          id: string
+          overall: number | null
+          presentation: number | null
+          reaction: string | null
+          target_person: string
+        }
+        Insert: {
+          agreement?: string | null
+          category: string
+          content?: number | null
+          created_at?: string
+          feedback?: string | null
+          id?: string
+          overall?: number | null
+          presentation?: number | null
+          reaction?: string | null
+          target_person: string
+        }
+        Update: {
+          agreement?: string | null
+          category?: string
+          content?: number | null
+          created_at?: string
+          feedback?: string | null
+          id?: string
+          overall?: number | null
+          presentation?: number | null
+          reaction?: string | null
+          target_person?: string
+        }
+        Relationships: []
+      }
+      resumes: {
+        Row: {
+          created_at: string
+          file_path: string
+          file_size: number
+          file_type: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          file_path: string
+          file_size: number
+          file_type: string
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          file_path?: string
+          file_size?: number
+          file_type?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
