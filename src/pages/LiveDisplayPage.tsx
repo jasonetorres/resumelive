@@ -460,7 +460,7 @@ const LiveDisplayPage = () => {
                     
                     {/* Live Chat */}
                     <ResizablePanel defaultSize={50} minSize={30}>
-                      <LiveChat currentTarget={currentTarget} />
+                      <LiveChat currentTarget={currentTarget} viewOnly={true} />
                     </ResizablePanel>
                   </ResizablePanelGroup>
                 </div>

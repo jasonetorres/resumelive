@@ -17,9 +17,10 @@ interface ChatMessage {
 
 interface LiveChatProps {
   currentTarget: string | null;
+  viewOnly?: boolean;
 }
 
-export function LiveChat({ currentTarget }: LiveChatProps) {
+export function LiveChat({ currentTarget, viewOnly = false }: LiveChatProps) {
   const [message, setMessage] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -153,35 +154,39 @@ export function LiveChat({ currentTarget }: LiveChatProps) {
           </div>
         </ScrollArea>
 
-        {/* Input Area */}
-        <div className="flex gap-2">
-          <Input
-            placeholder={currentTarget ? "Type your message..." : "Waiting for session..."}
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            onKeyPress={handleKeyPress}
-            disabled={isSending || !currentTarget}
-            className="flex-1 border-neon-cyan/30 focus:border-neon-cyan text-sm"
-            maxLength={200}
-          />
-          <Button
-            onClick={handleSendMessage}
-            disabled={isSending || !message.trim() || !currentTarget}
-            className="bg-gradient-to-r from-neon-cyan to-neon-green hover:from-neon-green hover:to-neon-cyan text-primary-foreground px-3"
-            size="sm"
-          >
-            {isSending ? (
-              <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-            ) : (
-              <Send className="w-4 h-4" />
+        {/* Input Area - Only show if not view-only */}
+        {!viewOnly && (
+          <>
+            <div className="flex gap-2">
+              <Input
+                placeholder={currentTarget ? "Type your message..." : "Waiting for session..."}
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                onKeyPress={handleKeyPress}
+                disabled={isSending || !currentTarget}
+                className="flex-1 border-neon-cyan/30 focus:border-neon-cyan text-sm"
+                maxLength={200}
+              />
+              <Button
+                onClick={handleSendMessage}
+                disabled={isSending || !message.trim() || !currentTarget}
+                className="bg-gradient-to-r from-neon-cyan to-neon-green hover:from-neon-green hover:to-neon-cyan text-primary-foreground px-3"
+                size="sm"
+              >
+                {isSending ? (
+                  <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <Send className="w-4 h-4" />
+                )}
+              </Button>
+            </div>
+            
+            {message.length > 0 && (
+              <div className="text-xs text-muted-foreground text-right">
+                {message.length}/200 characters
+              </div>
             )}
-          </Button>
-        </div>
-        
-        {message.length > 0 && (
-          <div className="text-xs text-muted-foreground text-right">
-            {message.length}/200 characters
-          </div>
+          </>
         )}
       </CardContent>
     </Card>
