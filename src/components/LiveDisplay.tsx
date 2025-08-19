@@ -55,26 +55,26 @@ export function LiveDisplay({ ratings }: LiveDisplayProps) {
   const calculateStats = (ratings: Rating[]) => {
     // Filter out quick reactions (ratings with overall = 0)
     const realRatings = ratings.filter(r => r.overall > 0);
-    if (realRatings.length === 0) return { average: 0, presentation: 0, content: 0 };
+    if (realRatings.length === 0) return { average: 0, resumeQuality: 0, layout: 0, content: 0 };
     
     const sum = realRatings.reduce((acc, r) => ({
       overall: acc.overall + r.overall,
-      presentation: acc.presentation + r.presentation,
+      resumeQuality: acc.resumeQuality + r.presentation, // Map presentation to resumeQuality
+      layout: acc.layout + (r.content || 0), // Use content field for layout since we don't have separate field
       content: acc.content + r.content
-    }), { overall: 0, presentation: 0, content: 0 });
+    }), { overall: 0, resumeQuality: 0, layout: 0, content: 0 });
     
     return {
       average: sum.overall / realRatings.length,
-      presentation: sum.presentation / realRatings.length,
+      resumeQuality: sum.resumeQuality / realRatings.length,
+      layout: sum.layout / realRatings.length,
       content: sum.content / realRatings.length
     };
   };
 
-  const resumeRatings = displayedRatings.filter(r => r.category === 'resume' && r.overall !== null);
-  const linkedinRatings = displayedRatings.filter(r => r.category === 'linkedin' && r.overall !== null);
+  // Only show resume ratings now (remove LinkedIn)
+  const resumeRatings = displayedRatings.filter(r => r.overall !== null);
   const allStats = calculateStats(displayedRatings.filter(r => r.overall > 0));
-  const resumeStats = calculateStats(resumeRatings);
-  const linkedinStats = calculateStats(linkedinRatings);
 
   // Calculate agreement stats
   const realRatingsWithAgreement = displayedRatings.filter(r => r.overall > 0);
@@ -170,7 +170,7 @@ export function LiveDisplay({ ratings }: LiveDisplayProps) {
       <div className={`flex-1 transition-all duration-700 transform overflow-hidden ${
         isRevealed ? 'opacity-100 translate-y-0 scale-100' : 'opacity-30 translate-y-4 scale-95 pointer-events-none'
       }`}>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 mb-4 flex-shrink-0">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 mb-4 flex-shrink-0">
           {/* Overall Stats */}
           <Card className={`glow-effect border-neon-purple/50 transition-all duration-500 ${
             isRevealed ? 'animate-scale-in' : ''
@@ -197,15 +197,22 @@ export function LiveDisplay({ ratings }: LiveDisplayProps) {
                   isRevealed ? 'animate-fade-in' : 'blur-sm opacity-30'
                 }`}>
                   <div className="flex justify-between text-xs">
-                    <span>Presentation</span>
+                    <span>Resume Quality</span>
                     <span className="text-neon-cyan">
-                      {isRevealed ? allStats.presentation.toFixed(1) : '?'}
+                      {isRevealed ? allStats.resumeQuality.toFixed(1) : '?'}
                     </span>
                   </div>
-                  <Progress value={isRevealed ? allStats.presentation * 20 : 0} className="h-1" />
+                  <Progress value={isRevealed ? allStats.resumeQuality * 20 : 0} className="h-1" />
                   <div className="flex justify-between text-xs">
-                    <span>Content</span>
+                    <span>Layout & Design</span>
                     <span className="text-neon-green">
+                      {isRevealed ? allStats.layout.toFixed(1) : '?'}
+                    </span>
+                  </div>
+                  <Progress value={isRevealed ? allStats.layout * 20 : 0} className="h-1" />
+                  <div className="flex justify-between text-xs">
+                    <span>Content Quality</span>
+                    <span className="text-neon-pink">
                       {isRevealed ? allStats.content.toFixed(1) : '?'}
                     </span>
                   </div>
@@ -230,67 +237,31 @@ export function LiveDisplay({ ratings }: LiveDisplayProps) {
                 <div className={`text-4xl font-bold text-neon-purple transition-all duration-700 delay-300 ${
                   isRevealed ? 'animate-fade-in' : 'blur-sm'
                 }`}>
-                  {isRevealed ? resumeStats.average.toFixed(1) : '?'}
+                  {isRevealed ? allStats.average.toFixed(1) : '?'}
                 </div>
                 <div className={`transition-all duration-700 delay-400 ${
                   isRevealed ? 'animate-fade-in' : 'blur-sm opacity-50'
                 }`}>
-                  <StarRating value={isRevealed ? Math.round(resumeStats.average) : 0} readonly />
+                  <StarRating value={isRevealed ? Math.round(allStats.average) : 0} readonly />
                 </div>
                 <div className={`grid grid-cols-2 gap-2 text-sm transition-all duration-700 delay-500 ${
                   isRevealed ? 'animate-fade-in' : 'blur-sm opacity-30'
                 }`}>
                   <div className="text-center">
                     <div className="text-neon-cyan font-semibold">
-                      {isRevealed ? resumeStats.presentation.toFixed(1) : '?'}
+                      {isRevealed ? allStats.resumeQuality.toFixed(1) : '?'}
                     </div>
-                    <div className="text-muted-foreground">Presentation</div>
+                    <div className="text-muted-foreground">Quality</div>
                   </div>
                   <div className="text-center">
                     <div className="text-neon-green font-semibold">
-                      {isRevealed ? resumeStats.content.toFixed(1) : '?'}
+                      {isRevealed ? allStats.layout.toFixed(1) : '?'}
                     </div>
-                    <div className="text-muted-foreground">Content</div>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* LinkedIn Stats */}
-          <Card className={`glow-effect border-neon-cyan/50 transition-all duration-500 delay-200 ${
-            isRevealed ? 'animate-scale-in' : ''
-          }`}>
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2">
-                <Badge className="bg-neon-cyan text-primary-foreground">LinkedIn</Badge>
-                <span className="text-sm text-muted-foreground">({linkedinRatings.length} votes)</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center space-y-4">
-                <div className={`text-4xl font-bold text-neon-cyan transition-all duration-700 delay-600 ${
-                  isRevealed ? 'animate-fade-in' : 'blur-sm'
-                }`}>
-                  {isRevealed ? linkedinStats.average.toFixed(1) : '?'}
-                </div>
-                <div className={`transition-all duration-700 delay-700 ${
-                  isRevealed ? 'animate-fade-in' : 'blur-sm opacity-50'
-                }`}>
-                  <StarRating value={isRevealed ? Math.round(linkedinStats.average) : 0} readonly />
-                </div>
-                <div className={`grid grid-cols-2 gap-2 text-sm transition-all duration-700 delay-800 ${
-                  isRevealed ? 'animate-fade-in' : 'blur-sm opacity-30'
-                }`}>
-                  <div className="text-center">
-                    <div className="text-neon-cyan font-semibold">
-                      {isRevealed ? linkedinStats.presentation.toFixed(1) : '?'}
-                    </div>
-                    <div className="text-muted-foreground">Presentation</div>
+                    <div className="text-muted-foreground">Layout</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-neon-green font-semibold">
-                      {isRevealed ? linkedinStats.content.toFixed(1) : '?'}
+                    <div className="text-neon-pink font-semibold">
+                      {isRevealed ? allStats.content.toFixed(1) : '?'}
                     </div>
                     <div className="text-muted-foreground">Content</div>
                   </div>
@@ -338,9 +309,9 @@ export function LiveDisplay({ ratings }: LiveDisplayProps) {
                 >
                   <Badge 
                     variant="outline" 
-                    className={`text-xs ${rating.category === 'resume' ? 'border-neon-purple/50' : 'border-neon-cyan/50'}`}
+                    className="text-xs border-neon-purple/50"
                   >
-                    {rating.category === 'resume' ? 'R' : 'L'}
+                    R
                   </Badge>
                   <StarRating value={isRevealed ? rating.overall : 0} readonly size="sm" />
                   <span className="text-xs font-semibold text-neon-orange">

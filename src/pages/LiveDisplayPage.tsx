@@ -192,6 +192,35 @@ const LiveDisplayPage = () => {
     }
   };
 
+  const handleResetScores = async () => {
+    if (!currentTarget) {
+      return;
+    }
+    
+    try {
+      // Only delete ratings (scores), not chat messages
+      const { error } = await (supabase as any)
+        .from('ratings')
+        .delete()
+        .eq('target_person', currentTarget);
+      
+      if (error) {
+        console.error('Error resetting scores:', error);
+        return;
+      }
+      
+      // Clear local ratings state but keep chat
+      setRatings([]);
+      
+      toast({
+        title: "Scores Reset! 🔄",
+        description: "All ratings have been cleared. Chat history is preserved.",
+      });
+    } catch (error) {
+      console.error('Exception while resetting scores:', error);
+    }
+  };
+
   const handleSetTarget = async () => {
     if (!selectedResumeId) {
       return;
@@ -256,11 +285,20 @@ const LiveDisplayPage = () => {
               <Button 
                 variant="outline" 
                 size="sm"
+                onClick={handleResetScores}
+                className="border-neon-orange text-neon-orange hover:bg-neon-orange/10"
+              >
+                <RotateCcw className="w-4 h-4 mr-1" />
+                Reset Scores
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm"
                 onClick={handleClearStats}
                 className="border-destructive text-destructive hover:bg-destructive/10"
               >
                 <RotateCcw className="w-4 h-4 mr-1" />
-                Clear Stats
+                Clear All
               </Button>
               <Button 
                 variant="outline" 
