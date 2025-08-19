@@ -12,7 +12,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Loader2, Users, Trophy } from 'lucide-react';
 
 const leadSchema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters'),
+  firstName: z.string().min(2, 'First name must be at least 2 characters'),
+  lastName: z.string().min(2, 'Last name must be at least 2 characters'),
   email: z.string().email('Please enter a valid email address'),
   jobTitle: z.string().min(2, 'Job title must be at least 2 characters'),
 });
@@ -30,7 +31,8 @@ export const LeadForm: React.FC<LeadFormProps> = ({ onSuccess }) => {
   const form = useForm<LeadFormData>({
     resolver: zodResolver(leadSchema),
     defaultValues: {
-      name: '',
+      firstName: '',
+      lastName: '',
       email: '',
       jobTitle: '',
     },
@@ -41,11 +43,13 @@ export const LeadForm: React.FC<LeadFormProps> = ({ onSuccess }) => {
     
     try {
       // Store in Supabase leads table
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from('leads')
         .insert([
           {
-            name: data.name,
+            name: `${data.firstName} ${data.lastName}`, // Keep name for backward compatibility
+            first_name: data.firstName,
+            last_name: data.lastName,
             email: data.email,
             job_title: data.jobTitle,
           }
@@ -91,24 +95,45 @@ export const LeadForm: React.FC<LeadFormProps> = ({ onSuccess }) => {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-sm">Full Name</FormLabel>
-              <FormControl>
-                <Input 
-                  placeholder="Enter your full name" 
-                  {...field}
-                  disabled={isSubmitting}
-                  className="border-muted-foreground/20 focus:border-neon-purple h-9"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className="grid grid-cols-2 gap-3">
+          <FormField
+            control={form.control}
+            name="firstName"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-sm">First Name</FormLabel>
+                <FormControl>
+                  <Input 
+                    placeholder="First name" 
+                    {...field}
+                    disabled={isSubmitting}
+                    className="border-muted-foreground/20 focus:border-neon-purple h-9"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="lastName"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-sm">Last Name</FormLabel>
+                <FormControl>
+                  <Input 
+                    placeholder="Last name" 
+                    {...field}
+                    disabled={isSubmitting}
+                    className="border-muted-foreground/20 focus:border-neon-purple h-9"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
         <FormField
           control={form.control}

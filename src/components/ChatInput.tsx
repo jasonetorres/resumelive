@@ -26,6 +26,18 @@ export function ChatInput({ currentTarget }: ChatInputProps) {
       return;
     }
 
+    // Get user's first name from session storage
+    const leadData = sessionStorage.getItem('leadData');
+    let firstName = 'Anonymous';
+    if (leadData) {
+      try {
+        const parsedData = JSON.parse(leadData);
+        firstName = parsedData.firstName || 'Anonymous';
+      } catch (e) {
+        console.error('Error parsing lead data:', e);
+      }
+    }
+
     setIsSending(true);
     
     try {
@@ -34,6 +46,7 @@ export function ChatInput({ currentTarget }: ChatInputProps) {
         .insert({
           target_person: currentTarget,
           message: message.trim(),
+          first_name: firstName,
         });
 
       if (error) throw error;

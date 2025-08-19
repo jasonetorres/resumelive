@@ -17,18 +17,21 @@ export type Database = {
       chat_messages: {
         Row: {
           created_at: string
+          first_name: string | null
           id: string
           message: string
           target_person: string
         }
         Insert: {
           created_at?: string
+          first_name?: string | null
           id?: string
           message: string
           target_person: string
         }
         Update: {
           created_at?: string
+          first_name?: string | null
           id?: string
           message?: string
           target_person?: string
@@ -57,24 +60,30 @@ export type Database = {
         Row: {
           created_at: string
           email: string
+          first_name: string | null
           id: string
           job_title: string
+          last_name: string | null
           name: string
           updated_at: string
         }
         Insert: {
           created_at?: string
           email: string
+          first_name?: string | null
           id?: string
           job_title: string
+          last_name?: string | null
           name: string
           updated_at?: string
         }
         Update: {
           created_at?: string
           email?: string
+          first_name?: string | null
           id?: string
           job_title?: string
+          last_name?: string | null
           name?: string
           updated_at?: string
         }

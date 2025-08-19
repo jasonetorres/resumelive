@@ -11,6 +11,7 @@ interface ChatMessage {
   id: string;
   message: string;
   target_person: string;
+  first_name?: string;
   created_at: string;
 }
 
@@ -141,8 +142,9 @@ export function LiveChat({ currentTarget }: LiveChatProps) {
             ) : (
               messages.map((msg) => (
                 <div key={msg.id} className="bg-muted/30 rounded-lg p-2 break-words">
-                  <div className="text-xs text-muted-foreground mb-1">
-                    {new Date(msg.created_at).toLocaleTimeString()}
+                  <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
+                    <span className="font-medium text-neon-cyan">{msg.first_name || 'Anonymous'}</span>
+                    <span>{new Date(msg.created_at).toLocaleTimeString()}</span>
                   </div>
                   <div className="text-xs">{msg.message}</div>
                 </div>
