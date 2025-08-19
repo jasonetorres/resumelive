@@ -123,28 +123,28 @@ export function LiveChat({ currentTarget }: LiveChatProps) {
   };
 
   return (
-    <Card className="h-full flex flex-col border-neon-cyan/30">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-lg bg-gradient-to-r from-neon-cyan to-neon-green bg-clip-text text-transparent flex items-center gap-2">
-          <MessageCircle className="w-5 h-5 text-neon-cyan" />
+    <Card className="h-full flex flex-col border-neon-cyan/30 overflow-hidden">
+      <CardHeader className="pb-2 flex-shrink-0">
+        <CardTitle className="text-sm bg-gradient-to-r from-neon-cyan to-neon-green bg-clip-text text-transparent flex items-center gap-2">
+          <MessageCircle className="w-4 h-4 text-neon-cyan" />
           Live Chat ({messages.length})
         </CardTitle>
       </CardHeader>
-      <CardContent className="flex-1 flex flex-col p-3 gap-3">
+      <CardContent className="flex-1 flex flex-col p-2 gap-2 min-h-0">
         {/* Messages Area */}
-        <ScrollArea ref={scrollAreaRef} className="flex-1 pr-3">
-          <div className="space-y-2">
+        <ScrollArea ref={scrollAreaRef} className="flex-1 pr-2 min-h-0">
+          <div className="space-y-1">
             {messages.length === 0 ? (
-              <div className="text-center text-muted-foreground text-sm py-4">
+              <div className="text-center text-muted-foreground text-xs py-2">
                 {currentTarget ? "No messages yet. Be the first to chat!" : "Waiting for session to start..."}
               </div>
             ) : (
               messages.map((msg) => (
-                <div key={msg.id} className="bg-muted/30 rounded-lg p-3 break-words">
-                  <div className="text-sm text-muted-foreground mb-1">
+                <div key={msg.id} className="bg-muted/30 rounded-lg p-2 break-words">
+                  <div className="text-xs text-muted-foreground mb-1">
                     {new Date(msg.created_at).toLocaleTimeString()}
                   </div>
-                  <div className="text-sm">{msg.message}</div>
+                  <div className="text-xs">{msg.message}</div>
                 </div>
               ))
             )}

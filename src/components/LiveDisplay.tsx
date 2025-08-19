@@ -93,7 +93,7 @@ export function LiveDisplay({ ratings }: LiveDisplayProps) {
   };
 
   return (
-    <div className="h-full bg-gradient-to-br from-background via-background to-background/80 p-4 relative overflow-hidden flex flex-col">
+    <div className="h-full bg-gradient-to-br from-background via-background to-background/80 p-2 relative overflow-hidden flex flex-col">
       {/* Confetti Animation */}
       {showConfetti && (
         <div className="absolute inset-0 pointer-events-none z-50">
@@ -117,11 +117,11 @@ export function LiveDisplay({ ratings }: LiveDisplayProps) {
         </div>
       )}
       {/* Header */}
-      <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-neon-purple via-neon-pink to-neon-orange bg-clip-text text-transparent mb-2">
+      <div className="text-center mb-4">
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-neon-purple via-neon-pink to-neon-orange bg-clip-text text-transparent mb-2">
           🚀 RESUME RATINGS LIVE 🚀
         </h1>
-        <p className="text-lg text-muted-foreground mb-4">feedback tool for resumes, live!</p>
+        <p className="text-base text-muted-foreground mb-3">feedback tool for resumes, live!</p>
         <div className="flex justify-center items-center gap-6 flex-wrap">
           <div className="flex items-center gap-2 text-neon-cyan">
             <Users className="w-5 h-5" />
@@ -170,21 +170,21 @@ export function LiveDisplay({ ratings }: LiveDisplayProps) {
       <div className={`flex-1 transition-all duration-700 transform overflow-hidden ${
         isRevealed ? 'opacity-100 translate-y-0 scale-100' : 'opacity-30 translate-y-4 scale-95 pointer-events-none'
       }`}>
-        <div className="flex justify-center mb-4 flex-shrink-0">
+        <div className="flex justify-center mb-3 flex-shrink-0">
           {/* Single Score Card */}
           <Card className={`glow-effect border-neon-purple/50 transition-all duration-500 max-w-md w-full ${
             isRevealed ? 'animate-scale-in' : ''
             }`}>
-            <CardHeader className="pb-3 text-center">
-              <CardTitle className="flex items-center justify-center gap-2 text-neon-purple text-lg">
-                <TrendingUp className="w-5 h-5" />
+            <CardHeader className="pb-2 text-center">
+              <CardTitle className="flex items-center justify-center gap-2 text-neon-purple text-base">
+                <TrendingUp className="w-4 h-4" />
                 SCORE
               </CardTitle>
-              <div className="text-sm text-muted-foreground">({resumeRatings.length} votes)</div>
+              <div className="text-xs text-muted-foreground">({resumeRatings.length} votes)</div>
             </CardHeader>
-            <CardContent className="pb-4">
-              <div className="text-center space-y-4">
-                <div className={`text-5xl font-bold text-neon-orange transition-all duration-700 ${
+            <CardContent className="pb-3">
+              <div className="text-center space-y-3">
+                <div className={`text-4xl font-bold text-neon-orange transition-all duration-700 ${
                   isRevealed ? 'animate-fade-in' : 'blur-sm'
                 }`}>
                   {isRevealed ? allStats.average.toFixed(1) : '?'}
@@ -192,29 +192,29 @@ export function LiveDisplay({ ratings }: LiveDisplayProps) {
                 <div className={`transition-all duration-700 delay-100 ${
                   isRevealed ? 'animate-fade-in' : 'blur-sm opacity-50'
                 }`}>
-                  <StarRating value={isRevealed ? Math.round(allStats.average) : 0} readonly size="lg" />
+                  <StarRating value={isRevealed ? Math.round(allStats.average) : 0} readonly size="md" />
                 </div>
                 
                 {/* Category Breakdown */}
-                <div className={`space-y-3 transition-all duration-700 delay-200 ${
+                <div className={`space-y-2 transition-all duration-700 delay-200 ${
                   isRevealed ? 'animate-fade-in' : 'blur-sm opacity-30'
                 }`}>
-                  <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div className="grid grid-cols-2 gap-2 text-xs">
                     <div className="text-center">
-                      <div className="text-neon-cyan font-bold text-lg">
+                      <div className="text-neon-cyan font-bold text-base">
                         {isRevealed ? allStats.resumeQuality.toFixed(1) : '?'}
                       </div>
                       <div className="text-muted-foreground">Resume Quality</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-neon-green font-bold text-lg">
+                      <div className="text-neon-green font-bold text-base">
                         {isRevealed ? allStats.layout.toFixed(1) : '?'}
                       </div>
                       <div className="text-muted-foreground">Layout & Design</div>
                     </div>
                   </div>
                   <div className="text-center">
-                    <div className="text-neon-pink font-bold text-lg">
+                    <div className="text-neon-pink font-bold text-base">
                       {isRevealed ? allStats.content.toFixed(1) : '?'}
                     </div>
                     <div className="text-muted-foreground">Content Quality</div>

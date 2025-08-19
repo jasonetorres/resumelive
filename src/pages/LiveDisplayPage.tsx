@@ -272,7 +272,7 @@ const LiveDisplayPage = () => {
 
   if (showResumeView && selectedResume) {
     return (
-      <div className="h-screen bg-gradient-to-br from-background via-background to-muted/20 flex flex-col">
+      <div className="h-screen bg-gradient-to-br from-background via-background to-muted/20 flex flex-col overflow-hidden">
         {/* Compact Header */}
         <div className="p-3 border-b border-border bg-card/50 backdrop-blur flex-shrink-0">
           <div className="max-w-full mx-auto flex items-center justify-between gap-4">
@@ -348,7 +348,7 @@ const LiveDisplayPage = () => {
                   <QRCodeGenerator 
                     url={ratingPageUrl} 
                     title="Scan to Rate & Upload Resume"
-                    size={120}
+                    size={100}
                   />
                 </div>
                 
@@ -356,7 +356,7 @@ const LiveDisplayPage = () => {
                 <div className="flex-1 overflow-hidden">
                   <ResizablePanelGroup direction="vertical" className="h-full">
                     {/* Live Ratings */}
-                    <ResizablePanel defaultSize={60} minSize={40}>
+                    <ResizablePanel defaultSize={50} minSize={30}>
                       <div className="h-full flex flex-col">
                         <div className="p-3 border-b border-border bg-card/80 flex-shrink-0">
                           <div className="flex items-center justify-between">
@@ -376,7 +376,7 @@ const LiveDisplayPage = () => {
                     <ResizableHandle withHandle />
                     
                     {/* Live Chat */}
-                    <ResizablePanel defaultSize={40} minSize={30}>
+                    <ResizablePanel defaultSize={50} minSize={30}>
                       <LiveChat currentTarget={currentTarget} />
                     </ResizablePanel>
                   </ResizablePanelGroup>
