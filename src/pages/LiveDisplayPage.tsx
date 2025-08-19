@@ -5,6 +5,8 @@ import { QRCodeGenerator } from '@/components/QRCodeGenerator';
 import { LiveParticipantCounter } from '@/components/LiveParticipantCounter';
 import { FloatingReactions } from '@/components/FloatingReactions';
 import { FloatingChatMessages } from '@/components/FloatingChatMessages';
+import { FloatingFeedback } from '@/components/FloatingFeedback';
+import { LiveChat } from '@/components/LiveChat';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -308,26 +310,38 @@ const LiveDisplayPage = () => {
                   <QRCodeGenerator 
                     url={ratingPageUrl} 
                     title="Scan to Rate & Upload Resume"
-                    size={140}
+                    size={120}
                   />
                 </div>
                 
-                {/* Live Ratings */}
+                {/* Split between Live Ratings and Chat */}
                 <div className="flex-1 overflow-hidden">
-                  <div className="h-full flex flex-col">
-                    <div className="p-3 border-b border-border bg-card/80 flex-shrink-0">
-                      <div className="flex items-center justify-between">
-                        <h3 className="font-semibold flex items-center gap-2">
-                          <Bell className="w-4 h-4 text-neon-pink" />
-                          Live Ratings ({transformedRatings.length})
-                        </h3>
-                        <Badge variant="outline" className="text-xs">Real-time</Badge>
+                  <ResizablePanelGroup direction="vertical" className="h-full">
+                    {/* Live Ratings */}
+                    <ResizablePanel defaultSize={60} minSize={40}>
+                      <div className="h-full flex flex-col">
+                        <div className="p-3 border-b border-border bg-card/80 flex-shrink-0">
+                          <div className="flex items-center justify-between">
+                            <h3 className="font-semibold flex items-center gap-2">
+                              <Bell className="w-4 h-4 text-neon-pink" />
+                              Live Ratings ({transformedRatings.length})
+                            </h3>
+                            <Badge variant="outline" className="text-xs">Real-time</Badge>
+                          </div>
+                        </div>
+                        <div className="flex-1 overflow-auto">
+                          <LiveDisplay ratings={transformedRatings} />
+                        </div>
                       </div>
-                    </div>
-                <div className="flex-1 overflow-auto">
-                  <LiveDisplay ratings={transformedRatings} />
-                </div>
-                  </div>
+                    </ResizablePanel>
+                    
+                    <ResizableHandle withHandle />
+                    
+                    {/* Live Chat */}
+                    <ResizablePanel defaultSize={40} minSize={30}>
+                      <LiveChat currentTarget={currentTarget} />
+                    </ResizablePanel>
+                  </ResizablePanelGroup>
                 </div>
               </div>
             </ResizablePanel>
@@ -335,6 +349,7 @@ const LiveDisplayPage = () => {
         </div>
         <FloatingReactions currentTarget={currentTarget} />
         <FloatingChatMessages currentTarget={currentTarget} />
+        <FloatingFeedback currentTarget={currentTarget} />
       </div>
     );
   }
@@ -410,6 +425,7 @@ const LiveDisplayPage = () => {
       </div>
       <FloatingReactions currentTarget={currentTarget} />
       <FloatingChatMessages currentTarget={currentTarget} />
+      <FloatingFeedback currentTarget={currentTarget} />
     </div>
   );
 };
