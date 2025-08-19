@@ -170,20 +170,21 @@ export function LiveDisplay({ ratings }: LiveDisplayProps) {
       <div className={`flex-1 transition-all duration-700 transform overflow-hidden ${
         isRevealed ? 'opacity-100 translate-y-0 scale-100' : 'opacity-30 translate-y-4 scale-95 pointer-events-none'
       }`}>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 mb-4 flex-shrink-0">
-          {/* Overall Stats */}
-          <Card className={`glow-effect border-neon-purple/50 transition-all duration-500 ${
+        <div className="flex justify-center mb-4 flex-shrink-0">
+          {/* Single Score Card */}
+          <Card className={`glow-effect border-neon-purple/50 transition-all duration-500 max-w-md w-full ${
             isRevealed ? 'animate-scale-in' : ''
             }`}>
-            <CardHeader className="pb-2">
-              <CardTitle className="flex items-center gap-2 text-neon-purple text-sm">
-                <TrendingUp className="w-4 h-4" />
-                Overall Score
+            <CardHeader className="pb-3 text-center">
+              <CardTitle className="flex items-center justify-center gap-2 text-neon-purple text-lg">
+                <TrendingUp className="w-5 h-5" />
+                SCORE
               </CardTitle>
+              <div className="text-sm text-muted-foreground">({resumeRatings.length} votes)</div>
             </CardHeader>
-            <CardContent className="pb-2">
-              <div className="text-center space-y-2">
-                <div className={`text-3xl font-bold text-neon-orange transition-all duration-700 ${
+            <CardContent className="pb-4">
+              <div className="text-center space-y-4">
+                <div className={`text-5xl font-bold text-neon-orange transition-all duration-700 ${
                   isRevealed ? 'animate-fade-in' : 'blur-sm'
                 }`}>
                   {isRevealed ? allStats.average.toFixed(1) : '?'}
@@ -191,79 +192,32 @@ export function LiveDisplay({ ratings }: LiveDisplayProps) {
                 <div className={`transition-all duration-700 delay-100 ${
                   isRevealed ? 'animate-fade-in' : 'blur-sm opacity-50'
                 }`}>
-                  <StarRating value={isRevealed ? Math.round(allStats.average) : 0} readonly size="sm" />
+                  <StarRating value={isRevealed ? Math.round(allStats.average) : 0} readonly size="lg" />
                 </div>
-                <div className={`space-y-1 text-xs transition-all duration-700 delay-200 ${
+                
+                {/* Category Breakdown */}
+                <div className={`space-y-3 transition-all duration-700 delay-200 ${
                   isRevealed ? 'animate-fade-in' : 'blur-sm opacity-30'
                 }`}>
-                  <div className="flex justify-between text-xs">
-                    <span>Resume Quality</span>
-                    <span className="text-neon-cyan">
-                      {isRevealed ? allStats.resumeQuality.toFixed(1) : '?'}
-                    </span>
-                  </div>
-                  <Progress value={isRevealed ? allStats.resumeQuality * 20 : 0} className="h-1" />
-                  <div className="flex justify-between text-xs">
-                    <span>Layout & Design</span>
-                    <span className="text-neon-green">
-                      {isRevealed ? allStats.layout.toFixed(1) : '?'}
-                    </span>
-                  </div>
-                  <Progress value={isRevealed ? allStats.layout * 20 : 0} className="h-1" />
-                  <div className="flex justify-between text-xs">
-                    <span>Content Quality</span>
-                    <span className="text-neon-pink">
-                      {isRevealed ? allStats.content.toFixed(1) : '?'}
-                    </span>
-                  </div>
-                  <Progress value={isRevealed ? allStats.content * 20 : 0} className="h-1" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Resume Stats */}
-          <Card className={`glow-effect border-neon-purple/50 transition-all duration-500 delay-100 ${
-            isRevealed ? 'animate-scale-in' : ''
-          }`}>
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2">
-                <Badge className="bg-neon-purple text-primary-foreground">Resume</Badge>
-                <span className="text-sm text-muted-foreground">({resumeRatings.length} votes)</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center space-y-4">
-                <div className={`text-4xl font-bold text-neon-purple transition-all duration-700 delay-300 ${
-                  isRevealed ? 'animate-fade-in' : 'blur-sm'
-                }`}>
-                  {isRevealed ? allStats.average.toFixed(1) : '?'}
-                </div>
-                <div className={`transition-all duration-700 delay-400 ${
-                  isRevealed ? 'animate-fade-in' : 'blur-sm opacity-50'
-                }`}>
-                  <StarRating value={isRevealed ? Math.round(allStats.average) : 0} readonly />
-                </div>
-                <div className={`grid grid-cols-2 gap-2 text-sm transition-all duration-700 delay-500 ${
-                  isRevealed ? 'animate-fade-in' : 'blur-sm opacity-30'
-                }`}>
-                  <div className="text-center">
-                    <div className="text-neon-cyan font-semibold">
-                      {isRevealed ? allStats.resumeQuality.toFixed(1) : '?'}
+                  <div className="grid grid-cols-2 gap-3 text-sm">
+                    <div className="text-center">
+                      <div className="text-neon-cyan font-bold text-lg">
+                        {isRevealed ? allStats.resumeQuality.toFixed(1) : '?'}
+                      </div>
+                      <div className="text-muted-foreground">Resume Quality</div>
                     </div>
-                    <div className="text-muted-foreground">Quality</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-neon-green font-semibold">
-                      {isRevealed ? allStats.layout.toFixed(1) : '?'}
+                    <div className="text-center">
+                      <div className="text-neon-green font-bold text-lg">
+                        {isRevealed ? allStats.layout.toFixed(1) : '?'}
+                      </div>
+                      <div className="text-muted-foreground">Layout & Design</div>
                     </div>
-                    <div className="text-muted-foreground">Layout</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-neon-pink font-semibold">
+                    <div className="text-neon-pink font-bold text-lg">
                       {isRevealed ? allStats.content.toFixed(1) : '?'}
                     </div>
-                    <div className="text-muted-foreground">Content</div>
+                    <div className="text-muted-foreground">Content Quality</div>
                   </div>
                 </div>
               </div>
