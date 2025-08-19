@@ -1,13 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { ParticipationFlow } from '@/components/ParticipationFlow';
-import { LeadForm } from '@/components/LeadForm';
-import { PersonalResumeUploader } from '@/components/PersonalResumeUploader';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Users, Wifi, CheckCircle, Upload, Star } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Users, Wifi } from 'lucide-react';
 
 interface RatingData {
   overall: number;
@@ -22,20 +19,8 @@ interface RatingData {
 const RateInputPage = () => {
   const [currentTarget, setCurrentTarget] = useState<string | null>(null);
   const [participantCount, setParticipantCount] = useState(0);
-  const [currentStep, setCurrentStep] = useState<'lead' | 'rating' | 'upload' | 'complete'>('lead');
-  const [hasSubmittedLead, setHasSubmittedLead] = useState(false);
-  const [hasSubmittedRating, setHasSubmittedRating] = useState(false);
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    // Check if user has already submitted lead data in this session
-    const leadData = sessionStorage.getItem('leadData');
-    if (leadData) {
-      setHasSubmittedLead(true);
-      setCurrentStep('rating');
-    }
-  }, []);
 
   useEffect(() => {
     // Fetch current target
@@ -137,15 +122,6 @@ const RateInputPage = () => {
     };
   }, [currentTarget]);
 
-  const handleSubmitLead = () => {
-    setHasSubmittedLead(true);
-    setCurrentStep('rating');
-    toast({
-      title: "Contact Info Saved! ✅",
-      description: "You can now rate the current resume",
-    });
-  };
-
   const handleSubmitRating = async (rating: RatingData) => {
     if (!currentTarget) {
       toast({
@@ -174,61 +150,10 @@ const RateInputPage = () => {
       throw error;
     }
 
-    setHasSubmittedRating(true);
-    // DON'T change step - keep user on rating form to vote again
     toast({
       title: "Rating Submitted! ⭐",
       description: "Your vote has been cast! You can vote again with different ratings.",
     });
-  };
-
-  const handleCompleteFlow = () => {
-    setCurrentStep('complete');
-    toast({
-      title: "All Done! 🎉",
-      description: "Thank you for participating in the conference!",
-    });
-  };
-
-  const renderStepIndicator = () => {
-    const steps = [
-      { key: 'lead', label: 'Contact Info', icon: Users },
-      { key: 'rating', label: 'Rate Resume', icon: Star },
-      { key: 'upload', label: 'Upload Resume', icon: Upload },
-      { key: 'complete', label: 'Complete', icon: CheckCircle }
-    ];
-
-    return (
-      <div className="flex justify-center mb-6">
-        <div className="flex items-center gap-2 bg-card/50 rounded-full p-2 border border-border/50">
-          {steps.map((step, index) => {
-            const Icon = step.icon;
-            const isActive = currentStep === step.key;
-            const isCompleted = 
-              (step.key === 'lead' && hasSubmittedLead) ||
-              (step.key === 'rating' && hasSubmittedRating) ||
-              (step.key === 'upload' && currentStep === 'complete') ||
-              (step.key === 'complete' && currentStep === 'complete');
-            
-            return (
-              <div
-                key={step.key}
-                className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs transition-all ${
-                  isActive
-                    ? 'bg-neon-purple text-primary-foreground'
-                    : isCompleted
-                    ? 'bg-neon-green text-primary-foreground'
-                    : 'text-muted-foreground'
-                }`}
-              >
-                <Icon className="w-3 h-3" />
-                <span className="hidden sm:inline">{step.label}</span>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    );
   };
 
   return (
@@ -280,109 +205,20 @@ const RateInputPage = () => {
           )}
         </div>
 
-        {renderStepIndicator()}
-
-        {/* Step Content */}
+        {/* Main Content */}
         <Card className="border border-neon-purple/20 bg-card/50 backdrop-blur">
           <CardContent className="p-4">
-            {currentStep === 'lead' && (
-              <div>
-                <div className="text-center mb-4">
-                  <h3 className="text-lg font-semibold text-neon-purple mb-1">Contact Information</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Please provide your contact details to participate
-                  </p>
+            {currentTarget ? (
+              <ParticipationFlow onSubmitRating={handleSubmitRating} currentTarget={currentTarget} />
+            ) : (
+              <div className="text-center py-8">
+                <div className="w-12 h-12 mx-auto mb-4 border-2 border-neon-orange border-dashed rounded-full flex items-center justify-center">
+                  <div className="w-4 h-4 bg-neon-orange rounded-full animate-pulse" />
                 </div>
-                <LeadForm onSuccess={handleSubmitLead} />
-              </div>
-            )}
-
-            {currentStep === 'rating' && currentTarget && (
-              <div>
-                <div className="text-center mb-4">
-                  <h3 className="text-lg font-semibold text-neon-purple mb-1">Rate the Resume</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Share your feedback on <span className="font-medium text-neon-green">{currentTarget}</span>
-                  </p>
-                </div>
-                <ParticipationFlow onSubmitRating={handleSubmitRating} currentTarget={currentTarget} />
-              </div>
-            )}
-
-            {currentStep === 'rating' && !currentTarget && (
-              <div>
-                <div className="text-center mb-4">
-                  <h3 className="text-lg font-semibold text-neon-orange mb-1">No Active Session</h3>
-                  <p className="text-sm text-muted-foreground">
-                    There's no resume being reviewed right now, but you can still upload your resume!
-                  </p>
-                </div>
-                
-                <Button 
-                  onClick={() => setCurrentStep('upload')}
-                  className="w-full bg-neon-purple hover:bg-neon-purple/90"
-                >
-                  Continue to Upload Resume
-                </Button>
-              </div>
-            )}
-
-            {currentStep === 'upload' && (
-              <div>
-                <div className="text-center mb-4">
-                  <h3 className="text-lg font-semibold text-neon-purple mb-1">Upload Your Resume</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Upload your resume to be considered for future reviews
-                  </p>
-                </div>
-                <PersonalResumeUploader onUploadSuccess={handleCompleteFlow} />
-                <div className="mt-3 text-center">
-                  <Button 
-                    variant="outline" 
-                    onClick={handleCompleteFlow}
-                    className="border-neon-cyan text-neon-cyan hover:bg-neon-cyan/10"
-                  >
-                    Finish Without Upload
-                  </Button>
-                </div>
-              </div>
-            )}
-
-            {currentStep === 'complete' && (
-              <div className="text-center py-6">
-                <CheckCircle className="w-16 h-16 mx-auto mb-4 text-neon-green" />
-                <h3 className="text-xl font-bold text-neon-green mb-2">Thank You!</h3>
-                <p className="text-muted-foreground mb-4">
-                  You've successfully participated in the conference resume review session.
+                <h3 className="text-lg font-semibold text-neon-orange mb-2">Waiting for Session</h3>
+                <p className="text-sm text-muted-foreground">
+                  The conference session will begin shortly. You'll be able to participate once a resume is being reviewed.
                 </p>
-                <div className="space-y-2 text-sm">
-                  {hasSubmittedLead && (
-                    <div className="flex items-center justify-center gap-2 text-neon-green">
-                      <CheckCircle className="w-4 h-4" />
-                      Contact information saved
-                    </div>
-                  )}
-                  {hasSubmittedRating && (
-                    <div className="flex items-center justify-center gap-2 text-neon-green">
-                      <CheckCircle className="w-4 h-4" />
-                      Rating submitted
-                    </div>
-                  )}
-                  <div className="flex items-center justify-center gap-2 text-neon-cyan">
-                    <CheckCircle className="w-4 h-4" />
-                    Session completed
-                  </div>
-                </div>
-                <Button 
-                  className="mt-6 bg-neon-purple hover:bg-neon-purple/90"
-                  onClick={() => {
-                    setCurrentStep('lead');
-                    setHasSubmittedLead(false);
-                    setHasSubmittedRating(false);
-                  }}
-                >
-                  Start New Session
-                </Button>
               </div>
             )}
           </CardContent>
