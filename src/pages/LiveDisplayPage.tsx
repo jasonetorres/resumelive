@@ -12,7 +12,8 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { FileText, RotateCcw, Users, Bell } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { FileText, RotateCcw, Users, Bell, MessageSquare } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -46,6 +47,8 @@ const LiveDisplayPage = () => {
   const [selectedResumeId, setSelectedResumeId] = useState<string>('');
   const [selectedResume, setSelectedResume] = useState<Resume | null>(null);
   const [showResumeView, setShowResumeView] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [passwordInput, setPasswordInput] = useState('');
 
   // Get the rating page URL for QR code
   const ratingPageUrl = `${window.location.origin}/rate-direct`;
@@ -221,6 +224,45 @@ const LiveDisplayPage = () => {
     }
   };
 
+  const handleClearChat = async () => {
+    if (!currentTarget) {
+      return;
+    }
+    
+    try {
+      // Delete chat messages for current target
+      const { error } = await (supabase as any)
+        .from('chat_messages')
+        .delete()
+        .eq('target_person', currentTarget);
+      
+      if (error) {
+        console.error('Error clearing chat:', error);
+        return;
+      }
+      
+      toast({
+        title: "Chat Cleared! 💬",
+        description: "All chat messages have been cleared.",
+      });
+    } catch (error) {
+      console.error('Exception while clearing chat:', error);
+    }
+  };
+
+  const handlePasswordSubmit = () => {
+    if (passwordInput === 'torcresumes') {
+      setIsAuthenticated(true);
+      setPasswordInput('');
+    } else {
+      toast({
+        title: "Access Denied",
+        description: "Incorrect password",
+        variant: "destructive"
+      });
+    }
+  };
+
   const handleSetTarget = async () => {
     if (!selectedResumeId) {
       return;
@@ -270,6 +312,38 @@ const LiveDisplayPage = () => {
     timestamp: rating.created_at
   }));
 
+  // Password protection check
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md border-2 border-neon-purple/20 bg-card/50 backdrop-blur">
+          <CardHeader>
+            <CardTitle className="text-center text-neon-purple">Display Access</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <label className="text-sm font-medium mb-2 block">Enter Password</label>
+              <Input
+                type="password"
+                value={passwordInput}
+                onChange={(e) => setPasswordInput(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handlePasswordSubmit()}
+                placeholder="Enter display password"
+                className="w-full"
+              />
+            </div>
+            <Button 
+              onClick={handlePasswordSubmit}
+              className="w-full bg-neon-purple hover:bg-neon-purple/90"
+            >
+              Access Display
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   if (showResumeView && selectedResume) {
     return (
       <div className="h-screen bg-gradient-to-br from-background via-background to-muted/20 flex flex-col overflow-hidden">
@@ -290,6 +364,15 @@ const LiveDisplayPage = () => {
               >
                 <RotateCcw className="w-4 h-4 mr-1" />
                 Reset Scores
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={handleClearChat}
+                className="border-neon-cyan text-neon-cyan hover:bg-neon-cyan/10"
+              >
+                <MessageSquare className="w-4 h-4 mr-1" />
+                Clear Chat
               </Button>
               <Button 
                 variant="outline" 
