@@ -1,6 +1,7 @@
 import React from 'react';
-import { RatingInput } from '@/components/RatingInput';
+import { QuickReactions } from '@/components/QuickReactions';
 import { ChatInput } from '@/components/ChatInput';
+import { VotingForm } from '@/components/VotingForm';
 
 interface RatingData {
   overall: number;
@@ -20,11 +21,14 @@ interface ParticipationFlowProps {
 export function ParticipationFlow({ currentTarget, onSubmitRating }: ParticipationFlowProps) {
   return (
     <div className="space-y-6">
-      {/* Rating Form with Quick Reactions - This contains both reactions and voting form */}
-      <RatingInput onSubmit={onSubmitRating} currentTarget={currentTarget} />
+      {/* 1. Quick Reactions - First */}
+      <QuickReactions />
       
-      {/* Live Chat - After the rating form */}
+      {/* 2. Live Chat - Second */}
       <ChatInput currentTarget={currentTarget} />
+      
+      {/* 3. Cast Your Vote - Third */}
+      <VotingForm onSubmit={onSubmitRating} currentTarget={currentTarget} />
     </div>
   );
 }
