@@ -29,11 +29,6 @@ const Index = () => {
           <p className="text-xl text-muted-foreground mb-8">
             Feedback tool for resumes, live!
           </p>
-          <div className="flex justify-center gap-2">
-            <Badge className="bg-neon-purple text-primary-foreground">Live Streaming</Badge>
-            <Badge className="bg-neon-cyan text-primary-foreground">Live Feedback</Badge>
-            <Badge className="bg-neon-pink text-primary-foreground">Real-time</Badge>
-          </div>
         </div>
 
         {/* Resume Upload Section */}
@@ -121,31 +116,6 @@ const Index = () => {
           </Card>
         </div>
 
-        {/* Instructions */}
-        <Card className="border-neon-pink/30 bg-card/90 backdrop-blur">
-          <CardHeader>
-            <CardTitle className="text-center text-neon-pink">How It Works</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid md:grid-cols-3 gap-6 text-center">
-              <div className="space-y-2">
-                <div className="w-8 h-8 bg-neon-purple rounded-full flex items-center justify-center mx-auto text-white font-bold">1</div>
-                <h3 className="font-semibold">Share the Rate Link</h3>
-                <p className="text-sm text-muted-foreground">Give your viewers the /rate page URL</p>
-              </div>
-              <div className="space-y-2">
-                <div className="w-8 h-8 bg-neon-cyan rounded-full flex items-center justify-center mx-auto text-white font-bold">2</div>
-                <h3 className="font-semibold">Open Display</h3>
-                <p className="text-sm text-muted-foreground">Use /display as your stream overlay</p>
-              </div>
-              <div className="space-y-2">
-                <div className="w-8 h-8 bg-neon-pink rounded-full flex items-center justify-center mx-auto text-white font-bold">3</div>
-                <h3 className="font-semibold">Get Live Feedback</h3>
-                <p className="text-sm text-muted-foreground">Watch ratings appear in real-time!</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
       </div>
     </div>
   );
