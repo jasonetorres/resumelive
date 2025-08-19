@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { RatingInput } from '@/components/RatingInput';
 import { LeadForm } from '@/components/LeadForm';
 import { PersonalResumeUploader } from '@/components/PersonalResumeUploader';
+import { ChatInput } from '@/components/ChatInput';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
@@ -306,6 +307,11 @@ const RateInputPage = () => {
                   </p>
                 </div>
                 <RatingInput onSubmit={handleSubmitRating} currentTarget={currentTarget} />
+                
+                {/* Add Chat Input */}
+                <div className="mt-6">
+                  <ChatInput currentTarget={currentTarget} />
+                </div>
               </div>
             )}
 
@@ -317,6 +323,12 @@ const RateInputPage = () => {
                     There's no resume being reviewed right now, but you can still upload your resume!
                   </p>
                 </div>
+                
+                {/* Show chat input even when no target */}
+                <div className="mb-4">
+                  <ChatInput currentTarget={currentTarget} />
+                </div>
+                
                 <Button 
                   onClick={() => setCurrentStep('upload')}
                   className="w-full bg-neon-purple hover:bg-neon-purple/90"

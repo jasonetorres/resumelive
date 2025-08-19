@@ -201,6 +201,26 @@ All colors MUST be HSL.
     }
   }
 
+  /* Chat message specific float animation */
+  @keyframes chat-float-up {
+    0% {
+      transform: translateY(0) scale(0.8);
+      opacity: 0;
+    }
+    10% {
+      transform: translateY(-10px) scale(1);
+      opacity: 1;
+    }
+    90% {
+      transform: translateY(-100px) scale(1);
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(-120px) scale(0.9);
+      opacity: 0;
+    }
+  }
+
   @keyframes pulse-scale {
     0%, 100% {
       transform: scale(1);

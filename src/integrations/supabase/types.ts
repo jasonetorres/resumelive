@@ -14,6 +14,27 @@ export type Database = {
   }
   public: {
     Tables: {
+      chat_messages: {
+        Row: {
+          created_at: string
+          id: string
+          message: string
+          target_person: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message: string
+          target_person: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string
+          target_person?: string
+        }
+        Relationships: []
+      }
       current_target: {
         Row: {
           id: number
