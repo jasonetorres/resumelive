@@ -23,10 +23,10 @@ interface RatingInputProps {
 
 export function RatingInput({ onSubmit, currentTarget }: RatingInputProps) {
   const [overall, setOverall] = useState(0);
-  const [presentation, setPresentation] = useState(0);
+  const [resumeQuality, setResumeQuality] = useState(0);
+  const [layout, setLayout] = useState(0);
   const [content, setContent] = useState(0);
   const [feedback, setFeedback] = useState('');
-  const [category, setCategory] = useState<'resume' | 'linkedin'>('resume');
   const [agreement, setAgreement] = useState<'agree' | 'disagree' | undefined>();
   const [reaction, setReaction] = useState<string | undefined>();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -69,10 +69,10 @@ export function RatingInput({ onSubmit, currentTarget }: RatingInputProps) {
   };
 
   const handleSubmit = async () => {
-    if (overall === 0 || presentation === 0) {
+    if (overall === 0 || resumeQuality === 0 || layout === 0 || content === 0) {
       toast({
         title: "Incomplete Rating",
-        description: "Please rate both categories before submitting!",
+        description: "Please rate all categories before submitting!",
         variant: "destructive"
       });
       return;
@@ -83,10 +83,10 @@ export function RatingInput({ onSubmit, currentTarget }: RatingInputProps) {
     try {
       await onSubmit({
         overall,
-        presentation,
-        content: presentation, // Use presentation score for content too since we removed content
+        presentation: resumeQuality, // Map to existing field
+        content,
         feedback: feedback.trim() || undefined,
-        category,
+        category: 'resume', // Always resume now
         agreement
       });
       
@@ -110,7 +110,7 @@ export function RatingInput({ onSubmit, currentTarget }: RatingInputProps) {
     }
   };
 
-  const averageRating = (overall + presentation) / 2;
+  const averageRating = (overall + resumeQuality + layout + content) / 4;
 
   return (
     <div className="space-y-6">
@@ -160,22 +160,6 @@ export function RatingInput({ onSubmit, currentTarget }: RatingInputProps) {
             <CardTitle className="text-2xl bg-gradient-to-r from-neon-purple to-neon-pink bg-clip-text text-transparent">
               Cast Your Vote
             </CardTitle>
-            <div className="flex justify-center gap-2 mt-2">
-              <Badge 
-                variant={category === 'resume' ? 'default' : 'outline'}
-                className={category === 'resume' ? 'bg-neon-purple text-primary-foreground' : 'border-neon-purple/50'}
-                onClick={() => setCategory('resume')}
-              >
-                Resume
-              </Badge>
-              <Badge 
-                variant={category === 'linkedin' ? 'default' : 'outline'}
-                className={category === 'linkedin' ? 'bg-neon-cyan text-primary-foreground' : 'border-neon-cyan/50'}
-                onClick={() => setCategory('linkedin')}
-              >
-                LinkedIn
-              </Badge>
-            </div>
           </CardHeader>
           
           <CardContent className="space-y-6">
@@ -187,14 +171,24 @@ export function RatingInput({ onSubmit, currentTarget }: RatingInputProps) {
               
               <div className="flex justify-between items-center">
                 <span className="text-sm font-medium text-foreground">Resume Quality</span>
-                <StarRating value={presentation} onChange={setPresentation} size="lg" />
+                <StarRating value={resumeQuality} onChange={setResumeQuality} size="lg" />
+              </div>
+              
+              <div className="flex justify-between items-center">
+                <span className="text-sm font-medium text-foreground">Layout & Design</span>
+                <StarRating value={layout} onChange={setLayout} size="lg" />
+              </div>
+              
+              <div className="flex justify-between items-center">
+                <span className="text-sm font-medium text-foreground">Content Quality</span>
+                <StarRating value={content} onChange={setContent} size="lg" />
               </div>
             </div>
 
             {averageRating > 0 && (
               <div className="text-center p-4 rounded-lg bg-gradient-to-r from-neon-purple/20 to-neon-pink/20 border border-neon-purple/30">
                 <div className="text-2xl font-bold text-neon-orange">
-                  {((overall + presentation) / 2).toFixed(1)}/5
+                  {averageRating.toFixed(1)}/5
                 </div>
                 <div className="text-sm text-muted-foreground">Average Score</div>
               </div>
@@ -248,7 +242,7 @@ export function RatingInput({ onSubmit, currentTarget }: RatingInputProps) {
 
             <Button
               onClick={handleSubmit}
-              disabled={isSubmitting || overall === 0 || presentation === 0}
+              disabled={isSubmitting || overall === 0 || resumeQuality === 0 || layout === 0 || content === 0}
               className="w-full bg-gradient-to-r from-neon-purple to-neon-pink hover:from-neon-pink hover:to-neon-purple text-primary-foreground font-bold py-3 glow-effect transform transition-all duration-200 hover:scale-105 active:scale-95"
             >
               {isSubmitting ? (

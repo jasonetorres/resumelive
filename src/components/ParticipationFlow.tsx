@@ -20,10 +20,10 @@ interface ParticipationFlowProps {
 export function ParticipationFlow({ currentTarget, onSubmitRating }: ParticipationFlowProps) {
   return (
     <div className="space-y-6">
-      {/* Quick Reactions - First */}
+      {/* Rating Form with Quick Reactions - This contains both reactions and voting form */}
       <RatingInput onSubmit={onSubmitRating} currentTarget={currentTarget} />
       
-      {/* Live Chat - Second */}
+      {/* Live Chat - After the rating form */}
       <ChatInput currentTarget={currentTarget} />
     </div>
   );
