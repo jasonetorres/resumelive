@@ -20,7 +20,7 @@ const RateInputPage = () => {
   const [currentTarget, setCurrentTarget] = useState<string | null>(null);
   const [participantCount, setParticipantCount] = useState(0);
   const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true); // Force refresh
 
   useEffect(() => {
     // Fetch current target
