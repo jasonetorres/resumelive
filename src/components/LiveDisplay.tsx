@@ -118,13 +118,14 @@ export function LiveDisplay({ ratings }: LiveDisplayProps) {
       )}
       {/* Header */}
       <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-neon-purple via-neon-pink to-neon-orange bg-clip-text text-transparent mb-4">
-          🚀 LIVE RATINGS 🚀
+        <h1 className="text-4xl font-bold bg-gradient-to-r from-neon-purple via-neon-pink to-neon-orange bg-clip-text text-transparent mb-2">
+          🚀 RESUME RATINGS LIVE 🚀
         </h1>
+        <p className="text-lg text-muted-foreground mb-4">feedback tool for resumes, live!</p>
         <div className="flex justify-center items-center gap-6 flex-wrap">
           <div className="flex items-center gap-2 text-neon-cyan">
             <Users className="w-5 h-5" />
-            <span className="text-lg font-semibold">{displayedRatings.filter(r => r.overall > 0).length} Anonymous Votes</span>
+            <span className="text-lg font-semibold">{displayedRatings.filter(r => r.overall > 0).length} Live Votes</span>
           </div>
           
           {agreementStats.total > 0 && (

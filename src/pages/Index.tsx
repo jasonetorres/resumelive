@@ -27,11 +27,11 @@ const Index = () => {
             />
           </div>
           <p className="text-xl text-muted-foreground mb-8">
-            Anonymous feedback tool for resume & LinkedIn reviews on stream
+            Feedback tool for resumes, live!
           </p>
           <div className="flex justify-center gap-2">
             <Badge className="bg-neon-purple text-primary-foreground">Live Streaming</Badge>
-            <Badge className="bg-neon-cyan text-primary-foreground">Anonymous</Badge>
+            <Badge className="bg-neon-cyan text-primary-foreground">Live Feedback</Badge>
             <Badge className="bg-neon-pink text-primary-foreground">Real-time</Badge>
           </div>
         </div>
@@ -63,7 +63,7 @@ const Index = () => {
             </CardHeader>
             <CardContent className="text-center space-y-4">
               <p className="text-muted-foreground">
-                Viewers use this page to submit anonymous ratings for resumes and LinkedIn profiles
+                Viewers use this page to submit live ratings for resumes and LinkedIn profiles
               </p>
               <div className="flex justify-center gap-2 text-sm">
                 <span className="flex items-center gap-1">
@@ -72,7 +72,7 @@ const Index = () => {
                 </span>
                 <span className="flex items-center gap-1">
                   <Users className="w-4 h-4 text-neon-cyan" />
-                  Anonymous
+                  Live Feedback
                 </span>
               </div>
               <Link to="/rate">
