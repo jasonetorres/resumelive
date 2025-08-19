@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { RatingInput } from '@/components/RatingInput';
+import { ParticipationFlow } from '@/components/ParticipationFlow';
 import { LeadForm } from '@/components/LeadForm';
 import { PersonalResumeUploader } from '@/components/PersonalResumeUploader';
-import { ChatInput } from '@/components/ChatInput';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
@@ -306,12 +305,7 @@ const RateInputPage = () => {
                     Share your feedback on <span className="font-medium text-neon-green">{currentTarget}</span>
                   </p>
                 </div>
-                <RatingInput onSubmit={handleSubmitRating} currentTarget={currentTarget} />
-                
-                {/* Add Chat Input */}
-                <div className="mt-6">
-                  <ChatInput currentTarget={currentTarget} />
-                </div>
+                <ParticipationFlow onSubmitRating={handleSubmitRating} currentTarget={currentTarget} />
               </div>
             )}
 
@@ -322,11 +316,6 @@ const RateInputPage = () => {
                   <p className="text-sm text-muted-foreground">
                     There's no resume being reviewed right now, but you can still upload your resume!
                   </p>
-                </div>
-                
-                {/* Show chat input even when no target */}
-                <div className="mb-4">
-                  <ChatInput currentTarget={currentTarget} />
                 </div>
                 
                 <Button 

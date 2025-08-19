@@ -69,10 +69,10 @@ export function RatingInput({ onSubmit, currentTarget }: RatingInputProps) {
   };
 
   const handleSubmit = async () => {
-    if (overall === 0 || presentation === 0 || content === 0) {
+    if (overall === 0 || presentation === 0) {
       toast({
         title: "Incomplete Rating",
-        description: "Please rate all categories before submitting!",
+        description: "Please rate both categories before submitting!",
         variant: "destructive"
       });
       return;
@@ -84,7 +84,7 @@ export function RatingInput({ onSubmit, currentTarget }: RatingInputProps) {
       await onSubmit({
         overall,
         presentation,
-        content,
+        content: presentation, // Use presentation score for content too since we removed content
         feedback: feedback.trim() || undefined,
         category,
         agreement
@@ -110,7 +110,7 @@ export function RatingInput({ onSubmit, currentTarget }: RatingInputProps) {
     }
   };
 
-  const averageRating = (overall + presentation + content) / 3;
+  const averageRating = (overall + presentation) / 2;
 
   return (
     <div className="space-y-6">
@@ -186,20 +186,15 @@ export function RatingInput({ onSubmit, currentTarget }: RatingInputProps) {
               </div>
               
               <div className="flex justify-between items-center">
-                <span className="text-sm font-medium text-foreground">Presentation</span>
+                <span className="text-sm font-medium text-foreground">Resume Quality</span>
                 <StarRating value={presentation} onChange={setPresentation} size="lg" />
-              </div>
-              
-              <div className="flex justify-between items-center">
-                <span className="text-sm font-medium text-foreground">Content Quality</span>
-                <StarRating value={content} onChange={setContent} size="lg" />
               </div>
             </div>
 
             {averageRating > 0 && (
               <div className="text-center p-4 rounded-lg bg-gradient-to-r from-neon-purple/20 to-neon-pink/20 border border-neon-purple/30">
                 <div className="text-2xl font-bold text-neon-orange">
-                  {averageRating.toFixed(1)}/5
+                  {((overall + presentation) / 2).toFixed(1)}/5
                 </div>
                 <div className="text-sm text-muted-foreground">Average Score</div>
               </div>
@@ -253,7 +248,7 @@ export function RatingInput({ onSubmit, currentTarget }: RatingInputProps) {
 
             <Button
               onClick={handleSubmit}
-              disabled={isSubmitting || overall === 0 || presentation === 0 || content === 0}
+              disabled={isSubmitting || overall === 0 || presentation === 0}
               className="w-full bg-gradient-to-r from-neon-purple to-neon-pink hover:from-neon-pink hover:to-neon-purple text-primary-foreground font-bold py-3 glow-effect transform transition-all duration-200 hover:scale-105 active:scale-95"
             >
               {isSubmitting ? (

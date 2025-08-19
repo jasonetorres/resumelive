@@ -348,7 +348,6 @@ const LiveDisplayPage = () => {
           </ResizablePanelGroup>
         </div>
         <FloatingReactions currentTarget={currentTarget} />
-        <FloatingChatMessages currentTarget={currentTarget} />
         <FloatingFeedback currentTarget={currentTarget} />
       </div>
     );
@@ -424,7 +423,6 @@ const LiveDisplayPage = () => {
         </Card>
       </div>
       <FloatingReactions currentTarget={currentTarget} />
-      <FloatingChatMessages currentTarget={currentTarget} />
       <FloatingFeedback currentTarget={currentTarget} />
     </div>
   );
