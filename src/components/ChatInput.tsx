@@ -29,7 +29,7 @@ export function ChatInput({ currentTarget }: ChatInputProps) {
     setIsSending(true);
     
     try {
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from('chat_messages')
         .insert({
           target_person: currentTarget,
