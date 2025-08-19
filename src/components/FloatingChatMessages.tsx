@@ -103,12 +103,12 @@ export function FloatingChatMessages({ currentTarget }: FloatingChatMessagesProp
             animationTimingFunction: 'ease-out'
           }}
         >
-          <div className="bg-gradient-to-r from-neon-cyan/90 to-neon-green/90 backdrop-blur-sm text-white px-4 py-2 rounded-full shadow-lg border border-neon-cyan/30 max-w-xs">
-            <div className="text-sm font-medium break-words">
+          <div className="bg-gradient-to-r from-neon-cyan/95 to-neon-green/95 backdrop-blur-sm text-white px-6 py-4 rounded-2xl shadow-2xl border-2 border-neon-cyan/50 max-w-md">
+            <div className="text-lg font-bold break-words leading-relaxed">
               {chatMessage.message}
             </div>
             {/* Chat bubble tail */}
-            <div className="absolute -bottom-1 left-4 w-3 h-3 bg-gradient-to-r from-neon-cyan/90 to-neon-green/90 rotate-45 border-r border-b border-neon-cyan/30"></div>
+            <div className="absolute -bottom-2 left-6 w-4 h-4 bg-gradient-to-r from-neon-cyan/95 to-neon-green/95 rotate-45 border-r-2 border-b-2 border-neon-cyan/50"></div>
           </div>
         </div>
       ))}
