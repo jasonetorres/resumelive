@@ -75,7 +75,7 @@ const Index = () => {
                   Live Feedback
                 </span>
               </div>
-              <Link to="/rate">
+              <Link to="/rate-direct">
                 <Button className="w-full bg-gradient-to-r from-neon-purple to-neon-pink hover:from-neon-pink hover:to-neon-purple text-primary-foreground glow-effect">
                   Open Rating Page
                   <Zap className="w-4 h-4 ml-2" />

@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Download, Search, RefreshCw, Users, Calendar, TrendingUp } from "lucide-react";
+import { Download, Search, RefreshCw, Users, Calendar, TrendingUp, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { format } from "date-fns";
@@ -91,6 +91,37 @@ export default function FormDisplay() {
       lead.job_title.toLowerCase().includes(term.toLowerCase())
     );
     setFilteredLeads(filtered);
+  };
+
+  const deleteLead = async (leadId: string, leadName: string) => {
+    if (!confirm(`Are you sure you want to delete the submission from ${leadName}?`)) {
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('leads')
+        .delete()
+        .eq('id', leadId);
+
+      if (error) throw error;
+
+      // Update local state
+      const updatedLeads = leads.filter(lead => lead.id !== leadId);
+      setLeads(updatedLeads);
+      setFilteredLeads(updatedLeads.filter(lead => 
+        !searchTerm || 
+        lead.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        lead.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        lead.job_title.toLowerCase().includes(searchTerm.toLowerCase())
+      ));
+      calculateStats(updatedLeads);
+      
+      toast.success("Submission deleted successfully!");
+    } catch (error) {
+      console.error("Error deleting lead:", error);
+      toast.error("Failed to delete submission");
+    }
   };
 
   const exportToCSV = () => {
@@ -241,6 +272,7 @@ export default function FormDisplay() {
                     <TableHead>Job Title</TableHead>
                     <TableHead>Registration Date</TableHead>
                     <TableHead>Status</TableHead>
+                    <TableHead>Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -254,6 +286,16 @@ export default function FormDisplay() {
                       </TableCell>
                       <TableCell>
                         <Badge variant="secondary">Registered</Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => deleteLead(lead.id, lead.name)}
+                          className="text-destructive hover:text-destructive"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
                       </TableCell>
                     </TableRow>
                   ))}
