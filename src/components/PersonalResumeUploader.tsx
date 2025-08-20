@@ -162,7 +162,7 @@ export function PersonalResumeUploader({ className, onUploadSuccess }: PersonalR
 
           <div className="text-center">
             <p className="text-xs text-muted-foreground">
-              Your resume will be added to the pool for future conference reviews
+              Upload to potentially be reviewed live
             </p>
           </div>
         </CardContent>
