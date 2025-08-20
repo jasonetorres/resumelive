@@ -40,7 +40,7 @@ export default function FormDisplay() {
   });
 
   const handleClearAllForNewEvent = async () => {
-    if (!confirm('🎉 Are you sure you want to clear ALL data for a new event? This will delete all ratings, questions, and chat messages from the database.')) {
+    if (!confirm('🎉 Are you sure you want to clear ALL data for a new event? This will delete all ratings, questions, chat messages, AND lead registrations from the database.')) {
       return;
     }
 
@@ -93,9 +93,35 @@ export default function FormDisplay() {
         return;
       }
 
+      // Clear all lead registrations
+      const { error: leadsError } = await supabase
+        .from('leads')
+        .delete()
+        .neq('id', '00000000-0000-0000-0000-000000000000');
+      
+      if (leadsError) {
+        console.error('Error clearing leads:', leadsError);
+        hookToast({
+          title: "Error",
+          description: "Failed to clear lead registrations.", 
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Clear local state
+      setLeads([]);
+      setFilteredLeads([]);
+      setStats({
+        total: 0,
+        today: 0,
+        thisWeek: 0,
+        recent: []
+      });
+
       hookToast({
         title: "🎉 Ready for New Event!",
-        description: "All ratings, questions, and chat messages cleared.",
+        description: "All ratings, questions, chat messages, and lead registrations cleared.",
       });
     } catch (error) {
       console.error('Exception while clearing all data:', error);
