@@ -4,7 +4,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { Users, Wifi } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Users, Wifi, AlertCircle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface RatingData {
   overall: number;
@@ -21,8 +23,19 @@ const RateInputPage = () => {
   const [participantCount, setParticipantCount] = useState(0);
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(true); // Force refresh
+  const [hasCompletedRegistration, setHasCompletedRegistration] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
+    // Check if user has completed registration
+    const registrationCompleted = sessionStorage.getItem('leadCompleted');
+    if (!registrationCompleted) {
+      // Redirect to registration if not completed
+      navigate('/register');
+      return;
+    }
+    setHasCompletedRegistration(true);
+
     // Fetch current target
     const fetchCurrentTarget = async () => {
       console.log('RateInputPage: Fetching current target...');
@@ -155,6 +168,11 @@ const RateInputPage = () => {
       description: "Your vote has been cast! You can vote again with different ratings.",
     });
   };
+
+  // Don't render anything if registration not completed (will redirect)
+  if (!hasCompletedRegistration) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 flex items-center justify-center p-3 sm:p-4">

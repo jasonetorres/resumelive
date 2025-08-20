@@ -7,6 +7,7 @@ import Index from "./pages/Index";
 import RateInputPage from "./pages/RateInput";
 import LiveDisplayPage from "./pages/LiveDisplayPage";
 import FormDisplay from "./pages/FormDisplay";
+import LeadFormPage from "./pages/LeadFormPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -19,6 +20,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/register" element={<LeadFormPage />} />
           <Route path="/rate-direct" element={<RateInputPage />} />
           <Route path="/display" element={<LiveDisplayPage />} />
           <Route path="/formdisplay" element={<FormDisplay />} />

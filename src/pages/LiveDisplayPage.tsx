@@ -50,8 +50,8 @@ const LiveDisplayPage = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [passwordInput, setPasswordInput] = useState('');
 
-  // Get the rating page URL for QR code
-  const ratingPageUrl = `${window.location.origin}/rate-direct`;
+  // Get the rating page URL for QR code - now points to registration form
+  const ratingPageUrl = `${window.location.origin}/register`;
 
   useEffect(() => {
     // Fetch initial data
@@ -430,7 +430,7 @@ const LiveDisplayPage = () => {
                 <div className="p-3 border-b border-border bg-card/80 flex-shrink-0">
                   <QRCodeGenerator 
                     url={ratingPageUrl} 
-                    title="Scan to Rate & Upload Resume"
+                    title="Scan to Register & Rate"
                     size={100}
                   />
                 </div>
