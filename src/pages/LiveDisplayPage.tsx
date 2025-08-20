@@ -259,73 +259,6 @@ const LiveDisplayPage = () => {
     }
   };
 
-  const handleClearAllForNewEvent = async () => {
-    try {
-      // Clear all ratings
-      const { error: ratingsError } = await supabase
-        .from('ratings')
-        .delete()
-        .neq('id', '00000000-0000-0000-0000-000000000000');
-      
-      if (ratingsError) {
-        console.error('Error clearing ratings:', ratingsError);
-        toast({
-          title: "Error",
-          description: "Failed to clear ratings.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // Clear all questions
-      const { error: questionsError } = await supabase
-        .from('questions')
-        .delete()
-        .neq('id', '00000000-0000-0000-0000-000000000000');
-      
-      if (questionsError) {
-        console.error('Error clearing questions:', questionsError);
-        toast({
-          title: "Error", 
-          description: "Failed to clear questions.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // Clear all chat messages
-      const { error: chatError } = await supabase
-        .from('chat_messages')
-        .delete()
-        .neq('id', '00000000-0000-0000-0000-000000000000');
-      
-      if (chatError) {
-        console.error('Error clearing chat:', chatError);
-        toast({
-          title: "Error",
-          description: "Failed to clear chat messages.", 
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // Clear local state
-      setRatings([]);
-      
-      toast({
-        title: "🎉 Ready for New Event!",
-        description: "All ratings, questions, and chat messages cleared.",
-      });
-    } catch (error) {
-      console.error('Exception while clearing all data:', error);
-      toast({
-        title: "Error",
-        description: "An error occurred while clearing data.",
-        variant: "destructive",
-      });
-    }
-  };
-
   const handlePasswordSubmit = () => {
     if (passwordInput === 'torcresumes') {
       setIsAuthenticated(true);
@@ -432,15 +365,6 @@ const LiveDisplayPage = () => {
             </div>
             
             <div className="flex items-center gap-3">
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={handleClearAllForNewEvent}
-                className="border-orange-500 text-orange-500 hover:bg-orange-500/10"
-              >
-                <RotateCcw className="w-4 h-4 mr-1" />
-                🎉 New Event
-              </Button>
               <Button 
                 variant="outline" 
                 size="sm"

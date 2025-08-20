@@ -4,10 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Download, Search, RefreshCw, Users, Calendar, TrendingUp, Trash2 } from "lucide-react";
+import { Download, Search, RefreshCw, Users, Calendar, TrendingUp, Trash2, RotateCcw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import { useToast } from "@/hooks/use-toast";
 
 interface Lead {
   id: string;
@@ -26,6 +27,7 @@ interface LeadStats {
 }
 
 export default function FormDisplay() {
+  const { toast: hookToast } = useToast();
   const [leads, setLeads] = useState<Lead[]>([]);
   const [filteredLeads, setFilteredLeads] = useState<Lead[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -36,6 +38,74 @@ export default function FormDisplay() {
     thisWeek: 0,
     recent: []
   });
+
+  const handleClearAllForNewEvent = async () => {
+    if (!confirm('🎉 Are you sure you want to clear ALL data for a new event? This will delete all ratings, questions, and chat messages from the database.')) {
+      return;
+    }
+
+    try {
+      // Clear all ratings
+      const { error: ratingsError } = await supabase
+        .from('ratings')
+        .delete()
+        .neq('id', '00000000-0000-0000-0000-000000000000');
+      
+      if (ratingsError) {
+        console.error('Error clearing ratings:', ratingsError);
+        hookToast({
+          title: "Error",
+          description: "Failed to clear ratings.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Clear all questions
+      const { error: questionsError } = await supabase
+        .from('questions')
+        .delete()
+        .neq('id', '00000000-0000-0000-0000-000000000000');
+      
+      if (questionsError) {
+        console.error('Error clearing questions:', questionsError);
+        hookToast({
+          title: "Error", 
+          description: "Failed to clear questions.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Clear all chat messages
+      const { error: chatError } = await supabase
+        .from('chat_messages')
+        .delete()
+        .neq('id', '00000000-0000-0000-0000-000000000000');
+      
+      if (chatError) {
+        console.error('Error clearing chat:', chatError);
+        hookToast({
+          title: "Error",
+          description: "Failed to clear chat messages.", 
+          variant: "destructive",
+        });
+        return;
+      }
+
+      hookToast({
+        title: "🎉 Ready for New Event!",
+        description: "All ratings, questions, and chat messages cleared.",
+      });
+    } catch (error) {
+      console.error('Exception while clearing all data:', error);
+      hookToast({
+        title: "Error",
+        description: "An error occurred while clearing data.",
+        variant: "destructive",
+      });
+    }
+  };
 
   const fetchLeads = async () => {
     try {
@@ -183,10 +253,21 @@ export default function FormDisplay() {
           <h1 className="text-3xl font-bold">Conference Lead Dashboard</h1>
           <p className="text-muted-foreground">Real-time lead collection and management</p>
         </div>
-        <Button onClick={fetchLeads} variant="outline" size="sm">
-          <RefreshCw className="mr-2 h-4 w-4" />
-          Refresh
-        </Button>
+        <div className="flex items-center gap-3">
+          <Button 
+            onClick={handleClearAllForNewEvent}
+            variant="outline" 
+            size="sm"
+            className="border-orange-500 text-orange-500 hover:bg-orange-500/10"
+          >
+            <RotateCcw className="mr-2 h-4 w-4" />
+            🎉 New Event
+          </Button>
+          <Button onClick={fetchLeads} variant="outline" size="sm">
+            <RefreshCw className="mr-2 h-4 w-4" />
+            Refresh
+          </Button>
+        </div>
       </div>
 
       {/* Stats Cards */}
