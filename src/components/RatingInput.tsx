@@ -13,7 +13,6 @@ interface RatingInputProps {
     overall: number; 
     presentation: number; 
     content: number; 
-    feedback?: string;
     category: 'resume' | 'linkedin';
     agreement?: 'agree' | 'disagree';
     reaction?: string;
@@ -26,7 +25,6 @@ export function RatingInput({ onSubmit, currentTarget }: RatingInputProps) {
   const [resumeQuality, setResumeQuality] = useState(0);
   const [layout, setLayout] = useState(0);
   const [content, setContent] = useState(0);
-  const [feedback, setFeedback] = useState('');
   const [agreement, setAgreement] = useState<'agree' | 'disagree' | undefined>();
   const [reaction, setReaction] = useState<string | undefined>();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -85,14 +83,12 @@ export function RatingInput({ onSubmit, currentTarget }: RatingInputProps) {
         overall,
         presentation: resumeQuality, // Map to existing field
         content,
-        feedback: feedback.trim() || undefined,
         category: 'resume', // Always resume now
         agreement
       });
       
       // Don't reset form - let users vote multiple times with same data
-      // Only clear feedback and agreement for next vote
-      setFeedback('');
+      // Only clear agreement for next vote
       setAgreement(undefined);
       
       toast({
@@ -193,19 +189,6 @@ export function RatingInput({ onSubmit, currentTarget }: RatingInputProps) {
                 <div className="text-sm text-muted-foreground">Average Score</div>
               </div>
             )}
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">
-                Optional Feedback
-              </label>
-              <Textarea
-                placeholder="Add your voice to the conversation... (This will appear on stream! 💬)"
-                value={feedback}
-                onChange={(e) => setFeedback(e.target.value)}
-                className="bg-input/50 border-neon-purple/30 focus:border-neon-purple transition-all duration-300 hover:shadow-lg hover:shadow-neon-purple/20"
-                rows={3}
-              />
-            </div>
 
             {/* Agreement Section */}
             <div className="space-y-3">

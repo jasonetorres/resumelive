@@ -13,7 +13,6 @@ interface MobileVotingFormProps {
     overall: number; 
     presentation: number; 
     content: number; 
-    feedback?: string;
     category: 'resume' | 'linkedin';
     agreement?: 'agree' | 'disagree';
     reaction?: string;
@@ -26,7 +25,6 @@ export function MobileVotingForm({ onSubmit, currentTarget }: MobileVotingFormPr
   const [resumeQuality, setResumeQuality] = useState(0);
   const [layout, setLayout] = useState(0);
   const [content, setContent] = useState(0);
-  const [feedback, setFeedback] = useState('');
   const [agreement, setAgreement] = useState<'agree' | 'disagree' | undefined>();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
@@ -48,12 +46,10 @@ export function MobileVotingForm({ onSubmit, currentTarget }: MobileVotingFormPr
         overall,
         presentation: resumeQuality,
         content,
-        feedback: feedback.trim() || undefined,
         category: 'resume',
         agreement
       });
       
-      setFeedback('');
       setAgreement(undefined);
       
       toast({
@@ -163,24 +159,6 @@ export function MobileVotingForm({ onSubmit, currentTarget }: MobileVotingFormPr
             <div className="text-sm text-muted-foreground">Average Score</div>
           </div>
         )}
-
-        {/* Feedback - Smaller for mobile */}
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-foreground">
-            Optional Feedback
-          </label>
-          <Textarea
-            placeholder="Share your thoughts..."
-            value={feedback}
-            onChange={(e) => setFeedback(e.target.value)}
-            className="bg-input/50 border-neon-purple/30 focus:border-neon-purple resize-none"
-            rows={2}
-            maxLength={300}
-          />
-          <div className="text-xs text-muted-foreground text-right">
-            {300 - feedback.length} chars left
-          </div>
-        </div>
 
         {/* Agreement - Mobile optimized buttons */}
         <div className="space-y-3">

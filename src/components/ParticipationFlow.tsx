@@ -11,7 +11,6 @@ interface RatingData {
   overall: number;
   presentation: number;
   content: number;
-  feedback?: string;
   category: 'resume' | 'linkedin';
   agreement?: 'agree' | 'disagree';
   reaction?: string;
