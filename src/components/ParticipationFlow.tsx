@@ -4,7 +4,7 @@ import { ChatInput } from '@/components/ChatInput';
 import { VotingForm } from '@/components/VotingForm';
 import { MobileVotingForm } from '@/components/MobileVotingForm';
 import { PersonalResumeUploader } from '@/components/PersonalResumeUploader';
-import { QASection } from '@/components/QASection';
+import { QuickQuestionInput } from '@/components/QuickQuestionInput';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 interface RatingData {
@@ -40,8 +40,8 @@ export function ParticipationFlow({ currentTarget, onSubmitRating }: Participati
         <VotingForm onSubmit={onSubmitRating} currentTarget={currentTarget} />
       )}
       
-      {/* 4. Q&A Section - Fourth */}
-      <QASection currentTarget={currentTarget} />
+      {/* 4. Quick Question Input - Fourth */}
+      <QuickQuestionInput currentTarget={currentTarget} />
       
       {/* 5. Upload Your Resume - Fifth */}
       <PersonalResumeUploader />

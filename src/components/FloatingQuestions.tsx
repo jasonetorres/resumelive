@@ -116,33 +116,33 @@ export function FloatingQuestions({ currentTarget }: FloatingQuestionsProps) {
             animationTimingFunction: 'ease-out'
           }}
         >
-          <div className="bg-gradient-to-r from-neon-blue/95 to-neon-purple/95 backdrop-blur-sm text-white px-6 py-4 rounded-2xl shadow-2xl border-2 border-neon-blue/50 max-w-sm">
+          <div className="bg-gradient-to-r from-neon-blue/95 to-neon-purple/95 backdrop-blur-sm text-white px-12 py-8 rounded-3xl shadow-2xl border-4 border-neon-blue/50 max-w-2xl">
             {/* Question Header */}
-            <div className="flex items-center gap-2 mb-2">
-              <MessageSquare className="w-5 h-5 text-neon-cyan flex-shrink-0" />
-              <span className="text-sm font-medium text-neon-cyan">Question</span>
+            <div className="flex items-center gap-4 mb-4">
+              <MessageSquare className="w-10 h-10 text-neon-cyan flex-shrink-0" />
+              <span className="text-2xl font-bold text-neon-cyan">Question</span>
               {floatingQuestion.upvotes > 0 && (
-                <div className="flex items-center gap-1 ml-auto bg-white/20 px-2 py-1 rounded-full">
-                  <ThumbsUp className="w-3 h-3" />
-                  <span className="text-xs font-bold">{floatingQuestion.upvotes}</span>
+                <div className="flex items-center gap-2 ml-auto bg-white/20 px-4 py-2 rounded-full">
+                  <ThumbsUp className="w-6 h-6" />
+                  <span className="text-xl font-bold">{floatingQuestion.upvotes}</span>
                 </div>
               )}
             </div>
             
             {/* Question Content */}
-            <div className="text-base font-semibold break-words leading-relaxed mb-2">
+            <div className="text-3xl font-bold break-words leading-relaxed mb-4">
               {floatingQuestion.question}
             </div>
             
             {/* Author */}
             {floatingQuestion.author_name && (
-              <div className="text-xs text-white/80 italic">
+              <div className="text-lg text-white/80 italic">
                 — {floatingQuestion.author_name}
               </div>
             )}
             
             {/* Question bubble tail */}
-            <div className="absolute -bottom-2 left-6 w-4 h-4 bg-gradient-to-r from-neon-blue/95 to-neon-purple/95 rotate-45 border-r-2 border-b-2 border-neon-blue/50"></div>
+            <div className="absolute -bottom-4 left-12 w-8 h-8 bg-gradient-to-r from-neon-blue/95 to-neon-purple/95 rotate-45 border-r-4 border-b-4 border-neon-blue/50"></div>
           </div>
         </div>
       ))}
