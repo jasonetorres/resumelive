@@ -18,38 +18,36 @@ interface ChatMessage {
 interface LiveChatProps {
   currentTarget: string | null;
   viewOnly?: boolean;
+  onClearChat?: () => void;
 }
 
-export function LiveChat({ currentTarget, viewOnly = false }: LiveChatProps) {
+export function LiveChat({ currentTarget, viewOnly = false, onClearChat }: LiveChatProps) {
   const [message, setMessage] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const { toast } = useToast();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
-  // Fetch existing messages when target changes
+  // Fetch existing messages when component mounts and target changes
   useEffect(() => {
-    if (!currentTarget) {
-      setMessages([]);
-      return;
-    }
-
     const fetchMessages = async () => {
+      console.log('LiveChat: Fetching messages for all targets');
       const { data } = await supabase
         .from('chat_messages')
         .select('*')
-        .eq('target_person', currentTarget)
         .order('created_at', { ascending: true })
-        .limit(50);
+        .limit(100); // Increased limit to show more history
       
+      console.log('LiveChat: Fetched messages:', data?.length || 0);
       setMessages(data || []);
     };
 
     fetchMessages();
 
-    // Subscribe to new messages
+    // Subscribe to new messages for ALL targets
+    console.log('LiveChat: Setting up real-time subscription for all chat messages');
     const channel = supabase
-      .channel('live-chat-messages')
+      .channel('live-chat-messages-all')
       .on(
         'postgres_changes',
         {
@@ -58,18 +56,46 @@ export function LiveChat({ currentTarget, viewOnly = false }: LiveChatProps) {
           table: 'chat_messages'
         },
         (payload) => {
+          console.log('LiveChat: New message received:', payload.new);
           const newMessage = payload.new as ChatMessage;
-          if (newMessage.target_person === currentTarget) {
-            setMessages(prev => [...prev, newMessage]);
-          }
+          setMessages(prev => {
+            // Avoid duplicates
+            if (prev.find(msg => msg.id === newMessage.id)) {
+              return prev;
+            }
+            return [...prev, newMessage];
+          });
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'DELETE',
+          schema: 'public',
+          table: 'chat_messages'
+        },
+        (payload) => {
+          console.log('LiveChat: Message deleted:', payload.old);
+          const deletedMessage = payload.old as ChatMessage;
+          setMessages(prev => prev.filter(msg => msg.id !== deletedMessage.id));
         }
       )
       .subscribe();
 
+    console.log('LiveChat: Subscription created');
+
     return () => {
+      console.log('LiveChat: Cleaning up subscription');
       supabase.removeChannel(channel);
     };
-  }, [currentTarget]);
+  }, []); // Only run once on mount
+
+  // Expose clear function through prop
+  useEffect(() => {
+    if (onClearChat) {
+      // This allows parent to trigger clear
+    }
+  }, [onClearChat]);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {

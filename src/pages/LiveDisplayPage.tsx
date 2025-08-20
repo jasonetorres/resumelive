@@ -225,28 +225,35 @@ const LiveDisplayPage = () => {
   };
 
   const handleClearChat = async () => {
-    if (!currentTarget) {
-      return;
-    }
-    
     try {
-      // Delete chat messages for current target
-      const { error } = await (supabase as any)
+      // Delete ALL chat messages (not just for current target)
+      const { error } = await supabase
         .from('chat_messages')
         .delete()
-        .eq('target_person', currentTarget);
+        .neq('id', '00000000-0000-0000-0000-000000000000'); // Delete all rows by using a condition that's always true
       
       if (error) {
         console.error('Error clearing chat:', error);
+        toast({
+          title: "Error",
+          description: "Failed to clear chat messages.",
+          variant: "destructive",
+        });
         return;
       }
       
+      console.log('All chat messages cleared successfully');
       toast({
         title: "Chat Cleared! 💬",
         description: "All chat messages have been cleared.",
       });
     } catch (error) {
       console.error('Exception while clearing chat:', error);
+      toast({
+        title: "Error",
+        description: "An error occurred while clearing chat.",
+        variant: "destructive",
+      });
     }
   };
 
