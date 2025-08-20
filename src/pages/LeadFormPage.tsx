@@ -56,6 +56,39 @@ const LeadFormPage = () => {
           </CardHeader>
           <CardContent className="p-6">
             <LeadForm onSuccess={handleSuccess} />
+            
+            {/* Fine Print / Terms */}
+            <div className="mt-6 pt-4 border-t border-border/50">
+              <h3 className="text-sm font-medium text-muted-foreground mb-2">Terms & Conditions</h3>
+              <div className="text-xs text-muted-foreground space-y-2 leading-relaxed">
+                <p>
+                  By registering and participating in this conference, you acknowledge and agree that:
+                </p>
+                <ul className="space-y-1 ml-4 list-disc">
+                  <li>
+                    Any resume or personal information you upload may be displayed publicly on stage and viewed by all conference attendees.
+                  </li>
+                  <li>
+                    Your participation data, ratings, and feedback may be visible to other participants and conference organizers.
+                  </li>
+                  <li>
+                    You will use the live chat feature appropriately and professionally, refraining from inappropriate, offensive, or disruptive content.
+                  </li>
+                  <li>
+                    Conference organizers reserve the right to remove inappropriate content or restrict access for violations of conduct policies.
+                  </li>
+                  <li>
+                    Your participation constitutes consent for potential recording, photography, or live streaming of the event.
+                  </li>
+                  <li>
+                    All information provided is subject to the conference's privacy policy and may be used for event analytics and improvement.
+                  </li>
+                </ul>
+                <p className="text-muted-foreground/80 italic">
+                  By proceeding with registration, you confirm that you have read, understood, and agree to these terms.
+                </p>
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>
