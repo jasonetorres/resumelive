@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Send, MessageCircle } from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Send, MessageCircle, Smile } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -93,6 +94,16 @@ export function ChatInput({ currentTarget }: ChatInputProps) {
     }
   };
 
+  const commonEmojis = [
+    '😀', '😂', '🥰', '😎', '🤔', '👍', '👎', '❤️', '🔥', '⭐',
+    '🎉', '💯', '👏', '🙌', '💪', '🤝', '🎯', '✨', '🚀', '💡',
+    '👀', '🤯', '😍', '🤩', '🥳', '😤', '🙄', '😬', '🤦', '🎊'
+  ];
+
+  const addEmoji = (emoji: string) => {
+    setMessage(prev => prev + emoji);
+  };
+
   return (
     <Card className="glow-effect border-neon-cyan/30 bg-card/90 backdrop-blur">
       <CardHeader className="text-center pb-4">
@@ -105,15 +116,44 @@ export function ChatInput({ currentTarget }: ChatInputProps) {
       </CardHeader>
       <CardContent>
         <div className="flex gap-2">
-          <Input
-            placeholder={currentTarget ? "Type your message..." : "Waiting for session to start..."}
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            onKeyPress={handleKeyPress}
-            disabled={isSending || !currentTarget}
-            className="flex-1 border-neon-cyan/30 focus:border-neon-cyan"
-            maxLength={200}
-          />
+          <div className="flex-1 relative">
+            <Input
+              placeholder={currentTarget ? "Type your message..." : "Waiting for session to start..."}
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              onKeyPress={handleKeyPress}
+              disabled={isSending || !currentTarget}
+              className="border-neon-cyan/30 focus:border-neon-cyan pr-10"
+              maxLength={200}
+            />
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  disabled={!currentTarget}
+                  className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 p-0 hover:bg-neon-cyan/10"
+                >
+                  <Smile className="w-4 h-4" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-64 p-2">
+                <div className="grid grid-cols-6 gap-1">
+                  {commonEmojis.map((emoji, index) => (
+                    <Button
+                      key={index}
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 w-8 p-0 hover:bg-muted text-lg"
+                      onClick={() => addEmoji(emoji)}
+                    >
+                      {emoji}
+                    </Button>
+                  ))}
+                </div>
+              </PopoverContent>
+            </Popover>
+          </div>
           <Button
             onClick={handleSendMessage}
             disabled={isSending || !message.trim() || !currentTarget}
