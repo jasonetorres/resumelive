@@ -125,68 +125,120 @@ export function LiveChat({ currentTarget, viewOnly = false }: LiveChatProps) {
   };
 
   return (
-    <Card className="h-full flex flex-col border-neon-cyan/30 overflow-hidden">
-      <CardHeader className="pb-2 flex-shrink-0">
+    <Card className="h-full flex flex-col border-neon-cyan/30 overflow-hidden bg-gradient-to-b from-background to-muted/20">
+      <CardHeader className="pb-3 flex-shrink-0 border-b border-border/50">
         <CardTitle className="text-sm bg-gradient-to-r from-neon-cyan to-neon-green bg-clip-text text-transparent flex items-center gap-2">
           <MessageCircle className="w-4 h-4 text-neon-cyan" />
-          Live Chat ({messages.length})
+          Live Chat
+          <span className="ml-auto text-xs text-muted-foreground font-normal">
+            {messages.length} {messages.length === 1 ? 'message' : 'messages'}
+          </span>
         </CardTitle>
       </CardHeader>
-      <CardContent className="flex-1 flex flex-col p-2 gap-2 min-h-0">
+      <CardContent className="flex-1 flex flex-col p-4 gap-4 min-h-0">
         {/* Messages Area */}
         <ScrollArea ref={scrollAreaRef} className="flex-1 pr-2 min-h-0">
-          <div className="space-y-1">
+          <div className="space-y-3 pb-2">
             {messages.length === 0 ? (
-              <div className="text-center text-muted-foreground text-xs py-2">
-                {currentTarget ? "No messages yet. Be the first to chat!" : "Waiting for session to start..."}
+              <div className="text-center text-muted-foreground text-sm py-8">
+                <div className="w-12 h-12 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-3">
+                  <MessageCircle className="w-6 h-6" />
+                </div>
+                {currentTarget ? "No messages yet. Start the conversation!" : "Waiting for session to start..."}
               </div>
             ) : (
-              messages.map((msg) => (
-                <div key={msg.id} className="bg-muted/30 rounded-lg p-2 break-words">
-                  <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
-                    <span className="font-medium text-neon-cyan">{msg.first_name || 'Anonymous'}</span>
-                    <span>{new Date(msg.created_at).toLocaleTimeString()}</span>
+              messages.map((msg, index) => {
+                const isConsecutive = index > 0 && 
+                  messages[index - 1].first_name === msg.first_name &&
+                  new Date(msg.created_at).getTime() - new Date(messages[index - 1].created_at).getTime() < 120000; // 2 minutes
+                
+                return (
+                  <div key={msg.id} className="flex items-start gap-3 animate-fade-in">
+                    {/* Avatar */}
+                    <div className={`flex-shrink-0 transition-opacity duration-200 ${isConsecutive ? 'opacity-0' : 'opacity-100'}`}>
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-neon-cyan/20 to-neon-purple/20 border border-neon-cyan/30 flex items-center justify-center">
+                        <span className="text-xs font-medium text-neon-cyan">
+                          {(msg.first_name || 'A').charAt(0).toUpperCase()}
+                        </span>
+                      </div>
+                    </div>
+                    
+                    {/* Message Content */}
+                    <div className="flex-1 min-w-0">
+                      {!isConsecutive && (
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-xs font-medium text-foreground/80">
+                            {msg.first_name || 'Anonymous'}
+                          </span>
+                          <span className="text-xs text-muted-foreground">
+                            {new Date(msg.created_at).toLocaleTimeString([], { 
+                              hour: '2-digit', 
+                              minute: '2-digit' 
+                            })}
+                          </span>
+                        </div>
+                      )}
+                      
+                      {/* Message Bubble */}
+                      <div className="relative group">
+                        <div className="bg-muted/80 backdrop-blur-sm rounded-2xl rounded-tl-md px-4 py-2.5 border border-border/50 shadow-sm hover:shadow-md transition-all duration-200">
+                          <p className="text-sm leading-relaxed break-words text-foreground/90">
+                            {msg.message}
+                          </p>
+                        </div>
+                        
+                        {/* Hover timestamp */}
+                        <div className="absolute right-0 -bottom-5 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                          <span className="text-xs text-muted-foreground bg-background/80 backdrop-blur-sm px-2 py-1 rounded-md border border-border/30">
+                            {new Date(msg.created_at).toLocaleTimeString()}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <div className="text-xs">{msg.message}</div>
-                </div>
-              ))
+                );
+              })
             )}
           </div>
         </ScrollArea>
 
         {/* Input Area - Only show if not view-only */}
         {!viewOnly && (
-          <>
-            <div className="flex gap-2">
-              <Input
-                placeholder={currentTarget ? "Type your message..." : "Waiting for session..."}
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                onKeyPress={handleKeyPress}
-                disabled={isSending || !currentTarget}
-                className="flex-1 border-neon-cyan/30 focus:border-neon-cyan text-sm"
-                maxLength={200}
-              />
-              <Button
-                onClick={handleSendMessage}
-                disabled={isSending || !message.trim() || !currentTarget}
-                className="bg-gradient-to-r from-neon-cyan to-neon-green hover:from-neon-green hover:to-neon-cyan text-primary-foreground px-3"
-                size="sm"
-              >
-                {isSending ? (
-                  <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                ) : (
-                  <Send className="w-4 h-4" />
-                )}
-              </Button>
+          <div className="flex-shrink-0 space-y-2">
+            <div className="flex gap-3 items-end">
+              <div className="flex-1 relative">
+                <Input
+                  placeholder={currentTarget ? "Message..." : "Waiting for session..."}
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  disabled={isSending || !currentTarget}
+                  className="rounded-2xl border-border/50 bg-muted/50 backdrop-blur-sm focus:bg-background/80 focus:border-neon-cyan/50 text-sm py-3 pl-4 pr-12 resize-none transition-all duration-200"
+                  maxLength={200}
+                />
+                <div className="absolute right-2 top-1/2 -translate-y-1/2">
+                  <Button
+                    onClick={handleSendMessage}
+                    disabled={isSending || !message.trim() || !currentTarget}
+                    className="rounded-full w-8 h-8 p-0 bg-gradient-to-r from-neon-cyan to-neon-green hover:from-neon-green hover:to-neon-cyan disabled:opacity-30 transition-all duration-200 hover:scale-105"
+                    size="sm"
+                  >
+                    {isSending ? (
+                      <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <Send className="w-3 h-3" />
+                    )}
+                  </Button>
+                </div>
+              </div>
             </div>
             
             {message.length > 0 && (
-              <div className="text-xs text-muted-foreground text-right">
-                {message.length}/200 characters
+              <div className="text-xs text-muted-foreground text-right px-1 animate-fade-in">
+                {message.length}/200
               </div>
             )}
-          </>
+          </div>
         )}
       </CardContent>
     </Card>
