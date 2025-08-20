@@ -99,7 +99,7 @@ export function PersonalResumeUploader({ className, onUploadSuccess }: PersonalR
 
   return (
     <div className={className}>
-      <Card className="border-neon-purple/20">
+      <Card className="border-neon-purple/20 glow-effect">
         <CardHeader className="pb-3">
           <CardTitle className="text-center text-neon-purple text-lg">Upload Your Resume</CardTitle>
           <p className="text-center text-sm text-muted-foreground">
