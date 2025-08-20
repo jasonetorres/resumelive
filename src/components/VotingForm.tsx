@@ -147,34 +147,26 @@ export function VotingForm({ onSubmit, currentTarget }: VotingFormProps) {
         {/* Agreement Section */}
         <div className="space-y-3">
           <label className="text-sm font-medium text-foreground">Do you agree with our feedback?</label>
-          <div className="flex gap-3">
-            <Button
-              type="button"
-              variant={agreement === 'agree' ? 'default' : 'outline'}
-              onClick={() => setAgreement(agreement === 'agree' ? undefined : 'agree')}
-              className={`flex-1 ${
-                agreement === 'agree' 
-                  ? 'bg-neon-green hover:bg-neon-green/90 text-primary-foreground border-neon-green' 
-                  : 'border-neon-green/50 text-neon-green hover:bg-neon-green/20'
-              }`}
-            >
-              <ThumbsUp className="w-4 h-4 mr-2" />
-              Agree
-            </Button>
-            <Button
-              type="button"
-              variant={agreement === 'disagree' ? 'default' : 'outline'}
-              onClick={() => setAgreement(agreement === 'disagree' ? undefined : 'disagree')}
-              className={`flex-1 ${
-                agreement === 'disagree' 
-                  ? 'bg-destructive hover:bg-destructive/90 text-destructive-foreground border-destructive' 
-                  : 'border-destructive/50 text-destructive hover:bg-destructive/20'
-              }`}
-            >
-              <ThumbsDown className="w-4 h-4 mr-2" />
-              Disagree
-            </Button>
-          </div>
+           <div className="flex gap-3">
+             <Button
+               type="button"
+               variant={agreement === 'agree' ? 'agree' : 'outline'}
+               onClick={() => setAgreement(agreement === 'agree' ? undefined : 'agree')}
+               className="flex-1"
+             >
+               <ThumbsUp className="w-4 h-4 mr-2" />
+               Agree
+             </Button>
+             <Button
+               type="button"
+               variant={agreement === 'disagree' ? 'disagree' : 'outline'}
+               onClick={() => setAgreement(agreement === 'disagree' ? undefined : 'disagree')}
+               className="flex-1"
+             >
+               <ThumbsDown className="w-4 h-4 mr-2" />
+               Disagree
+             </Button>
+           </div>
         </div>
 
         <Button

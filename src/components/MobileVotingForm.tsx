@@ -187,36 +187,26 @@ export function MobileVotingForm({ onSubmit, currentTarget }: MobileVotingFormPr
           <label className="text-sm font-medium text-foreground">
             Do you agree with our feedback?
           </label>
-          <div className="grid grid-cols-2 gap-2">
-            <Button
-              type="button"
-              variant={agreement === 'agree' ? 'default' : 'outline'}
-              onClick={() => setAgreement(agreement === 'agree' ? undefined : 'agree')}
-              className={`${
-                agreement === 'agree' 
-                  ? 'bg-neon-green hover:bg-neon-green/90 text-primary-foreground border-neon-green' 
-                  : 'border-neon-green/50 text-neon-green hover:bg-neon-green/20'
-              }`}
-              size="sm"
-            >
-              <ThumbsUp className="w-4 h-4 mr-2" />
-              Agree
-            </Button>
-            <Button
-              type="button"
-              variant={agreement === 'disagree' ? 'default' : 'outline'}
-              onClick={() => setAgreement(agreement === 'disagree' ? undefined : 'disagree')}
-              className={`${
-                agreement === 'disagree' 
-                  ? 'bg-destructive hover:bg-destructive/90 text-destructive-foreground border-destructive' 
-                  : 'border-destructive/50 text-destructive hover:bg-destructive/20'
-              }`}
-              size="sm"
-            >
-              <ThumbsDown className="w-4 h-4 mr-2" />
-              Disagree
-            </Button>
-          </div>
+           <div className="grid grid-cols-2 gap-2">
+             <Button
+               type="button"
+               variant={agreement === 'agree' ? 'agree' : 'outline'}
+               onClick={() => setAgreement(agreement === 'agree' ? undefined : 'agree')}
+               size="sm"
+             >
+               <ThumbsUp className="w-4 h-4 mr-2" />
+               Agree
+             </Button>
+             <Button
+               type="button"
+               variant={agreement === 'disagree' ? 'disagree' : 'outline'}
+               onClick={() => setAgreement(agreement === 'disagree' ? undefined : 'disagree')}
+               size="sm"
+             >
+               <ThumbsDown className="w-4 h-4 mr-2" />
+               Disagree
+             </Button>
+           </div>
         </div>
 
         {/* Submit Button - Full width for mobile */}
