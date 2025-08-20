@@ -89,6 +89,65 @@ export type Database = {
         }
         Relationships: []
       }
+      question_upvotes: {
+        Row: {
+          created_at: string
+          id: string
+          question_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          question_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          question_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "question_upvotes_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      questions: {
+        Row: {
+          author_name: string | null
+          created_at: string
+          id: string
+          is_answered: boolean
+          question: string
+          target_person: string
+          upvotes: number
+        }
+        Insert: {
+          author_name?: string | null
+          created_at?: string
+          id?: string
+          is_answered?: boolean
+          question: string
+          target_person: string
+          upvotes?: number
+        }
+        Update: {
+          author_name?: string | null
+          created_at?: string
+          id?: string
+          is_answered?: boolean
+          question?: string
+          target_person?: string
+          upvotes?: number
+        }
+        Relationships: []
+      }
       ratings: {
         Row: {
           agreement: string | null
