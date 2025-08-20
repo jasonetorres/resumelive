@@ -182,6 +182,14 @@ const RateInputPage = () => {
             Conference Participation
           </h1>
           
+          {/* Privacy Notice */}
+          <div className="flex items-center justify-center gap-1 mb-4">
+            <AlertCircle className="w-3 h-3 text-muted-foreground" />
+            <p className="text-xs text-muted-foreground">
+              Votes are anonymous • Live chat is not
+            </p>
+          </div>
+          
           {/* Live Status Indicators */}
           <div className="flex flex-wrap justify-center gap-2 mb-4">
             <Badge variant="outline" className="border-neon-green text-neon-green bg-neon-green/10 flex items-center gap-1 text-xs">
