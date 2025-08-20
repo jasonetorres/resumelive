@@ -52,12 +52,12 @@ export function FloatingQuestions({ currentTarget }: FloatingQuestionsProps) {
     console.log('FloatingQuestions: New question created:', newFloatingQuestion);
     setFloatingQuestions(prev => [...prev, newFloatingQuestion]);
 
-    // Remove the question after 12 seconds (longer than chat for readability)
+    // Remove the question after 20 seconds (longer for better readability)
     setTimeout(() => {
       console.log('FloatingQuestions: Removing question:', questionId);
       setFloatingQuestions(prev => prev.filter(fq => fq.id !== questionId));
       processedQuestions.current.delete(questionId);
-    }, 12000);
+    }, 20000);
   };
 
   useEffect(() => {
@@ -118,8 +118,8 @@ export function FloatingQuestions({ currentTarget }: FloatingQuestionsProps) {
           style={{
             left: `${floatingQuestion.x}%`,
             top: `${floatingQuestion.y}%`,
-            animationDuration: '12s',
-            animationTimingFunction: 'ease-out'
+            animationDuration: '20s',
+            animationTimingFunction: 'linear'
           }}
         >
           <div className="bg-gradient-to-r from-neon-blue/95 to-neon-purple/95 backdrop-blur-sm text-white px-12 py-8 rounded-3xl shadow-2xl border-4 border-neon-blue/50 max-w-2xl">
