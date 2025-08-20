@@ -21,7 +21,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/register" element={<LeadFormPage />} />
-          <Route path="/rate-direct" element={<RateInputPage />} />
+          <Route path="/rate" element={<RateInputPage />} />
           <Route path="/display" element={<LiveDisplayPage />} />
           <Route path="/formdisplay" element={<FormDisplay />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

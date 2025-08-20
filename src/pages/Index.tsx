@@ -60,7 +60,7 @@ const Index = () => {
               <p className="text-muted-foreground">
                 Viewers use this page to submit live ratings for resumes and LinkedIn profiles
               </p>
-              <Link to="/rate-direct">
+              <Link to="/rate">
                 <Button className="w-full bg-gradient-to-r from-neon-purple to-neon-pink hover:from-neon-pink hover:to-neon-purple text-primary-foreground glow-effect">
                   Open Rating Page
                   <Lightning className="w-4 h-4 ml-2" weight="fill" />

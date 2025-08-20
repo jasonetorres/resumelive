@@ -19,7 +19,7 @@ const LeadFormPage = () => {
     sessionStorage.setItem('leadData', JSON.stringify(leadData));
     
     // Redirect to rating page
-    navigate('/rate-direct');
+    navigate('/rate');
   };
 
   return (
