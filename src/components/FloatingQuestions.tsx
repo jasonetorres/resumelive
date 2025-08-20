@@ -20,6 +20,8 @@ export function FloatingQuestions({ currentTarget }: FloatingQuestionsProps) {
   const [floatingQuestions, setFloatingQuestions] = useState<FloatingQuestion[]>([]);
   const processedQuestions = useRef<Set<string>>(new Set());
 
+  console.log('FloatingQuestions: Component rendered with currentTarget:', currentTarget, 'Questions count:', floatingQuestions.length);
+
   const addFloatingQuestion = (question: string, author_name: string | null, upvotes: number, questionId: string) => {
     console.log('FloatingQuestions: Adding question:', { question, author_name, upvotes, questionId });
     
@@ -54,15 +56,16 @@ export function FloatingQuestions({ currentTarget }: FloatingQuestionsProps) {
 
   useEffect(() => {
     if (!currentTarget) {
+      console.log('FloatingQuestions: No current target, clearing questions');
       setFloatingQuestions([]);
       processedQuestions.current.clear();
       return;
     }
 
-    console.log('FloatingQuestions: Setting up subscription for questions');
+    console.log('FloatingQuestions: Setting up subscription for questions, target:', currentTarget);
     
     const channel = supabase
-      .channel('floating-questions')
+      .channel('floating-questions-channel')
       .on(
         'postgres_changes',
         {
@@ -76,7 +79,7 @@ export function FloatingQuestions({ currentTarget }: FloatingQuestionsProps) {
           
           // Only show questions for current target
           if (newQuestion.target_person === currentTarget) {
-            console.log('FloatingQuestions: Processing question:', newQuestion.question);
+            console.log('FloatingQuestions: Processing question for current target:', newQuestion.question);
             addFloatingQuestion(
               newQuestion.question, 
               newQuestion.author_name, 
@@ -84,7 +87,7 @@ export function FloatingQuestions({ currentTarget }: FloatingQuestionsProps) {
               newQuestion.id
             );
           } else {
-            console.log('FloatingQuestions: Not for current target, ignoring');
+            console.log('FloatingQuestions: Question for different target, ignoring. Expected:', currentTarget, 'Got:', newQuestion.target_person);
           }
         }
       )
@@ -92,10 +95,10 @@ export function FloatingQuestions({ currentTarget }: FloatingQuestionsProps) {
         console.log('FloatingQuestions: Subscription status:', status);
       });
 
-    console.log('FloatingQuestions: Subscription created');
+    console.log('FloatingQuestions: Subscription created for target:', currentTarget);
 
     return () => {
-      console.log('FloatingQuestions: Cleaning up subscription');
+      console.log('FloatingQuestions: Cleaning up subscription for target:', currentTarget);
       supabase.removeChannel(channel);
     };
   }, [currentTarget]);
