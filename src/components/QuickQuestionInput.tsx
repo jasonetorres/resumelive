@@ -19,11 +19,21 @@ export function QuickQuestionInput({ currentTarget }: QuickQuestionInputProps) {
   const { toast } = useToast();
   const isMobile = useIsMobile();
 
-  const handleSubmitQuestion = async () => {
-    if (!question.trim() || !currentTarget) return;
+  console.log('QuickQuestionInput: Component rendered with currentTarget:', currentTarget);
 
+  const handleSubmitQuestion = async () => {
+    console.log('QuickQuestionInput: handleSubmitQuestion called', { question: question.trim(), currentTarget });
+    
+    if (!question.trim() || !currentTarget) {
+      console.log('QuickQuestionInput: Validation failed', { hasQuestion: !!question.trim(), hasTarget: !!currentTarget });
+      return;
+    }
+
+    console.log('QuickQuestionInput: Starting submission...');
     setIsSubmitting(true);
+    
     try {
+      console.log('QuickQuestionInput: Inserting question into database...');
       const { error } = await supabase
         .from('questions')
         .insert({
@@ -32,8 +42,12 @@ export function QuickQuestionInput({ currentTarget }: QuickQuestionInputProps) {
           author_name: authorName.trim() || null
         });
 
-      if (error) throw error;
+      if (error) {
+        console.error('QuickQuestionInput: Database error:', error);
+        throw error;
+      }
 
+      console.log('QuickQuestionInput: Question submitted successfully!');
       setQuestion('');
       setAuthorName('');
       toast({
@@ -41,7 +55,7 @@ export function QuickQuestionInput({ currentTarget }: QuickQuestionInputProps) {
         description: "Your question will appear on the conference display!"
       });
     } catch (error) {
-      console.error('Error submitting question:', error);
+      console.error('QuickQuestionInput: Error submitting question:', error);
       toast({
         title: "Submission Failed",
         description: "Please try again!",
@@ -102,7 +116,10 @@ export function QuickQuestionInput({ currentTarget }: QuickQuestionInputProps) {
             {200 - question.length} characters left
           </span>
           <Button
-            onClick={handleSubmitQuestion}
+            onClick={() => {
+              console.log('QuickQuestionInput: Button clicked');
+              handleSubmitQuestion();
+            }}
             disabled={!question.trim() || isSubmitting}
             className="bg-gradient-to-r from-neon-blue to-neon-cyan hover:from-neon-cyan hover:to-neon-blue text-primary-foreground font-medium"
             size={isMobile ? "sm" : "default"}
