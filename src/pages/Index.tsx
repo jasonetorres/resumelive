@@ -63,11 +63,11 @@ const Index = () => {
               <div className="flex justify-center gap-2 text-sm">
                 <span className="flex items-center gap-1">
                   <Star className="w-4 h-4 text-neon-orange" />
-                  5-Star Rating
+                  Interactive Rating
                 </span>
                 <span className="flex items-center gap-1">
                   <Users className="w-4 h-4 text-neon-cyan" />
-                  Live Feedback
+                  Real-time Comments
                 </span>
               </div>
               <Link to="/rate-direct">
@@ -93,11 +93,11 @@ const Index = () => {
               <div className="flex justify-center gap-2 text-sm">
                 <span className="flex items-center gap-1">
                   <TrendingUp className="w-4 h-4 text-neon-green" />
-                  Live Updates
+                  Analytics Dashboard
                 </span>
                 <span className="flex items-center gap-1">
                   <Monitor className="w-4 h-4 text-neon-pink" />
-                  Stream Ready
+                  Overlay Compatible
                 </span>
               </div>
               <Link to="/display">
