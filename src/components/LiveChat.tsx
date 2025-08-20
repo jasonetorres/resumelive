@@ -178,27 +178,18 @@ export function LiveChat({ currentTarget, viewOnly = false, onClearChat }: LiveC
                   messages[index - 1].first_name === msg.first_name &&
                   new Date(msg.created_at).getTime() - new Date(messages[index - 1].created_at).getTime() < 120000; // 2 minutes
                 
-                // Get current user's name from sessionStorage for bubble styling
-                const leadData = sessionStorage.getItem('leadData');
-                let currentUserName = '';
-                if (leadData) {
-                  try {
-                    const parsedData = JSON.parse(leadData);
-                    currentUserName = parsedData.firstName || '';
-                  } catch (e) {
-                    console.error('Error parsing lead data:', e);
-                  }
-                }
-                
-                const isCurrentUser = msg.first_name === currentUserName;
+                // Get unique senders and assign alternating sides
+                const uniqueSenders = Array.from(new Set(messages.map(m => m.first_name || 'Anonymous')));
+                const senderIndex = uniqueSenders.indexOf(msg.first_name || 'Anonymous');
+                const isRightSide = senderIndex % 2 === 1;
                 
                 return (
-                  <div key={msg.id} className={`flex items-start gap-3 animate-fade-in ${isCurrentUser ? 'flex-row-reverse' : ''}`}>
+                  <div key={msg.id} className={`flex items-start gap-3 animate-fade-in ${isRightSide ? 'flex-row-reverse' : ''}`}>
                     {/* Avatar */}
                     <div className={`flex-shrink-0 transition-opacity duration-200 ${isConsecutive ? 'opacity-0' : 'opacity-100'}`}>
                       <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                        isCurrentUser 
-                          ? 'bg-gradient-to-br from-blue-500 to-blue-600 border border-blue-400/30' 
+                        isRightSide 
+                          ? 'bg-[#0044ff] border border-blue-400/30' 
                           : 'bg-gradient-to-br from-gray-400 to-gray-500 border border-gray-400/30'
                       }`}>
                         <span className="text-xs font-medium text-white">
@@ -208,9 +199,9 @@ export function LiveChat({ currentTarget, viewOnly = false, onClearChat }: LiveC
                     </div>
                     
                     {/* Message Content */}
-                    <div className={`flex-1 min-w-0 ${isCurrentUser ? 'text-right' : ''}`}>
+                    <div className={`flex-1 min-w-0 ${isRightSide ? 'text-right' : ''}`}>
                       {!isConsecutive && (
-                        <div className={`flex items-center gap-2 mb-1 ${isCurrentUser ? 'justify-end' : ''}`}>
+                        <div className={`flex items-center gap-2 mb-1 ${isRightSide ? 'justify-end' : ''}`}>
                           <span className="text-xs font-medium text-foreground/80">
                             {msg.first_name || 'Anonymous'}
                           </span>
@@ -226,8 +217,8 @@ export function LiveChat({ currentTarget, viewOnly = false, onClearChat }: LiveC
                       {/* Message Bubble */}
                       <div className="relative group">
                         <div className={`max-w-[280px] inline-block rounded-2xl px-4 py-2.5 shadow-sm hover:shadow-md transition-all duration-200 ${
-                          isCurrentUser 
-                            ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-br-md ml-auto' 
+                          isRightSide 
+                            ? 'bg-[#0044ff] text-white rounded-br-md ml-auto' 
                             : 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-tl-md'
                         }`}>
                           <p className="text-sm leading-relaxed break-words">
@@ -237,7 +228,7 @@ export function LiveChat({ currentTarget, viewOnly = false, onClearChat }: LiveC
                         
                         {/* Hover timestamp */}
                         <div className={`absolute -bottom-5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 ${
-                          isCurrentUser ? 'right-0' : 'left-0'
+                          isRightSide ? 'right-0' : 'left-0'
                         }`}>
                           <span className="text-xs text-muted-foreground bg-background/80 backdrop-blur-sm px-2 py-1 rounded-md border border-border/30">
                             {new Date(msg.created_at).toLocaleTimeString()}
