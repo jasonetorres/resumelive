@@ -6,6 +6,7 @@ import { LiveParticipantCounter } from '@/components/LiveParticipantCounter';
 import { FloatingReactions } from '@/components/FloatingReactions';
 import { FloatingChatMessages } from '@/components/FloatingChatMessages';
 import { FloatingFeedback } from '@/components/FloatingFeedback';
+import { FloatingQuestions } from '@/components/FloatingQuestions';
 import { LiveChat } from '@/components/LiveChat';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
 import { Button } from '@/components/ui/button';
@@ -476,6 +477,7 @@ const LiveDisplayPage = () => {
           </ResizablePanelGroup>
         </div>
         <FloatingReactions currentTarget={currentTarget} />
+        <FloatingQuestions currentTarget={currentTarget} />
         <FloatingFeedback currentTarget={currentTarget} />
       </div>
     );
@@ -551,6 +553,7 @@ const LiveDisplayPage = () => {
         </Card>
       </div>
       <FloatingReactions currentTarget={currentTarget} />
+      <FloatingQuestions currentTarget={currentTarget} />
       <FloatingFeedback currentTarget={currentTarget} />
     </div>
   );
