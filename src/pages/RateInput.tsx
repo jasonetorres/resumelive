@@ -19,6 +19,7 @@ interface RatingData {
 }
 
 const RateInputPage = () => {
+  console.log('RateInputPage: Component starting to render');
   const [currentTarget, setCurrentTarget] = useState<string | null>(null);
   const [participantCount, setParticipantCount] = useState(0);
   const { toast } = useToast();

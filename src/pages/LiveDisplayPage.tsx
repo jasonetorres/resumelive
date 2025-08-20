@@ -41,6 +41,7 @@ interface Resume {
 }
 
 const LiveDisplayPage = () => {
+  console.log('LiveDisplayPage: Component starting to render');
   const { toast } = useToast();
   const [ratings, setRatings] = useState<Rating[]>([]);
   const [currentTarget, setCurrentTarget] = useState<string | null>(null);

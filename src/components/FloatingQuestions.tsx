@@ -22,6 +22,12 @@ export function FloatingQuestions({ currentTarget }: FloatingQuestionsProps) {
 
   console.log('FloatingQuestions: Component rendered with currentTarget:', currentTarget, 'Questions count:', floatingQuestions.length);
 
+  // Add this to ensure we can see the component is mounting
+  React.useEffect(() => {
+    console.log('FloatingQuestions: Component MOUNTED');
+    return () => console.log('FloatingQuestions: Component UNMOUNTED');
+  }, []);
+
   const addFloatingQuestion = (question: string, author_name: string | null, upvotes: number, questionId: string) => {
     console.log('FloatingQuestions: Adding question:', { question, author_name, upvotes, questionId });
     

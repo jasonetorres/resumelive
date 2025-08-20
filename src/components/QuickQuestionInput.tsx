@@ -21,6 +21,12 @@ export function QuickQuestionInput({ currentTarget }: QuickQuestionInputProps) {
 
   console.log('QuickQuestionInput: Component rendered with currentTarget:', currentTarget);
 
+  // Add this to ensure we can see the component is mounting
+  React.useEffect(() => {
+    console.log('QuickQuestionInput: Component MOUNTED');
+    return () => console.log('QuickQuestionInput: Component UNMOUNTED');
+  }, []);
+
   const handleSubmitQuestion = async () => {
     console.log('QuickQuestionInput: handleSubmitQuestion called', { question: question.trim(), currentTarget });
     
