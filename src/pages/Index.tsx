@@ -60,16 +60,6 @@ const Index = () => {
               <p className="text-muted-foreground">
                 Viewers use this page to submit live ratings for resumes and LinkedIn profiles
               </p>
-              <div className="flex justify-center gap-2 text-sm">
-                <span className="flex items-center gap-1">
-                  <Star className="w-4 h-4 text-neon-orange" weight="fill" />
-                  Interactive Rating
-                </span>
-                <span className="flex items-center gap-1">
-                  <Users className="w-4 h-4 text-neon-cyan" weight="bold" />
-                  Real-time Comments
-                </span>
-              </div>
               <Link to="/rate-direct">
                 <Button className="w-full bg-gradient-to-r from-neon-purple to-neon-pink hover:from-neon-pink hover:to-neon-purple text-primary-foreground glow-effect">
                   Open Rating Page
@@ -90,16 +80,6 @@ const Index = () => {
               <p className="text-muted-foreground">
                 Real-time display for your stream overlay showing live ratings and feedback
               </p>
-              <div className="flex justify-center gap-2 text-sm">
-                <span className="flex items-center gap-1">
-                  <TrendUp className="w-4 h-4 text-neon-green" weight="bold" />
-                  Analytics Dashboard
-                </span>
-                <span className="flex items-center gap-1">
-                  <Monitor className="w-4 h-4 text-neon-pink" weight="fill" />
-                  Overlay Compatible
-                </span>
-              </div>
               <Link to="/display">
                 <Button className="w-full bg-gradient-to-r from-neon-cyan to-neon-green hover:from-neon-green hover:to-neon-cyan text-primary-foreground glow-effect">
                   Open Display
