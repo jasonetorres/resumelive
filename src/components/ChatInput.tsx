@@ -41,21 +41,39 @@ export function ChatInput({ currentTarget }: ChatInputProps) {
     setIsSending(true);
     
     try {
-      const { error } = await supabase
-        .from('chat_messages')
-        .insert({
+      // Send message through moderation edge function
+      const { data, error } = await supabase.functions.invoke('moderate-chat', {
+        body: {
           target_person: currentTarget,
           message: message.trim(),
           first_name: firstName,
-        });
+        },
+      });
 
       if (error) throw error;
+      
+      if (data?.blocked) {
+        toast({
+          title: "Message Blocked",
+          description: "Your message contains inappropriate content and was not sent.",
+          variant: "destructive",
+        });
+        return;
+      }
 
       setMessage('');
-      toast({
-        title: "Message Sent! 💬",
-        description: "Your message will appear on the live display",
-      });
+      
+      if (data?.moderated) {
+        toast({
+          title: "Message Sent (Filtered) 💬",
+          description: "Your message was filtered for inappropriate content and sent.",
+        });
+      } else {
+        toast({
+          title: "Message Sent! 💬",
+          description: "Your message will appear on the live display",
+        });
+      }
     } catch (error) {
       console.error('Error sending message:', error);
       toast({
