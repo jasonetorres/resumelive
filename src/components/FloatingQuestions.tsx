@@ -52,12 +52,12 @@ export function FloatingQuestions({ currentTarget }: FloatingQuestionsProps) {
     console.log('FloatingQuestions: New question created:', newFloatingQuestion);
     setFloatingQuestions(prev => [...prev, newFloatingQuestion]);
 
-    // Remove the question after 20 seconds (longer for better readability)
+    // Remove the question after 30 seconds (longer for better readability)
     setTimeout(() => {
       console.log('FloatingQuestions: Removing question:', questionId);
       setFloatingQuestions(prev => prev.filter(fq => fq.id !== questionId));
       processedQuestions.current.delete(questionId);
-    }, 20000);
+    }, 30000);
   };
 
   useEffect(() => {
@@ -118,11 +118,11 @@ export function FloatingQuestions({ currentTarget }: FloatingQuestionsProps) {
           style={{
             left: `${floatingQuestion.x}%`,
             top: `${floatingQuestion.y}%`,
-            animationDuration: '20s',
+            animationDuration: '30s',
             animationTimingFunction: 'linear'
           }}
         >
-          <div className="bg-gradient-to-r from-neon-blue/95 to-neon-purple/95 backdrop-blur-sm text-white px-12 py-8 rounded-3xl shadow-2xl border-4 border-neon-blue/50 max-w-2xl">
+          <div className="backdrop-blur-sm text-white px-12 py-8 rounded-3xl shadow-2xl border-4 max-w-2xl" style={{ backgroundColor: '#0044ff', borderColor: '#0044ff' }}>
             {/* Question Header */}
             <div className="flex items-center gap-4 mb-4">
               <MessageSquare className="w-10 h-10 text-neon-cyan flex-shrink-0" />
@@ -148,7 +148,7 @@ export function FloatingQuestions({ currentTarget }: FloatingQuestionsProps) {
             )}
             
             {/* Question bubble tail */}
-            <div className="absolute -bottom-4 left-12 w-8 h-8 bg-gradient-to-r from-neon-blue/95 to-neon-purple/95 rotate-45 border-r-4 border-b-4 border-neon-blue/50"></div>
+            <div className="absolute -bottom-4 left-12 w-8 h-8 rotate-45 border-r-4 border-b-4" style={{ backgroundColor: '#0044ff', borderColor: '#0044ff' }}></div>
           </div>
         </div>
       ))}
