@@ -2,8 +2,6 @@ import React from 'react';
 import { LeadForm } from '@/components/LeadForm';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Users, Wifi } from 'lucide-react';
 
 interface LeadFormData {
   firstName: string;
@@ -28,20 +26,20 @@ const LeadFormPage = () => {
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 flex items-center justify-center p-3 sm:p-4">
       <div className="w-full max-w-lg">
         <div className="text-center mb-6 sm:mb-8">
-          <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-neon-purple to-neon-pink bg-clip-text text-transparent mb-2">
-            Conference Registration
-          </h1>
-          
-          {/* Live Status Indicators */}
-          <div className="flex flex-wrap justify-center gap-2 mb-4">
-            <Badge variant="outline" className="border-neon-green text-neon-green bg-neon-green/10 flex items-center gap-1 text-xs">
-              <Wifi className="w-3 h-3" />
-              Live
-            </Badge>
-            <Badge variant="outline" className="border-neon-cyan text-neon-cyan bg-neon-cyan/10 flex items-center gap-1 text-xs">
-              <Users className="w-3 h-3" />
-              Required
-            </Badge>
+          <div className="flex items-center justify-center gap-4 mb-4">
+            <img 
+              src="/lovable-uploads/47be24da-2929-4836-b53c-587b774ca249.png" 
+              alt="Conference Logo" 
+              className="w-12 h-12 sm:w-14 sm:h-14"
+            />
+            <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-neon-purple to-neon-pink bg-clip-text text-transparent">
+              Conference Registration
+            </h1>
+            <img 
+              src="/lovable-uploads/47be24da-2929-4836-b53c-587b774ca249.png" 
+              alt="Conference Logo" 
+              className="w-12 h-12 sm:w-14 sm:h-14"
+            />
           </div>
 
           <p className="text-muted-foreground text-sm sm:text-base">
