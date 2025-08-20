@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Star } from 'lucide-react';
+import { Star } from 'phosphor-react';
 import { cn } from '@/lib/utils';
 
 interface StarRatingProps {
@@ -63,10 +63,11 @@ export function StarRating({
             disabled={readonly}
           >
             <Star
+              weight={isFilled ? "fill" : "regular"}
               className={cn(
                 "transition-all duration-200",
                 isFilled 
-                  ? "fill-neon-orange text-neon-orange star-animation" 
+                  ? "text-neon-orange star-animation" 
                   : "text-muted-foreground hover:text-neon-orange",
                 !readonly && "hover:drop-shadow-[0_0_8px_hsl(var(--neon-orange))]"
               )}

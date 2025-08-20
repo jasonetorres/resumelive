@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Link } from 'react-router-dom';
-import { Star, Users, Monitor, Smartphone, Zap, TrendingUp, Upload } from 'lucide-react';
+import { Star, Users, Monitor, DeviceMobile, Lightning, TrendUp, Upload } from 'phosphor-react';
 import { ResumeManager } from '@/components/ResumeManager';
 
 const Index = () => {
@@ -35,7 +35,7 @@ const Index = () => {
         <Card className="glow-effect border-neon-orange/50 hover:border-neon-orange transition-all duration-300 mb-8">
           <CardHeader className="text-center">
             <div className="mx-auto mb-4 w-16 h-16 bg-gradient-to-r from-neon-orange to-neon-pink rounded-full flex items-center justify-center">
-              <Upload className="w-8 h-8 text-white" />
+              <Upload className="w-8 h-8 text-white" weight="bold" />
             </div>
             <CardTitle className="text-2xl text-neon-orange">Upload Resume</CardTitle>
           </CardHeader>
@@ -52,7 +52,7 @@ const Index = () => {
           <Card className="glow-effect border-neon-purple/50 hover:border-neon-purple transition-all duration-300">
             <CardHeader className="text-center">
               <div className="mx-auto mb-4 w-16 h-16 bg-gradient-to-r from-neon-purple to-neon-pink rounded-full flex items-center justify-center">
-                <Smartphone className="w-8 h-8 text-white" />
+                <DeviceMobile className="w-8 h-8 text-white" weight="bold" />
               </div>
               <CardTitle className="text-2xl text-neon-purple">Rate Content</CardTitle>
             </CardHeader>
@@ -62,18 +62,18 @@ const Index = () => {
               </p>
               <div className="flex justify-center gap-2 text-sm">
                 <span className="flex items-center gap-1">
-                  <Star className="w-4 h-4 text-neon-orange" />
+                  <Star className="w-4 h-4 text-neon-orange" weight="fill" />
                   Interactive Rating
                 </span>
                 <span className="flex items-center gap-1">
-                  <Users className="w-4 h-4 text-neon-cyan" />
+                  <Users className="w-4 h-4 text-neon-cyan" weight="bold" />
                   Real-time Comments
                 </span>
               </div>
               <Link to="/rate-direct">
                 <Button className="w-full bg-gradient-to-r from-neon-purple to-neon-pink hover:from-neon-pink hover:to-neon-purple text-primary-foreground glow-effect">
                   Open Rating Page
-                  <Zap className="w-4 h-4 ml-2" />
+                  <Lightning className="w-4 h-4 ml-2" weight="fill" />
                 </Button>
               </Link>
             </CardContent>
@@ -82,7 +82,7 @@ const Index = () => {
           <Card className="glow-effect border-neon-cyan/50 hover:border-neon-cyan transition-all duration-300">
             <CardHeader className="text-center">
               <div className="mx-auto mb-4 w-16 h-16 bg-gradient-to-r from-neon-cyan to-neon-green rounded-full flex items-center justify-center">
-                <Monitor className="w-8 h-8 text-white" />
+                <Monitor className="w-8 h-8 text-white" weight="bold" />
               </div>
               <CardTitle className="text-2xl text-neon-cyan">Stream Display</CardTitle>
             </CardHeader>
@@ -92,24 +92,24 @@ const Index = () => {
               </p>
               <div className="flex justify-center gap-2 text-sm">
                 <span className="flex items-center gap-1">
-                  <TrendingUp className="w-4 h-4 text-neon-green" />
+                  <TrendUp className="w-4 h-4 text-neon-green" weight="bold" />
                   Analytics Dashboard
                 </span>
                 <span className="flex items-center gap-1">
-                  <Monitor className="w-4 h-4 text-neon-pink" />
+                  <Monitor className="w-4 h-4 text-neon-pink" weight="fill" />
                   Overlay Compatible
                 </span>
               </div>
               <Link to="/display">
                 <Button className="w-full bg-gradient-to-r from-neon-cyan to-neon-green hover:from-neon-green hover:to-neon-cyan text-primary-foreground glow-effect">
                   Open Display
-                  <Monitor className="w-4 h-4 ml-2" />
+                  <Monitor className="w-4 h-4 ml-2" weight="bold" />
                 </Button>
               </Link>
               <Link to="/formdisplay">
                 <Button variant="outline" className="w-full mt-2">
                   Conference Leads Dashboard
-                  <Users className="w-4 h-4 ml-2" />
+                  <Users className="w-4 h-4 ml-2" weight="bold" />
                 </Button>
               </Link>
             </CardContent>

@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Send, MessageCircle } from 'lucide-react';
+import { PaperPlaneTilt, ChatCircle } from 'phosphor-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -154,7 +154,7 @@ export function LiveChat({ currentTarget, viewOnly = false, onClearChat }: LiveC
     <Card className="h-full flex flex-col border-neon-cyan/30 overflow-hidden bg-gradient-to-b from-background to-muted/20">
       <CardHeader className="pb-3 flex-shrink-0 border-b border-border/50">
         <CardTitle className="text-sm bg-gradient-to-r from-neon-cyan to-neon-green bg-clip-text text-transparent flex items-center gap-2">
-          <MessageCircle className="w-4 h-4 text-neon-cyan" />
+          <ChatCircle className="w-4 h-4 text-neon-cyan" weight="bold" />
           Live Chat
           <span className="ml-auto text-xs text-muted-foreground font-normal">
             {messages.length} {messages.length === 1 ? 'message' : 'messages'}
@@ -168,7 +168,7 @@ export function LiveChat({ currentTarget, viewOnly = false, onClearChat }: LiveC
             {messages.length === 0 ? (
               <div className="text-center text-muted-foreground text-sm py-8">
                 <div className="w-12 h-12 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-3">
-                  <MessageCircle className="w-6 h-6" />
+                  <ChatCircle className="w-6 h-6" weight="light" />
                 </div>
                 {currentTarget ? "No messages yet. Start the conversation!" : "Waiting for session to start..."}
               </div>
@@ -267,7 +267,7 @@ export function LiveChat({ currentTarget, viewOnly = false, onClearChat }: LiveC
                     {isSending ? (
                       <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin" />
                     ) : (
-                      <Send className="w-3 h-3" />
+                      <PaperPlaneTilt className="w-3 h-3" weight="bold" />
                     )}
                   </Button>
                 </div>

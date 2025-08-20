@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Send, MessageCircle, Smile } from 'lucide-react';
+import { PaperPlaneTilt, ChatCircle, Smiley } from 'phosphor-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -134,7 +134,7 @@ export function ChatInput({ currentTarget }: ChatInputProps) {
                   disabled={!currentTarget}
                   className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 p-0 hover:bg-neon-cyan/10"
                 >
-                  <Smile className="w-4 h-4" />
+                  <Smiley className="w-4 h-4" />
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-64 p-2">
@@ -162,7 +162,7 @@ export function ChatInput({ currentTarget }: ChatInputProps) {
             {isSending ? (
               <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
             ) : (
-              <Send className="w-4 h-4" />
+              <PaperPlaneTilt className="w-4 h-4" weight="bold" />
             )}
           </Button>
         </div>
@@ -170,7 +170,7 @@ export function ChatInput({ currentTarget }: ChatInputProps) {
         {!currentTarget && (
           <div className="mt-3 text-center">
             <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
-              <MessageCircle className="w-4 h-4" />
+              <ChatCircle className="w-4 h-4" />
               Chat will be available when a session starts
             </div>
           </div>
