@@ -12,6 +12,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Loader2, Users, Trophy, CheckCircle, Calendar } from 'lucide-react';
 import { ScheduleBooking } from './ScheduleBooking';
 import { format, parse } from 'date-fns';
+import { parseISO } from 'date-fns';
 
 const leadSchema = z.object({
   firstName: z.string().min(2, 'First name must be at least 2 characters'),
@@ -164,38 +165,53 @@ export const LeadForm: React.FC<LeadFormProps> = ({ onSuccess }) => {
   if (booking) {
     const formData = form.getValues();
     return (
-      <div className="space-y-4">
-        <Card className="border-green-200 bg-green-50/50">
-          <CardHeader className="pb-3">
-            <div className="flex items-center gap-2">
-              <CheckCircle className="h-5 w-5 text-green-600" />
-              <CardTitle className="text-green-900">Registration & Booking Complete!</CardTitle>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div>
-              <p className="text-sm text-green-800">
-                <strong>{formData.firstName} {formData.lastName}</strong>
-              </p>
-              <p className="text-sm text-green-700">{formData.email}</p>
-              <p className="text-sm text-green-700">{formData.jobTitle}</p>
+      <div className="space-y-6">
+        <div className="text-center space-y-4">
+          <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+            <CheckCircle className="h-8 w-8 text-green-600" />
+          </div>
+          <div className="space-y-2">
+            <h2 className="text-2xl font-semibold text-green-900">All Set! 🎉</h2>
+            <p className="text-green-800">
+              Your registration and booking are confirmed
+            </p>
+          </div>
+        </div>
+
+        <Card className="border-green-200 bg-green-50">
+          <CardContent className="p-6 space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                <Users className="h-5 w-5 text-green-600" />
+              </div>
+              <div>
+                <p className="font-semibold text-green-900">
+                  {formData.firstName} {formData.lastName}
+                </p>
+                <p className="text-sm text-green-700">{formData.email}</p>
+                <p className="text-sm text-green-700">{formData.jobTitle}</p>
+              </div>
             </div>
             
-            <div className="border-t border-green-200 pt-3">
-              <div className="flex items-center gap-2 text-green-800">
-                <Calendar className="h-4 w-4" />
-                <span className="text-sm font-medium">Scheduled Session:</span>
+            <div className="border-t border-green-200 pt-4">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                  <Calendar className="h-5 w-5 text-blue-600" />
+                </div>
+                <div>
+                  <p className="font-semibold text-blue-900">Scheduled Session</p>
+                  <p className="text-sm text-blue-800">
+                    {format(parseISO(booking.time_slot.date), 'EEEE, MMMM dd, yyyy')} at {formatTime(booking.time_slot.start_time)}
+                  </p>
+                </div>
               </div>
-              <p className="text-sm text-green-700 mt-1">
-                {booking.time_slot.date} at {formatTime(booking.time_slot.start_time)} - {formatTime(booking.time_slot.end_time)}
-              </p>
             </div>
           </CardContent>
         </Card>
         
         <Button 
           onClick={() => onSuccess(formData)}
-          className="w-full bg-gradient-to-r from-neon-purple to-neon-pink hover:from-neon-purple/80 hover:to-neon-pink/80 text-white font-semibold"
+          className="w-full bg-gradient-to-r from-neon-purple to-neon-pink hover:from-neon-purple/80 hover:to-neon-pink/80 text-white font-semibold h-12"
         >
           Continue to Session
         </Button>
@@ -206,19 +222,28 @@ export const LeadForm: React.FC<LeadFormProps> = ({ onSuccess }) => {
   // Show scheduling options if enabled and lead is created
   if (showScheduling && leadId) {
     return (
-      <div className="space-y-4">
+      <div className="space-y-6">
+        <div className="text-center space-y-2 pb-4 border-b">
+          <h2 className="text-2xl font-semibold">Almost Done!</h2>
+          <p className="text-muted-foreground">
+            Your registration is complete. Now let's schedule your session.
+          </p>
+        </div>
+        
         <ScheduleBooking 
           leadId={leadId}
           onBookingComplete={handleBookingComplete}
         />
         
-        <Button 
-          onClick={handleSkipScheduling}
-          variant="outline" 
-          className="w-full"
-        >
-          Skip Scheduling - Continue to Session
-        </Button>
+        <div className="text-center">
+          <Button 
+            onClick={handleSkipScheduling}
+            variant="ghost" 
+            className="text-muted-foreground hover:text-foreground"
+          >
+            Skip scheduling for now - Continue to session
+          </Button>
+        </div>
       </div>
     );
   }

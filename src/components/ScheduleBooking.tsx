@@ -29,6 +29,12 @@ export const ScheduleBooking: React.FC<ScheduleBookingProps> = ({
   const [isBooking, setIsBooking] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
 
+  // Helper function to parse time and calculate duration
+  const parseTime = (timeString: string) => {
+    const date = parse(timeString, 'HH:mm', new Date());
+    return date.getTime();
+  };
+
   // Helper function to format time in 12-hour format
   const formatTime = (timeString: string | null | undefined) => {
     if (!timeString || typeof timeString !== 'string') {
@@ -123,25 +129,33 @@ export const ScheduleBooking: React.FC<ScheduleBookingProps> = ({
 
   if (isLoading) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Calendar className="h-5 w-5" />
-            Available Time Slots
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-            <p className="mt-2 text-muted-foreground">Loading available times...</p>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="text-center py-12 space-y-4">
+        <div className="mx-auto w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
+          <Calendar className="h-6 w-6 text-primary" />
+        </div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+        <div className="space-y-1">
+          <p className="font-medium">Finding Available Times</p>
+          <p className="text-sm text-muted-foreground">Please wait while we check for open slots...</p>
+        </div>
+      </div>
     );
   }
 
   if (availableSlots.length === 0) {
-    return null; // Don't show the component if no slots available
+    return (
+      <div className="text-center py-12 space-y-4">
+        <div className="mx-auto w-12 h-12 bg-muted/50 rounded-full flex items-center justify-center">
+          <Calendar className="h-6 w-6 text-muted-foreground" />
+        </div>
+        <div className="space-y-1">
+          <p className="font-medium text-muted-foreground">No Available Time Slots</p>
+          <p className="text-sm text-muted-foreground">
+            All slots are currently booked. Please check back later or contact us directly.
+          </p>
+        </div>
+      </div>
+    );
   }
 
   // Group slots by date
@@ -155,68 +169,98 @@ export const ScheduleBooking: React.FC<ScheduleBookingProps> = ({
   }, {} as Record<string, TimeSlot[]>);
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Calendar className="h-5 w-5" />
-          Book a Time Slot
-        </CardTitle>
-        <p className="text-sm text-muted-foreground">
-          Schedule a personalized resume review session
+    <div className="space-y-6">
+      {/* Header Section */}
+      <div className="text-center space-y-2">
+        <div className="mx-auto w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-3">
+          <Calendar className="h-6 w-6 text-primary" />
+        </div>
+        <h3 className="text-xl font-semibold">Choose Your Time Slot</h3>
+        <p className="text-muted-foreground text-sm">
+          Select a convenient time for your personalized resume review session
         </p>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          {Object.entries(slotsByDate).map(([date, slots]) => (
-            <div key={date}>
-              <h4 className="font-medium text-sm mb-2 flex items-center gap-2">
-                <Calendar className="h-4 w-4" />
-                {format(parseISO(date), 'EEEE, MMM dd, yyyy')}
+      </div>
+
+      {/* Available Slots */}
+      <div className="space-y-6">
+        {Object.entries(slotsByDate).map(([date, slots]) => (
+          <div key={date} className="space-y-3">
+            {/* Date Header */}
+            <div className="flex items-center gap-2 pb-2 border-b">
+              <Calendar className="h-4 w-4 text-primary" />
+              <h4 className="font-medium text-lg">
+                {format(parseISO(date), 'EEEE, MMMM dd, yyyy')}
               </h4>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                {slots.map((slot) => (
-                  <Button
-                    key={slot.id}
-                    variant="outline"
-                    size="sm"
-                    onClick={() => bookTimeSlot(slot.id)}
-                    disabled={isBooking && selectedSlot === slot.id}
-                    className="justify-start h-auto p-3 text-left"
-                  >
-                    <div className="flex items-center gap-2">
-                      {isBooking && selectedSlot === slot.id ? (
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary" />
-                      ) : (
-                        <Clock className="h-4 w-4" />
-                      )}
-                      <div>
-                        <div className="font-medium text-sm">
-                          {formatTime(slot.start_time)} - {formatTime(slot.end_time)}
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          Available
+            </div>
+            
+            {/* Time Slots Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {slots.map((slot) => (
+                <Card 
+                  key={slot.id}
+                  className={`cursor-pointer transition-all duration-200 hover:shadow-md border-2 ${
+                    selectedSlot === slot.id && isBooking 
+                      ? 'border-primary bg-primary/5' 
+                      : 'border-muted hover:border-primary/50'
+                  }`}
+                  onClick={() => bookTimeSlot(slot.id)}
+                >
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        {isBooking && selectedSlot === slot.id ? (
+                          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary" />
+                        ) : (
+                          <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center">
+                            <div className="w-2 h-2 rounded-full bg-green-600"></div>
+                          </div>
+                        )}
+                        <div>
+                          <div className="font-semibold text-base">
+                            {formatTime(slot.start_time)}
+                          </div>
+                          <div className="text-sm text-muted-foreground">
+                            {Math.round((parseTime(slot.end_time) - parseTime(slot.start_time)) / 60000)} min session
+                          </div>
                         </div>
                       </div>
+                      
+                      <div className="text-right">
+                        <Badge variant="secondary" className="bg-green-100 text-green-800 border-green-200">
+                          Available
+                        </Badge>
+                      </div>
                     </div>
-                  </Button>
-                ))}
-              </div>
+                    
+                    {isBooking && selectedSlot === slot.id && (
+                      <div className="mt-3 text-sm text-primary font-medium">
+                        Booking your session...
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              ))}
             </div>
-          ))}
-        </div>
-        
-        <div className="mt-4 p-3 bg-muted/50 rounded-lg">
-          <div className="flex items-start gap-2 text-sm">
-            <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
-            <div>
-              <p className="font-medium">What to expect:</p>
-              <p className="text-muted-foreground text-xs mt-1">
-                One-on-one resume review session with personalized feedback and improvement suggestions.
+          </div>
+        ))}
+      </div>
+      
+      {/* Info Section */}
+      <Card className="bg-blue-50/50 border-blue-200">
+        <CardContent className="p-4">
+          <div className="flex items-start gap-3">
+            <CheckCircle className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
+            <div className="space-y-1">
+              <p className="font-medium text-blue-900">What to Expect</p>
+              <p className="text-sm text-blue-800">
+                • One-on-one resume review with an expert<br/>
+                • Personalized feedback and improvement suggestions<br/>
+                • Tips for better job application success
               </p>
             </div>
           </div>
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
