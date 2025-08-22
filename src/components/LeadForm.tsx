@@ -11,6 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Loader2, Users, Trophy, CheckCircle, Calendar } from 'lucide-react';
 import { ScheduleBooking } from './ScheduleBooking';
+import { format, parse } from 'date-fns';
 
 const leadSchema = z.object({
   firstName: z.string().min(2, 'First name must be at least 2 characters'),
@@ -43,6 +44,12 @@ export const LeadForm: React.FC<LeadFormProps> = ({ onSuccess }) => {
   const [booking, setBooking] = useState<Booking | null>(null);
   const [showScheduling, setShowScheduling] = useState(false);
   const { toast } = useToast();
+
+  // Helper function to format time in 12-hour format
+  const formatTime = (timeString: string) => {
+    const date = parse(timeString, 'HH:mm', new Date());
+    return format(date, 'h:mm a');
+  };
 
   const form = useForm<LeadFormData>({
     resolver: zodResolver(leadSchema),
@@ -131,7 +138,7 @@ export const LeadForm: React.FC<LeadFormProps> = ({ onSuccess }) => {
     
     toast({
       title: "Booking Confirmed! 🗓️",
-      description: `Your session is scheduled for ${timeSlot.date} at ${timeSlot.start_time}`,
+      description: `Your session is scheduled for ${timeSlot.date} at ${formatTime(timeSlot.start_time)}`,
     });
   };
 
@@ -168,7 +175,7 @@ export const LeadForm: React.FC<LeadFormProps> = ({ onSuccess }) => {
                 <span className="text-sm font-medium">Scheduled Session:</span>
               </div>
               <p className="text-sm text-green-700 mt-1">
-                {booking.time_slot.date} at {booking.time_slot.start_time} - {booking.time_slot.end_time}
+                {booking.time_slot.date} at {formatTime(booking.time_slot.start_time)} - {formatTime(booking.time_slot.end_time)}
               </p>
             </div>
           </CardContent>

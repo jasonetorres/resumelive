@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, Clock, User, CheckCircle } from 'lucide-react';
-import { format, parseISO } from 'date-fns';
+import { format, parseISO, parse } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -28,6 +28,12 @@ export const ScheduleBooking: React.FC<ScheduleBookingProps> = ({
   const [isLoading, setIsLoading] = useState(true);
   const [isBooking, setIsBooking] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
+
+  // Helper function to format time in 12-hour format
+  const formatTime = (timeString: string) => {
+    const date = parse(timeString, 'HH:mm', new Date());
+    return format(date, 'h:mm a');
+  };
 
   const fetchAvailableSlots = async () => {
     try {
@@ -173,7 +179,7 @@ export const ScheduleBooking: React.FC<ScheduleBookingProps> = ({
                       )}
                       <div>
                         <div className="font-medium text-sm">
-                          {slot.start_time} - {slot.end_time}
+                          {formatTime(slot.start_time)} - {formatTime(slot.end_time)}
                         </div>
                         <div className="text-xs text-muted-foreground">
                           Available

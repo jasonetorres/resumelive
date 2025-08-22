@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { CalendarIcon, Plus, Trash2, Clock } from 'lucide-react';
-import { format, parseISO } from 'date-fns';
+import { format, parseISO, parse } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -39,6 +39,12 @@ export const ScheduleManager: React.FC = () => {
   const [duration, setDuration] = useState(15); // Default 15 minutes
   const [isAddingSlot, setIsAddingSlot] = useState(false);
   const [isGeneratingSlots, setIsGeneratingSlots] = useState(false);
+  
+  // Helper function to format time in 12-hour format
+  const formatTime = (timeString: string) => {
+    const date = parse(timeString, 'HH:mm', new Date());
+    return format(date, 'h:mm a');
+  };
 
   const fetchTimeSlots = async () => {
     try {
@@ -250,7 +256,7 @@ export const ScheduleManager: React.FC = () => {
                 variant="outline"
                 size="sm"
               >
-                9AM - 5PM
+                9:00 AM - 5:00 PM
               </Button>
               <Button
                 onClick={() => generateDaySlots(10, 16)}
@@ -258,7 +264,7 @@ export const ScheduleManager: React.FC = () => {
                 variant="outline"
                 size="sm"
               >
-                10AM - 4PM
+                10:00 AM - 4:00 PM
               </Button>
               <Button
                 onClick={() => generateDaySlots(12, 18)}
@@ -266,7 +272,7 @@ export const ScheduleManager: React.FC = () => {
                 variant="outline"
                 size="sm"
               >
-                12PM - 6PM
+                12:00 PM - 6:00 PM
               </Button>
               <Button
                 onClick={() => generateDaySlots(13, 17)}
@@ -274,7 +280,7 @@ export const ScheduleManager: React.FC = () => {
                 variant="outline"
                 size="sm"
               >
-                1PM - 5PM
+                1:00 PM - 5:00 PM
               </Button>
             </div>
             {isGeneratingSlots && (
@@ -399,7 +405,7 @@ export const ScheduleManager: React.FC = () => {
                         {format(parseISO(slot.date), 'MMM dd, yyyy')}
                       </TableCell>
                       <TableCell>
-                        {slot.start_time} - {slot.end_time}
+                        {formatTime(slot.start_time)} - {formatTime(slot.end_time)}
                       </TableCell>
                       <TableCell>
                         <Badge variant={slot.booking ? "secondary" : "default"}>
