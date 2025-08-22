@@ -229,7 +229,7 @@ export const ScheduleBooking: React.FC<ScheduleBookingProps> = ({
             </div>
             
             {/* Time Slots Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {slots.map((slot) => (
                 <Card 
                   key={slot.id}
@@ -241,37 +241,42 @@ export const ScheduleBooking: React.FC<ScheduleBookingProps> = ({
                   onClick={() => bookTimeSlot(slot.id)}
                 >
                   <CardContent className="p-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        {isBooking && selectedSlot === slot.id ? (
-                          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary" />
-                        ) : (
-                          <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center">
-                            <div className="w-2 h-2 rounded-full bg-green-600"></div>
-                          </div>
-                        )}
-                        <div>
-                          <div className="font-semibold text-base">
-                            {formatTime(slot.start_time)}
-                          </div>
-                          <div className="text-sm text-muted-foreground">
-                            {calculateDuration(slot.start_time, slot.end_time)} min session
+                    <div className="space-y-3">
+                      {/* Top Row - Time and Status */}
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          {isBooking && selectedSlot === slot.id ? (
+                            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary" />
+                          ) : (
+                            <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                              <div className="w-2 h-2 rounded-full bg-green-600"></div>
+                            </div>
+                          )}
+                          <div>
+                            <div className="font-semibold text-lg">
+                              {formatTime(slot.start_time)}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                      
-                      <div className="text-right">
-                        <Badge variant="secondary" className="bg-green-100 text-green-800 border-green-200">
-                          Available
+                        
+                        <Badge variant="secondary" className="bg-green-100 text-green-800 border-green-200 text-xs px-2 py-1">
+                          Open
                         </Badge>
                       </div>
-                    </div>
-                    
-                    {isBooking && selectedSlot === slot.id && (
-                      <div className="mt-3 text-sm text-primary font-medium">
-                        Booking your session...
+                      
+                      {/* Bottom Row - Duration and Booking Status */}
+                      <div className="flex items-center justify-between">
+                        <div className="text-sm text-muted-foreground">
+                          {calculateDuration(slot.start_time, slot.end_time)} minute session
+                        </div>
+                        
+                        {isBooking && selectedSlot === slot.id && (
+                          <div className="text-xs text-primary font-medium">
+                            Booking...
+                          </div>
+                        )}
                       </div>
-                    )}
+                    </div>
                   </CardContent>
                 </Card>
               ))}
