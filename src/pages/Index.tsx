@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Link } from 'react-router-dom';
 import { Star, Users, Monitor, DeviceMobile, Lightning, TrendUp, Upload } from 'phosphor-react';
 import { ResumeManager } from '@/components/ResumeManager';
+import { RealtimeTest } from '@/components/RealtimeTest';
 
 const Index = () => {
   return (
@@ -94,6 +95,11 @@ const Index = () => {
               </Link>
             </CardContent>
           </Card>
+        </div>
+
+        {/* Realtime Test Section */}
+        <div className="mb-12">
+          <RealtimeTest />
         </div>
 
       </div>
