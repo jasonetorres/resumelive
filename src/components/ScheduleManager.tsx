@@ -41,9 +41,21 @@ export const ScheduleManager: React.FC = () => {
   const [isGeneratingSlots, setIsGeneratingSlots] = useState(false);
   
   // Helper function to format time in 12-hour format
-  const formatTime = (timeString: string) => {
-    const date = parse(timeString, 'HH:mm', new Date());
-    return format(date, 'h:mm a');
+  const formatTime = (timeString: string | null | undefined) => {
+    if (!timeString || typeof timeString !== 'string') {
+      return 'Invalid time';
+    }
+    
+    try {
+      const date = parse(timeString, 'HH:mm', new Date());
+      if (isNaN(date.getTime())) {
+        return timeString; // Return original if parsing fails
+      }
+      return format(date, 'h:mm a');
+    } catch (error) {
+      console.error('Error formatting time:', timeString, error);
+      return timeString; // Return original if formatting fails
+    }
   };
 
   const fetchTimeSlots = async () => {

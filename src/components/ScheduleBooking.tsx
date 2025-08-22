@@ -30,9 +30,21 @@ export const ScheduleBooking: React.FC<ScheduleBookingProps> = ({
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
 
   // Helper function to format time in 12-hour format
-  const formatTime = (timeString: string) => {
-    const date = parse(timeString, 'HH:mm', new Date());
-    return format(date, 'h:mm a');
+  const formatTime = (timeString: string | null | undefined) => {
+    if (!timeString || typeof timeString !== 'string') {
+      return 'Invalid time';
+    }
+    
+    try {
+      const date = parse(timeString, 'HH:mm', new Date());
+      if (isNaN(date.getTime())) {
+        return timeString; // Return original if parsing fails
+      }
+      return format(date, 'h:mm a');
+    } catch (error) {
+      console.error('Error formatting time:', timeString, error);
+      return timeString; // Return original if formatting fails
+    }
   };
 
   const fetchAvailableSlots = async () => {
