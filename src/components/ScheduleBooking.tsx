@@ -31,8 +31,29 @@ export const ScheduleBooking: React.FC<ScheduleBookingProps> = ({
 
   // Helper function to parse time and calculate duration
   const parseTime = (timeString: string) => {
-    const date = parse(timeString, 'HH:mm', new Date());
-    return date.getTime();
+    try {
+      const [hours, minutes] = timeString.split(':').map(Number);
+      const date = new Date();
+      date.setHours(hours, minutes, 0, 0);
+      return date.getTime();
+    } catch (error) {
+      console.error('Error parsing time:', timeString, error);
+      return 0;
+    }
+  };
+
+  // Helper function to calculate session duration in minutes
+  const calculateDuration = (startTime: string, endTime: string) => {
+    try {
+      const start = parseTime(startTime);
+      const end = parseTime(endTime);
+      const durationMs = end - start;
+      const durationMin = Math.round(durationMs / (1000 * 60));
+      return durationMin > 0 ? durationMin : 15; // Default to 15 min if calculation fails
+    } catch (error) {
+      console.error('Error calculating duration:', error);
+      return 15; // Default duration
+    }
   };
 
   // Helper function to format time in 12-hour format
@@ -42,14 +63,22 @@ export const ScheduleBooking: React.FC<ScheduleBookingProps> = ({
     }
     
     try {
-      const date = parse(timeString, 'HH:mm', new Date());
-      if (isNaN(date.getTime())) {
-        return timeString; // Return original if parsing fails
+      // Handle both HH:mm and HH:mm:ss formats
+      const timeParts = timeString.split(':');
+      const hours = parseInt(timeParts[0], 10);
+      const minutes = parseInt(timeParts[1], 10);
+      
+      if (isNaN(hours) || isNaN(minutes)) {
+        return timeString;
       }
+      
+      const date = new Date();
+      date.setHours(hours, minutes, 0, 0);
+      
       return format(date, 'h:mm a');
     } catch (error) {
       console.error('Error formatting time:', timeString, error);
-      return timeString; // Return original if formatting fails
+      return timeString;
     }
   };
 
@@ -158,13 +187,19 @@ export const ScheduleBooking: React.FC<ScheduleBookingProps> = ({
     );
   }
 
-  // Group slots by date
+  // Group slots by date and remove duplicates
   const slotsByDate = availableSlots.reduce((acc, slot) => {
     const date = slot.date;
     if (!acc[date]) {
       acc[date] = [];
     }
-    acc[date].push(slot);
+    
+    // Check for duplicates based on start_time
+    const isDuplicate = acc[date].some(existing => existing.start_time === slot.start_time);
+    if (!isDuplicate) {
+      acc[date].push(slot);
+    }
+    
     return acc;
   }, {} as Record<string, TimeSlot[]>);
 
@@ -220,7 +255,7 @@ export const ScheduleBooking: React.FC<ScheduleBookingProps> = ({
                             {formatTime(slot.start_time)}
                           </div>
                           <div className="text-sm text-muted-foreground">
-                            {Math.round((parseTime(slot.end_time) - parseTime(slot.start_time)) / 60000)} min session
+                            {calculateDuration(slot.start_time, slot.end_time)} min session
                           </div>
                         </div>
                       </div>
@@ -250,13 +285,20 @@ export const ScheduleBooking: React.FC<ScheduleBookingProps> = ({
         <CardContent className="p-4">
           <div className="flex items-start gap-3">
             <CheckCircle className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
-            <div className="space-y-1">
-              <p className="font-medium text-blue-900">What to Expect</p>
-              <p className="text-sm text-blue-800">
-                • One-on-one resume review with an expert<br/>
-                • Personalized feedback and improvement suggestions<br/>
-                • Tips for better job application success
-              </p>
+            <div className="space-y-2">
+              <p className="font-medium text-blue-900">Live Resume Review Experience</p>
+              <div className="text-sm text-blue-800 space-y-1">
+                <p>• One-on-one resume review with an expert at our booth</p>
+                <p>• Your resume will be displayed on screen for educational purposes</p>
+                <p>• Live feedback and improvement suggestions</p>
+                <p>• Interactive learning experience with other attendees nearby</p>
+                <p>• Tips for better job application success</p>
+              </div>
+              <div className="mt-3 p-2 bg-amber-50 border border-amber-200 rounded">
+                <p className="text-xs text-amber-800">
+                  <strong>Note:</strong> Your resume will be visible to others during the session as part of the interactive learning experience.
+                </p>
+              </div>
             </div>
           </div>
         </CardContent>

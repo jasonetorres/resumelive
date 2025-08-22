@@ -241,7 +241,7 @@ export const LeadForm: React.FC<LeadFormProps> = ({ onSuccess }) => {
             variant="ghost" 
             className="text-muted-foreground hover:text-foreground"
           >
-            Skip scheduling for now - Continue to session
+            I'll schedule later - Continue to session
           </Button>
         </div>
       </div>
