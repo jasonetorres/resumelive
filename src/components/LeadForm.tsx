@@ -9,7 +9,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Loader2, Users, Trophy } from 'lucide-react';
+import { Loader2, Users, Trophy, CheckCircle, Calendar } from 'lucide-react';
+import { ScheduleBooking } from './ScheduleBooking';
 
 const leadSchema = z.object({
   firstName: z.string().min(2, 'First name must be at least 2 characters'),
@@ -24,8 +25,23 @@ interface LeadFormProps {
   onSuccess: (leadData: LeadFormData) => void;
 }
 
+interface TimeSlot {
+  id: string;
+  date: string;
+  start_time: string;
+  end_time: string;
+}
+
+interface Booking {
+  id: string;
+  time_slot: TimeSlot;
+}
+
 export const LeadForm: React.FC<LeadFormProps> = ({ onSuccess }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [leadId, setLeadId] = useState<string | null>(null);
+  const [booking, setBooking] = useState<Booking | null>(null);
+  const [showScheduling, setShowScheduling] = useState(false);
   const { toast } = useToast();
 
   const form = useForm<LeadFormData>({
@@ -42,8 +58,8 @@ export const LeadForm: React.FC<LeadFormProps> = ({ onSuccess }) => {
     setIsSubmitting(true);
     
     try {
-      // Store in Supabase leads table
-      const { error } = await supabase
+      // Store in Supabase leads table and get the created lead ID
+      const { data: leadData, error } = await supabase
         .from('leads')
         .insert([
           {
@@ -53,7 +69,9 @@ export const LeadForm: React.FC<LeadFormProps> = ({ onSuccess }) => {
             email: data.email,
             job_title: data.jobTitle,
           }
-        ]);
+        ])
+        .select()
+        .single();
 
       if (error) {
         if (error.code === '23505') { // Unique constraint violation
@@ -68,10 +86,21 @@ export const LeadForm: React.FC<LeadFormProps> = ({ onSuccess }) => {
         return;
       }
 
+      // Store lead ID for potential scheduling
+      setLeadId(leadData.id);
+
+      // Check if scheduling is enabled
+      const { data: settings } = await supabase
+        .from('scheduling_settings')
+        .select('scheduling_enabled')
+        .eq('id', 1)
+        .single();
+
       // Also store in session storage as backup
       sessionStorage.setItem('leadData', JSON.stringify({
         ...data,
         submittedAt: new Date().toISOString(),
+        leadId: leadData.id,
       }));
       
       toast({
@@ -79,7 +108,11 @@ export const LeadForm: React.FC<LeadFormProps> = ({ onSuccess }) => {
         description: "Thanks for joining! Your information has been saved.",
       });
 
-      onSuccess(data);
+      if (settings?.scheduling_enabled) {
+        setShowScheduling(true);
+      } else {
+        onSuccess(data);
+      }
     } catch (error) {
       console.error('Error submitting lead:', error);
       toast({
@@ -92,6 +125,86 @@ export const LeadForm: React.FC<LeadFormProps> = ({ onSuccess }) => {
     }
   };
 
+  const handleBookingComplete = (bookingId: string, timeSlot: TimeSlot) => {
+    setBooking({ id: bookingId, time_slot: timeSlot });
+    setShowScheduling(false);
+    
+    toast({
+      title: "Booking Confirmed! 🗓️",
+      description: `Your session is scheduled for ${timeSlot.date} at ${timeSlot.start_time}`,
+    });
+  };
+
+  const handleSkipScheduling = () => {
+    setShowScheduling(false);
+    const formData = form.getValues();
+    onSuccess(formData);
+  };
+
+  // Show booking confirmation if already booked
+  if (booking) {
+    const formData = form.getValues();
+    return (
+      <div className="space-y-4">
+        <Card className="border-green-200 bg-green-50/50">
+          <CardHeader className="pb-3">
+            <div className="flex items-center gap-2">
+              <CheckCircle className="h-5 w-5 text-green-600" />
+              <CardTitle className="text-green-900">Registration & Booking Complete!</CardTitle>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div>
+              <p className="text-sm text-green-800">
+                <strong>{formData.firstName} {formData.lastName}</strong>
+              </p>
+              <p className="text-sm text-green-700">{formData.email}</p>
+              <p className="text-sm text-green-700">{formData.jobTitle}</p>
+            </div>
+            
+            <div className="border-t border-green-200 pt-3">
+              <div className="flex items-center gap-2 text-green-800">
+                <Calendar className="h-4 w-4" />
+                <span className="text-sm font-medium">Scheduled Session:</span>
+              </div>
+              <p className="text-sm text-green-700 mt-1">
+                {booking.time_slot.date} at {booking.time_slot.start_time} - {booking.time_slot.end_time}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Button 
+          onClick={() => onSuccess(formData)}
+          className="w-full bg-gradient-to-r from-neon-purple to-neon-pink hover:from-neon-purple/80 hover:to-neon-pink/80 text-white font-semibold"
+        >
+          Continue to Session
+        </Button>
+      </div>
+    );
+  }
+
+  // Show scheduling options if enabled and lead is created
+  if (showScheduling && leadId) {
+    return (
+      <div className="space-y-4">
+        <ScheduleBooking 
+          leadId={leadId}
+          onBookingComplete={handleBookingComplete}
+        />
+        
+        <Button 
+          onClick={handleSkipScheduling}
+          variant="outline" 
+          className="w-full"
+        >
+          Skip Scheduling - Continue to Session
+        </Button>
+      </div>
+    );
+  }
+
+  // Show main registration form
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">

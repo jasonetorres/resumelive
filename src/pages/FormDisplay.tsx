@@ -4,11 +4,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Download, Search, RefreshCw, Users, Calendar, TrendingUp, Trash2, RotateCcw } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { Download, Search, RefreshCw, Users, Calendar, TrendingUp, Trash2, RotateCcw, Lock, Clock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
+import { ScheduleManager } from "@/components/ScheduleManager";
 
 interface Lead {
   id: string;
@@ -32,6 +35,10 @@ export default function FormDisplay() {
   const [filteredLeads, setFilteredLeads] = useState<Lead[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [passwordInput, setPasswordInput] = useState("");
+  const [schedulingEnabled, setSchedulingEnabled] = useState(false);
+  const [showScheduleManager, setShowScheduleManager] = useState(false);
   const [stats, setStats] = useState<LeadStats>({
     total: 0,
     today: 0,
@@ -39,8 +46,52 @@ export default function FormDisplay() {
     recent: []
   });
 
+  const handlePasswordSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (passwordInput === "torcresumes") {
+      setIsAuthenticated(true);
+      fetchSchedulingSettings();
+    } else {
+      toast.error("Incorrect password");
+      setPasswordInput("");
+    }
+  };
+
+  const fetchSchedulingSettings = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('scheduling_settings')
+        .select('scheduling_enabled')
+        .eq('id', 1)
+        .single();
+      
+      if (!error && data) {
+        setSchedulingEnabled(data.scheduling_enabled);
+      }
+    } catch (error) {
+      console.error('Error fetching scheduling settings:', error);
+    }
+  };
+
+  const toggleScheduling = async (enabled: boolean) => {
+    try {
+      const { error } = await supabase
+        .from('scheduling_settings')
+        .update({ scheduling_enabled: enabled })
+        .eq('id', 1);
+      
+      if (error) throw error;
+      
+      setSchedulingEnabled(enabled);
+      toast.success(enabled ? "Scheduling enabled" : "Scheduling disabled");
+    } catch (error) {
+      console.error('Error updating scheduling settings:', error);
+      toast.error("Failed to update scheduling settings");
+    }
+  };
+
   const handleClearAllForNewEvent = async () => {
-    if (!confirm('🎉 Are you sure you want to clear ALL data for a new event? This will delete all ratings, questions, chat messages, AND lead registrations from the database.')) {
+    if (!confirm('🎉 Are you sure you want to clear ALL data for a new event? This will delete all ratings, questions, chat messages, lead registrations, AND bookings from the database.')) {
       return;
     }
 
@@ -109,6 +160,38 @@ export default function FormDisplay() {
         return;
       }
 
+      // Clear all bookings
+      const { error: bookingsError } = await supabase
+        .from('bookings')
+        .delete()
+        .neq('id', '00000000-0000-0000-0000-000000000000');
+      
+      if (bookingsError) {
+        console.error('Error clearing bookings:', bookingsError);
+        hookToast({
+          title: "Error",
+          description: "Failed to clear bookings.", 
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Clear all time slots
+      const { error: timeSlotsError } = await supabase
+        .from('time_slots')
+        .delete()
+        .neq('id', '00000000-0000-0000-0000-000000000000');
+      
+      if (timeSlotsError) {
+        console.error('Error clearing time slots:', timeSlotsError);
+        hookToast({
+          title: "Error",
+          description: "Failed to clear time slots.", 
+          variant: "destructive",
+        });
+        return;
+      }
+
       // Clear local state
       setLeads([]);
       setFilteredLeads([]);
@@ -121,7 +204,7 @@ export default function FormDisplay() {
 
       hookToast({
         title: "🎉 Ready for New Event!",
-        description: "All ratings, questions, chat messages, and lead registrations cleared.",
+        description: "All ratings, questions, chat messages, lead registrations, and bookings cleared.",
       });
     } catch (error) {
       console.error('Exception while clearing all data:', error);
@@ -245,15 +328,19 @@ export default function FormDisplay() {
     toast.success("Leads exported successfully!");
   };
 
-  // Auto-refresh every 30 seconds
+  // Auto-refresh every 30 seconds (only when authenticated)
   useEffect(() => {
-    fetchLeads();
-    const interval = setInterval(fetchLeads, 30000);
-    return () => clearInterval(interval);
-  }, []);
+    if (isAuthenticated) {
+      fetchLeads();
+      const interval = setInterval(fetchLeads, 30000);
+      return () => clearInterval(interval);
+    }
+  }, [isAuthenticated]);
 
-  // Real-time subscription
+  // Real-time subscription (only when authenticated)
   useEffect(() => {
+    if (!isAuthenticated) return;
+    
     const channel = (supabase as any)
       .channel('leads-changes')
       .on('postgres_changes', 
@@ -269,7 +356,42 @@ export default function FormDisplay() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [isAuthenticated]);
+
+  // Password protection screen
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center p-6">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center">
+            <div className="mx-auto w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+              <Lock className="w-6 h-6 text-primary" />
+            </div>
+            <CardTitle>Access Required</CardTitle>
+            <p className="text-muted-foreground">Enter password to access dashboard</p>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handlePasswordSubmit} className="space-y-4">
+              <div>
+                <Label htmlFor="password">Password</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  value={passwordInput}
+                  onChange={(e) => setPasswordInput(e.target.value)}
+                  placeholder="Enter password"
+                  className="mt-1"
+                />
+              </div>
+              <Button type="submit" className="w-full">
+                Access Dashboard
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto p-6 space-y-6">
@@ -295,6 +417,50 @@ export default function FormDisplay() {
           </Button>
         </div>
       </div>
+
+      {/* Scheduling Control */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Clock className="h-5 w-5" />
+            Scheduling Management
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="scheduling-toggle"
+                checked={schedulingEnabled}
+                onCheckedChange={toggleScheduling}
+              />
+              <Label htmlFor="scheduling-toggle" className="text-sm font-medium">
+                Enable time slot booking for leads
+              </Label>
+            </div>
+            <Badge variant={schedulingEnabled ? "default" : "secondary"}>
+              {schedulingEnabled ? "Active" : "Inactive"}
+            </Badge>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <Button
+              onClick={() => setShowScheduleManager(!showScheduleManager)}
+              variant="outline"
+              size="sm"
+            >
+              <Calendar className="mr-2 h-4 w-4" />
+              {showScheduleManager ? "Hide" : "Manage"} Time Slots
+            </Button>
+          </div>
+
+          {showScheduleManager && (
+            <div className="border-t pt-4">
+              <ScheduleManager />
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
