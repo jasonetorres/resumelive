@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
 import { ScheduleManager } from "@/components/ScheduleManager";
+import { Link } from "react-router-dom";
 
 interface Lead {
   id: string;
@@ -402,6 +403,16 @@ export default function FormDisplay() {
           <p className="text-muted-foreground">Real-time lead collection and management</p>
         </div>
         <div className="flex items-center gap-3">
+          <Link to="/schedule">
+            <Button 
+              variant="outline" 
+              size="sm"
+              className="border-blue-500 text-blue-500 hover:bg-blue-500/10"
+            >
+              <Calendar className="mr-2 h-4 w-4" />
+              View Schedule
+            </Button>
+          </Link>
           <Button 
             onClick={handleClearAllForNewEvent}
             variant="outline" 
