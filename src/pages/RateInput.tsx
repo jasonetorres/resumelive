@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ParticipationFlow } from '@/components/ParticipationFlow';
+import { ScheduledBookingBanner } from '@/components/ScheduledBookingBanner';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
@@ -178,6 +179,9 @@ const RateInputPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 flex items-center justify-center p-3 sm:p-4">
       <div className="w-full max-w-lg">
+        {/* Scheduled Booking Banner */}
+        <ScheduledBookingBanner />
+        
         <div className="text-center mb-6 sm:mb-8">
           <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-neon-purple to-neon-pink bg-clip-text text-transparent mb-2">
             Conference Participation
