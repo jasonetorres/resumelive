@@ -4,6 +4,9 @@ import { toast } from "sonner";
 import { Volume2 } from "lucide-react";
 import { audioManager } from "@/utils/audioManager";
 
+// Add audio initialization on component mount
+import { useEffect } from "react";
+
 const SOUND_OPTIONS = [
   { name: "applause", emoji: "👏", label: "Applause" },
   { name: "airhorn", emoji: "📯", label: "Air Horn" },
@@ -20,6 +23,11 @@ const SOUND_OPTIONS = [
 ];
 
 const Soundboard = () => {
+  useEffect(() => {
+    // Show user they need to interact first
+    console.log('Soundboard: Ready - click any button to enable audio');
+  }, []);
+
   const playSound = async (soundName: string) => {
     try {
       // Play the actual audio sound
@@ -63,7 +71,7 @@ const Soundboard = () => {
       
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
         <Volume2 className="h-4 w-4" />
-        <span>Sounds will appear as floating animations on the display</span>
+        <span>Click any button to enable audio • Sounds appear as floating animations</span>
       </div>
     </div>
   );

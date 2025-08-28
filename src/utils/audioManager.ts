@@ -10,6 +10,8 @@ interface SoundConfig {
 class AudioManager {
   private sounds: Map<string, Howl> = new Map();
   private initialized = false;
+  private audioEnabled = false;
+  private pendingSound: string | null = null;
   private audioContext: AudioContext | null = null;
   private userInteracted = false;
 
@@ -114,6 +116,33 @@ class AudioManager {
     }
   ];
 
+  constructor() {
+    // Add click listener to enable audio on first user interaction
+    this.setupUserInteractionListener();
+  }
+
+  private setupUserInteractionListener(): void {
+    const enableAudio = () => {
+      this.audioEnabled = true;
+      console.log('AudioManager: Audio enabled by user interaction');
+      
+      // Play any pending sound
+      if (this.pendingSound) {
+        this.playSound(this.pendingSound);
+        this.pendingSound = null;
+      }
+      
+      // Remove listeners after first interaction
+      document.removeEventListener('click', enableAudio);
+      document.removeEventListener('touchstart', enableAudio);
+      document.removeEventListener('keydown', enableAudio);
+    };
+
+    document.addEventListener('click', enableAudio);
+    document.addEventListener('touchstart', enableAudio);
+    document.addEventListener('keydown', enableAudio);
+  }
+
   // Initialize audio context on first user interaction
   private async initializeAudioContext(): Promise<void> {
     if (this.audioContext || this.userInteracted) return;
@@ -200,6 +229,13 @@ class AudioManager {
   }
 
   async playSound(soundName: string): Promise<void> {
+    // Check if audio is enabled by user interaction
+    if (!this.audioEnabled) {
+      console.log('AudioManager: Audio not enabled yet, storing pending sound');
+      this.pendingSound = soundName;
+      return;
+    }
+
     try {
       // Ensure user has interacted and audio context is ready
       await this.initializeAudioContext();
