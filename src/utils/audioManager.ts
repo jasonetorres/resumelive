@@ -28,20 +28,21 @@ class AudioManager {
   }
 
   private initializeSounds(): void {
-    // Using freesound.org URLs for actual sound effects
+    // These URLs now point to local files in the `public/sounds/` directory.
+    // Make sure you have these files in that location!
     const soundUrls = {
-      applause: 'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav',
-      airhorn: 'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav',
-      drumroll: 'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav',
-      ding: 'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav',
-      woosh: 'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav',
-      fanfare: 'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav',
-      boing: 'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav',
-      cricket: 'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav',
-      trombone: 'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav',
-      confetti: 'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav',
-      buzzer: 'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav',
-      cheer: 'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav',
+      applause: '/sounds/applause.mp3',
+      airhorn: '/sounds/airhorn.mp3',
+      drumroll: '/sounds/drumroll.mp3',
+      ding: '/sounds/ding.mp3',
+      woosh: '/sounds/woosh.mp3',
+      fanfare: '/sounds/fanfare.mp3',
+      boing: '/sounds/boing.mp3',
+      cricket: '/sounds/cricket.mp3',
+      trombone: '/sounds/trombone.mp3',
+      confetti: '/sounds/confetti.mp3',
+      buzzer: '/sounds/buzzer.mp3',
+      cheer: '/sounds/cheer.mp3',
     };
 
     // Initialize Howl instances for each sound
@@ -49,9 +50,12 @@ class AudioManager {
       this.sounds[name] = new Howl({
         src: [url],
         volume: 0.7,
-        preload: false, // Don't preload to avoid CORS issues
+        preload: true, // Preloading is great for local files
         onloaderror: (id, error) => {
-          console.warn(`AudioManager: Failed to load ${name} from URL, will use fallback`);
+          console.error(`AudioManager: Error loading sound "${name}" from "${url}". Error: ${error}`);
+        },
+        onload: () => {
+          console.log(`AudioManager: Successfully loaded sound "${name}" from "${url}"`);
         }
       });
     });
@@ -414,28 +418,23 @@ class AudioManager {
   }
 
   async playSound(soundName: string): Promise<void> {
-    console.log(`AudioManager: Playing ${soundName}`);
+    console.log(`AudioManager: Attempting to play ${soundName}`);
     
     if (!this.userInteracted) {
-      console.log('AudioManager: No user interaction yet - click to enable audio');
+      console.warn('AudioManager: User has not interacted with the page yet. Audio is disabled.');
       return;
     }
 
-    // Try to play the real sound first
     const sound = this.sounds[soundName];
-    if (sound) {
-      try {
-        sound.play();
-        console.log(`AudioManager: Playing real audio for ${soundName}`);
-        return;
-      } catch (error) {
-        console.warn(`AudioManager: Real audio failed for ${soundName}, using fallback`);
-      }
+    
+    // Check if the sound is loaded. If not, use the fallback.
+    if (sound && sound.state() === 'loaded') {
+      sound.play();
+      console.log(`AudioManager: Playing preloaded audio for ${soundName}`);
+    } else {
+      console.warn(`AudioManager: Audio for ${soundName} not loaded or failed to load. Using fallback.`);
+      this.createFallbackSound(soundName);
     }
-
-    // Fallback to synthesized sound effects
-    this.createFallbackSound(soundName);
-    console.log(`AudioManager: Playing synthesized ${soundName}`);
   }
 }
 
