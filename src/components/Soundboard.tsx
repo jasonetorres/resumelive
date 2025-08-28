@@ -18,7 +18,7 @@ const SOUND_OPTIONS = [
   { name: "cheer", emoji: "🎊", label: "Cheer" },
 ];
 
-export const Soundboard = () => {
+const Soundboard = () => {
   const playSound = async (soundName: string) => {
     try {
       const { error } = await supabase
@@ -63,3 +63,5 @@ export const Soundboard = () => {
     </div>
   );
 };
+
+export { Soundboard };
