@@ -304,6 +304,36 @@ export default function FormDisplay() {
     }
   };
 
+  const bulkDeleteLeads = async () => {
+    if (leads.length === 0) {
+      toast.error('No leads to delete');
+      return;
+    }
+
+    if (!confirm(`Are you sure you want to delete ALL ${leads.length} leads? This action cannot be undone.`)) {
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('leads')
+        .delete()
+        .neq('id', '00000000-0000-0000-0000-000000000000'); // Delete all rows
+
+      if (error) throw error;
+
+      // Update local state
+      setLeads([]);
+      setFilteredLeads([]);
+      calculateStats([]);
+      
+      toast.success('All leads deleted successfully');
+    } catch (error) {
+      console.error('Error deleting leads:', error);
+      toast.error('Failed to delete leads');
+    }
+  };
+
   const exportToCSV = () => {
     const headers = ['Name', 'Email', 'Job Title', 'Registration Date'];
     const csvContent = [
@@ -515,7 +545,20 @@ export default function FormDisplay() {
       {/* Search and Export */}
       <Card>
         <CardHeader>
-          <CardTitle>Lead Management</CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle>Lead Management</CardTitle>
+            {leads.length > 0 && (
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={bulkDeleteLeads}
+                className="flex items-center gap-2"
+              >
+                <Trash2 className="h-4 w-4" />
+                Clear All Leads
+              </Button>
+            )}
+          </div>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col sm:flex-row gap-4 mb-6">
