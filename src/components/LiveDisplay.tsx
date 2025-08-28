@@ -178,7 +178,7 @@ export function LiveDisplay({ ratings }: LiveDisplayProps) {
                     {allStats.average.toFixed(1)}
                   </div>
                   <div className="flex justify-center">
-                    <StarRating value={Math.round(allStats.average)} readonly size="md" />
+                    <StarRating value={Math.round(allStats.average)} readonly size="xl" />
                   </div>
                 </div>
               </CardContent>
