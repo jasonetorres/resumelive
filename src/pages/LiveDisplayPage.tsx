@@ -59,18 +59,10 @@ const LiveDisplayPage = () => {
   useEffect(() => {
     // Fetch initial data
     const fetchInitialData = async () => {
-      // Get current target
-      const { data: targetData } = await (supabase as any)
-        .from('current_target')
-        .select('target_person')
-        .eq('id', 1)
-        .maybeSingle();
-      
-      setCurrentTarget(targetData?.target_person || null);
-
-      // Get uploaded resumes
+      // Get uploaded resumes first
+      let resumesData: Resume[] = [];
       try {
-        const { data: resumesData, error: resumesError } = await (supabase as any)
+        const { data, error: resumesError } = await (supabase as any)
           .from('resumes')
           .select('*')
           .order('created_at', { ascending: false });
@@ -78,14 +70,32 @@ const LiveDisplayPage = () => {
         if (resumesError) {
           console.error('Error fetching resumes:', resumesError);
         } else {
-          setResumes((resumesData as unknown as Resume[]) || []);
+          resumesData = (data as unknown as Resume[]) || [];
+          setResumes(resumesData);
         }
       } catch (error) {
         console.error('Exception while fetching resumes:', error);
       }
 
-      // Get ratings for current target (only real ratings, not quick reactions)
+      // Get current target
+      const { data: targetData } = await (supabase as any)
+        .from('current_target')
+        .select('target_person')
+        .eq('id', 1)
+        .maybeSingle();
+      
       if (targetData?.target_person) {
+        setCurrentTarget(targetData.target_person);
+        
+        // Find and set the corresponding resume
+        const matchingResume = resumesData.find((r: Resume) => r.name === targetData.target_person);
+        if (matchingResume) {
+          setSelectedResume(matchingResume);
+          setSelectedResumeId(matchingResume.id);
+          setShowResumeView(true);
+        }
+
+        // Get ratings for current target (only real ratings, not quick reactions)
         const { data: ratingsData } = await (supabase as any)
           .from('ratings')
           .select('*')
@@ -114,13 +124,20 @@ const LiveDisplayPage = () => {
           const newTarget = payload.new.target_person;
           setCurrentTarget(newTarget);
           
-          // Find and set the corresponding resume
-          const matchingResume = resumes.find(r => r.name === newTarget);
-          if (matchingResume) {
-            setSelectedResume(matchingResume);
-            setSelectedResumeId(matchingResume.id);
-            setShowResumeView(true);
-          }
+          // Find and set the corresponding resume using current resumes state
+          setResumes(currentResumes => {
+            const matchingResume = currentResumes.find(r => r.name === newTarget);
+            if (matchingResume) {
+              console.log('LiveDisplayPage: Found matching resume:', matchingResume.name);
+              setSelectedResume(matchingResume);
+              setSelectedResumeId(matchingResume.id);
+              setShowResumeView(true);
+            } else {
+              console.log('LiveDisplayPage: No matching resume found for:', newTarget);
+              setShowResumeView(false);
+            }
+            return currentResumes; // Return unchanged
+          });
           
           // Fetch ratings for new target (only real ratings)
           if (newTarget) {
@@ -171,7 +188,7 @@ const LiveDisplayPage = () => {
       supabase.removeChannel(targetChannel);
       supabase.removeChannel(ratingsChannel);
     };
-  }, [currentTarget]);
+  }, []); // Remove currentTarget dependency to avoid race conditions
 
   const handleClearStats = async () => {
     if (!currentTarget) {

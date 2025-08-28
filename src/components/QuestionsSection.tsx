@@ -82,8 +82,29 @@ export function QuestionsSection({ currentTarget, showControls = false }: Questi
       )
       .subscribe();
 
+    // Subscribe to questions deletion (for real-time removal)
+    const questionsChannel = supabase
+      .channel('questions-display-section')
+      .on(
+        'postgres_changes',
+        {
+          event: 'DELETE',
+          schema: 'public',
+          table: 'questions'
+        },
+        (payload) => {
+          console.log('QuestionsSection: Question deleted:', payload);
+          const deletedQuestion = payload.old as Question;
+          if (deletedQuestion.target_person === currentTarget) {
+            setQuestions(prev => prev.filter(q => q.id !== deletedQuestion.id));
+          }
+        }
+      )
+      .subscribe();
+
     return () => {
       supabase.removeChannel(channel);
+      supabase.removeChannel(questionsChannel);
     };
   }, [currentTarget]);
 
