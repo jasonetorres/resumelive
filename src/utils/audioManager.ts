@@ -1,34 +1,24 @@
+import { Howl } from 'howler';
+
 class AudioManager {
-  private audioContext: AudioContext | null = null;
   private userInteracted = false;
+  private sounds: Map<string, Howl> = new Map();
 
   constructor() {
-    // Setup user interaction listener
     this.setupUserInteractionListener();
   }
 
   private setupUserInteractionListener(): void {
-    const enableAudio = async () => {
+    const enableAudio = () => {
       if (this.userInteracted) return;
       
-      try {
-        // Create and resume audio context
-        this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-        
-        if (this.audioContext.state === 'suspended') {
-          await this.audioContext.resume();
-        }
-        
-        this.userInteracted = true;
-        console.log('AudioManager: Audio enabled by user interaction');
-        
-        // Remove listeners after first interaction
-        document.removeEventListener('click', enableAudio);
-        document.removeEventListener('touchstart', enableAudio);
-        document.removeEventListener('keydown', enableAudio);
-      } catch (error) {
-        console.error('AudioManager: Failed to initialize audio:', error);
-      }
+      this.userInteracted = true;
+      console.log('AudioManager: Audio enabled by user interaction');
+      
+      // Remove listeners after first interaction
+      document.removeEventListener('click', enableAudio);
+      document.removeEventListener('touchstart', enableAudio);
+      document.removeEventListener('keydown', enableAudio);
     };
 
     document.addEventListener('click', enableAudio);
@@ -36,66 +26,120 @@ class AudioManager {
     document.addEventListener('keydown', enableAudio);
   }
 
-  private createTone(frequency: number, duration: number, type: OscillatorType = 'sine'): void {
-    if (!this.audioContext || !this.userInteracted) {
-      console.log('AudioManager: Audio not ready yet');
+  private createSound(soundName: string): Howl {
+    // Use free sound effect URLs from various sources
+    const soundUrls: Record<string, string[]> = {
+      applause: [
+        'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav',
+        'https://freesound.org/data/previews/316/316847_5123451-lq.mp3'
+      ],
+      airhorn: [
+        'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav'
+      ],
+      drumroll: [
+        'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav'
+      ],
+      ding: [
+        'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav'
+      ],
+      woosh: [
+        'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav'
+      ],
+      fanfare: [
+        'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav'
+      ],
+      boing: [
+        'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav'
+      ],
+      cricket: [
+        'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav'
+      ],
+      trombone: [
+        'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav'
+      ],
+      confetti: [
+        'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav'
+      ],
+      buzzer: [
+        'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav'
+      ],
+      cheer: [
+        'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav'
+      ]
+    };
+
+    const urls = soundUrls[soundName] || [];
+    
+    const sound = new Howl({
+      src: urls,
+      volume: 0.7,
+      preload: false, // Load on demand to avoid autoplay issues
+      onload: () => {
+        console.log(`AudioManager: ${soundName} loaded successfully`);
+      },
+      onloaderror: (id, error) => {
+        console.log(`AudioManager: Failed to load ${soundName}, using fallback tone`);
+        this.createFallbackTone(soundName);
+      },
+      onplayerror: (id, error) => {
+        console.log(`AudioManager: Failed to play ${soundName}, using fallback tone`);
+        this.createFallbackTone(soundName);
+      }
+    });
+
+    return sound;
+  }
+
+  private createFallbackTone(soundName: string): void {
+    if (!this.userInteracted) {
+      console.log('AudioManager: Cannot play fallback - no user interaction yet');
       return;
     }
 
     try {
-      const oscillator = this.audioContext.createOscillator();
-      const gainNode = this.audioContext.createGain();
+      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      
+      if (audioContext.state === 'suspended') {
+        audioContext.resume();
+      }
+
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
       
       oscillator.connect(gainNode);
-      gainNode.connect(this.audioContext.destination);
+      gainNode.connect(audioContext.destination);
       
-      oscillator.frequency.value = frequency;
-      oscillator.type = type;
+      // Different tones for different sounds
+      const frequencies: Record<string, number> = {
+        applause: 800,
+        airhorn: 220,
+        drumroll: 150,
+        ding: 1000,
+        woosh: 400,
+        fanfare: 523,
+        boing: 600,
+        cricket: 3000,
+        trombone: 174,
+        confetti: 1200,
+        buzzer: 100,
+        cheer: 880
+      };
+
+      oscillator.frequency.value = frequencies[soundName] || 440;
+      oscillator.type = soundName === 'buzzer' ? 'square' : 'sine';
       
-      // Envelope for smooth sound
-      const now = this.audioContext.currentTime;
+      // Louder volume
+      const now = audioContext.currentTime;
       gainNode.gain.setValueAtTime(0, now);
-      gainNode.gain.linearRampToValueAtTime(0.3, now + 0.01);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, now + duration);
+      gainNode.gain.linearRampToValueAtTime(0.5, now + 0.01); // Louder
+      gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
       
       oscillator.start(now);
-      oscillator.stop(now + duration);
+      oscillator.stop(now + 0.3);
       
-      console.log(`AudioManager: Played tone at ${frequency}Hz for ${duration}s`);
+      console.log(`AudioManager: Played fallback tone for ${soundName} at ${frequencies[soundName] || 440}Hz`);
     } catch (error) {
-      console.error('AudioManager: Error creating tone:', error);
-    }
-  }
-
-  private createDrumRoll(): void {
-    if (!this.audioContext || !this.userInteracted) return;
-
-    try {
-      // Create multiple quick hits that speed up
-      const baseDelay = 0.1;
-      for (let i = 0; i < 20; i++) {
-        const delay = i * (baseDelay * (1 - i * 0.03)); // Speed up over time
-        setTimeout(() => {
-          this.createTone(200 + Math.random() * 100, 0.05, 'square');
-        }, delay * 1000);
-      }
-    } catch (error) {
-      console.error('AudioManager: Error creating drum roll:', error);
-    }
-  }
-
-  private createApplause(): void {
-    if (!this.audioContext || !this.userInteracted) return;
-
-    try {
-      // Create multiple claps
-      for (let i = 0; i < 15; i++) {
-        setTimeout(() => {
-          this.createTone(800 + Math.random() * 400, 0.1, 'square');
-        }, Math.random() * 2000);
-      }
-    } catch (error) {
-      console.error('AudioManager: Error creating applause:', error);
+      console.error('AudioManager: Error creating fallback tone:', error);
     }
   }
 
@@ -103,101 +147,26 @@ class AudioManager {
     console.log(`AudioManager: Attempting to play ${soundName}`);
     
     if (!this.userInteracted) {
-      console.log('AudioManager: Waiting for user interaction...');
+      console.log('AudioManager: No user interaction yet - audio will be blocked');
+      // Just play the fallback tone since external audio won't work anyway
+      this.createFallbackTone(soundName);
       return;
     }
 
+    // Try to get or create the sound
+    let sound = this.sounds.get(soundName);
+    if (!sound) {
+      sound = this.createSound(soundName);
+      this.sounds.set(soundName, sound);
+    }
+
     try {
-      switch (soundName) {
-        case 'applause':
-          this.createApplause();
-          break;
-        case 'drumroll':
-          this.createDrumRoll();
-          break;
-        case 'airhorn':
-          this.createTone(220, 1.0, 'sawtooth');
-          break;
-        case 'ding':
-          this.createTone(800, 0.5);
-          setTimeout(() => this.createTone(1200, 0.3), 100);
-          break;
-        case 'woosh':
-          // Frequency sweep
-          if (this.audioContext) {
-            const oscillator = this.audioContext.createOscillator();
-            const gainNode = this.audioContext.createGain();
-            
-            oscillator.connect(gainNode);
-            gainNode.connect(this.audioContext.destination);
-            
-            const now = this.audioContext.currentTime;
-            oscillator.frequency.setValueAtTime(1000, now);
-            oscillator.frequency.exponentialRampToValueAtTime(200, now + 0.5);
-            
-            gainNode.gain.setValueAtTime(0.3, now);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
-            
-            oscillator.start(now);
-            oscillator.stop(now + 0.5);
-          }
-          break;
-        case 'fanfare':
-          this.createTone(523, 0.3); // C
-          setTimeout(() => this.createTone(659, 0.3), 300); // E
-          setTimeout(() => this.createTone(784, 0.5), 600); // G
-          break;
-        case 'boing':
-          if (this.audioContext) {
-            const oscillator = this.audioContext.createOscillator();
-            const gainNode = this.audioContext.createGain();
-            
-            oscillator.connect(gainNode);
-            gainNode.connect(this.audioContext.destination);
-            
-            const now = this.audioContext.currentTime;
-            oscillator.frequency.setValueAtTime(800, now);
-            oscillator.frequency.exponentialRampToValueAtTime(200, now + 0.3);
-            
-            gainNode.gain.setValueAtTime(0.3, now);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
-            
-            oscillator.start(now);
-            oscillator.stop(now + 0.3);
-          }
-          break;
-        case 'cricket':
-          for (let i = 0; i < 3; i++) {
-            setTimeout(() => this.createTone(3000, 0.1), i * 200);
-          }
-          break;
-        case 'trombone':
-          this.createTone(220, 0.3, 'sawtooth');
-          setTimeout(() => this.createTone(196, 0.3, 'sawtooth'), 300);
-          setTimeout(() => this.createTone(174, 0.4, 'sawtooth'), 600);
-          break;
-        case 'confetti':
-          for (let i = 0; i < 8; i++) {
-            setTimeout(() => {
-              this.createTone(1500 + Math.random() * 1000, 0.1);
-            }, i * 50);
-          }
-          break;
-        case 'buzzer':
-          this.createTone(150, 0.8, 'square');
-          break;
-        case 'cheer':
-          for (let i = 0; i < 10; i++) {
-            setTimeout(() => {
-              this.createTone(600 + Math.random() * 400, 0.2);
-            }, Math.random() * 1000);
-          }
-          break;
-        default:
-          this.createTone(440, 0.3);
-      }
+      // Try to play the Howler sound
+      sound.play();
+      console.log(`AudioManager: Playing Howler sound for ${soundName}`);
     } catch (error) {
-      console.error(`AudioManager: Error playing ${soundName}:`, error);
+      console.log(`AudioManager: Howler failed for ${soundName}, using fallback`);
+      this.createFallbackTone(soundName);
     }
   }
 }
