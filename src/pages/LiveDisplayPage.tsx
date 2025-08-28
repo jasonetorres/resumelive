@@ -15,7 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { FileText, RotateCcw, Users, Bell } from 'lucide-react';
+import { FileText, RotateCcw, Users, Bell, MessageSquare } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -394,46 +394,51 @@ const LiveDisplayPage = () => {
             
             <ResizableHandle withHandle />
             
-            {/* Live Ratings Panel - Right Side */}
+            {/* Live Display Sidebar - Right Side */}
             <ResizablePanel defaultSize={30} minSize={25}>
               <div className="h-full flex flex-col bg-card">
-                {/* QR Code Section */}
-                <div className="p-3 border-b border-border bg-card/80 flex-shrink-0">
-                  <QRCodeGenerator 
-                    url={ratingPageUrl} 
-                    title="Scan to Register & Rate"
-                    size={100}
-                  />
+                {/* QR Code Section - Compact */}
+                <div className="p-2 border-b border-border bg-card/80 flex-shrink-0">
+                  <div className="text-center">
+                    <QRCodeGenerator 
+                      url={ratingPageUrl} 
+                      title="Scan to Rate"
+                      size={80}
+                    />
+                  </div>
                 </div>
                 
-                {/* Live Ratings and Questions */}
-                <div className="flex-1 overflow-hidden flex flex-col">
-                  {/* Timer Section */}
-                  <div className="p-3 border-b border-border bg-card/80 flex-shrink-0">
-                    <Timer />
-                  </div>
+                {/* Timer Section - Compact */}
+                <div className="p-2 border-b border-border bg-card/80 flex-shrink-0">
+                  <Timer />
+                </div>
 
-                  {/* Live Ratings Section - Takes up remaining space */}
-                  <div className="flex-1 flex flex-col min-h-0">
-                    <div className="p-3 border-b border-border bg-card/80 flex-shrink-0">
-                      <div className="flex items-center justify-between">
-                        <h3 className="font-semibold flex items-center gap-2">
-                          <Bell className="w-4 h-4 text-neon-pink" />
-                          Live Ratings ({transformedRatings.length})
-                        </h3>
-                        <Badge variant="outline" className="text-xs">Real-time</Badge>
-                      </div>
-                    </div>
-                    <div className="flex-1 overflow-auto min-h-0 max-h-64">
-                      <LiveDisplay ratings={transformedRatings} />
+                {/* Live Ratings Section */}
+                <div className="flex-1 flex flex-col min-h-0">
+                  <div className="p-2 border-b border-border bg-card/80 flex-shrink-0">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-sm font-semibold flex items-center gap-2">
+                        <Bell className="w-3 h-3 text-neon-pink" />
+                        Ratings ({transformedRatings.length})
+                      </h3>
+                      <Badge variant="outline" className="text-xs">Live</Badge>
                     </div>
                   </div>
-                  
-                  {/* Questions Section - Fixed height */}
-                  <div className="border-t border-border bg-card/80 p-3 flex-shrink-0 h-48 overflow-hidden">
-                    <div className="h-full overflow-auto">
-                      <QuestionsSection currentTarget={currentTarget} />
-                    </div>
+                  <div className="flex-1 overflow-auto min-h-0" style={{ maxHeight: '45%' }}>
+                    <LiveDisplay ratings={transformedRatings} />
+                  </div>
+                </div>
+                
+                {/* Questions Section */}
+                <div className="flex-1 flex flex-col min-h-0 border-t border-border">
+                  <div className="p-2 bg-card/80 flex-shrink-0">
+                    <h3 className="text-sm font-semibold flex items-center gap-2">
+                      <MessageSquare className="w-3 h-3 text-neon-cyan" />
+                      Questions
+                    </h3>
+                  </div>
+                  <div className="flex-1 overflow-auto min-h-0 p-2">
+                    <QuestionsSection currentTarget={currentTarget} />
                   </div>
                 </div>
               </div>
