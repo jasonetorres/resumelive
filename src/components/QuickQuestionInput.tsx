@@ -121,6 +121,8 @@ export function QuickQuestionInput({ currentTarget }: QuickQuestionInputProps) {
             onChange={(e) => setAuthorName(e.target.value)}
             className="bg-input/50 border-neon-blue/30 focus:border-neon-blue"
             maxLength={50}
+            readOnly={!!authorName}
+            disabled={!!authorName}
           />
           <Textarea
             placeholder="What would you like to ask this presenter?"
