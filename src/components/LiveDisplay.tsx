@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 
-import { TrendingUp, Users, MessageSquare, Star, Eye, EyeOff, Sparkles, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { TrendingUp, Users, MessageSquare, Star, Sparkles, ThumbsUp, ThumbsDown } from 'lucide-react';
 
 interface Rating {
   id: string;
@@ -26,8 +26,6 @@ interface LiveDisplayProps {
 export function LiveDisplay({ ratings }: LiveDisplayProps) {
   const [displayedRatings, setDisplayedRatings] = useState<Rating[]>([]);
   const [currentFeedback, setCurrentFeedback] = useState<string>('');
-  const [isRevealed, setIsRevealed] = useState(false);
-  const [showConfetti, setShowConfetti] = useState(false);
   
   console.log('LiveDisplay: Received ratings:', ratings.length, ratings);
   
@@ -84,38 +82,8 @@ export function LiveDisplay({ ratings }: LiveDisplayProps) {
     disagree: realRatingsWithAgreement.filter(r => r.agreement === 'disagree').length
   };
 
-  const handleReveal = () => {
-    if (!isRevealed) {
-      setShowConfetti(true);
-      setTimeout(() => setShowConfetti(false), 3000);
-    }
-    setIsRevealed(!isRevealed);
-  };
-
   return (
     <div className="h-full bg-gradient-to-br from-background via-background to-background/80 p-2 relative overflow-hidden flex flex-col">
-      {/* Confetti Animation */}
-      {showConfetti && (
-        <div className="absolute inset-0 pointer-events-none z-50">
-          {[...Array(50)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute animate-confetti"
-              style={{
-                left: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 3}s`,
-                animationDuration: `${3 + Math.random() * 2}s`
-              }}
-            >
-              <div 
-                className={`w-2 h-2 ${
-                  ['bg-neon-purple', 'bg-neon-pink', 'bg-neon-cyan', 'bg-neon-orange', 'bg-neon-green'][Math.floor(Math.random() * 5)]
-                } rounded-full`}
-              />
-            </div>
-          ))}
-        </div>
-      )}
       {/* Header */}
       <div className="text-center mb-4">
         <h1 className="text-3xl font-bold bg-gradient-to-r from-neon-purple via-neon-pink to-neon-orange bg-clip-text text-transparent mb-2">
@@ -140,41 +108,14 @@ export function LiveDisplay({ ratings }: LiveDisplayProps) {
               </div>
             </div>
           )}
-          
-          <Button
-            onClick={handleReveal}
-            variant="outline"
-            size="lg"
-            className={`${
-              isRevealed 
-                ? 'bg-neon-purple/20 border-neon-purple text-neon-purple' 
-                : 'bg-neon-orange/20 border-neon-orange text-neon-orange'
-            } hover:scale-105 transition-all duration-300`}
-          >
-            {isRevealed ? (
-              <>
-                <EyeOff className="w-5 h-5 mr-2" />
-                Hide Results
-              </>
-            ) : (
-              <>
-                <Sparkles className="w-5 h-5 mr-2" />
-                Reveal Results
-              </>
-            )}
-          </Button>
         </div>
       </div>
 
-      {/* Results Section */}
-      <div className={`flex-1 transition-all duration-700 transform overflow-hidden ${
-        isRevealed ? 'opacity-100 translate-y-0 scale-100' : 'opacity-30 translate-y-4 scale-95 pointer-events-none'
-      }`}>
+      {/* Results Section - Always Visible */}
+      <div className="flex-1 overflow-hidden">
         <div className="flex justify-center mb-3 flex-shrink-0">
           {/* Single Score Card */}
-          <Card className={`glow-effect border-neon-purple/50 transition-all duration-500 max-w-md w-full ${
-            isRevealed ? 'animate-scale-in' : ''
-            }`}>
+          <Card className="glow-effect border-neon-purple/50 transition-all duration-500 max-w-md w-full">
             <CardHeader className="pb-2 text-center">
               <CardTitle className="flex items-center justify-center gap-2 text-neon-purple text-base">
                 <TrendingUp className="w-4 h-4" />
@@ -184,40 +125,28 @@ export function LiveDisplay({ ratings }: LiveDisplayProps) {
             </CardHeader>
             <CardContent className="pb-3">
               <div className="text-center space-y-3">
-                <div className={`text-4xl font-bold text-neon-orange transition-all duration-700 ${
-                  isRevealed ? 'animate-fade-in' : 'blur-sm'
-                }`}>
-                  {isRevealed ? allStats.average.toFixed(1) : '?'}
+                <div className="text-4xl font-bold text-neon-orange">
+                  {allStats.average.toFixed(1)}
                 </div>
-                <div className={`transition-all duration-700 delay-100 ${
-                  isRevealed ? 'animate-fade-in' : 'blur-sm opacity-50'
-                }`}>
-                  <StarRating value={isRevealed ? Math.round(allStats.average) : 0} readonly size="md" />
+                <div>
+                  <StarRating value={Math.round(allStats.average)} readonly size="md" />
                 </div>
                 
                 {/* Category Breakdown */}
-                <div className={`space-y-2 transition-all duration-700 delay-200 ${
-                  isRevealed ? 'animate-fade-in' : 'blur-sm opacity-30'
-                }`}>
+                <div className="space-y-2">
                   <div className="grid grid-cols-2 gap-2 text-xs">
                     <div className="text-center">
                       <div className="text-neon-cyan font-bold text-base">
-                        {isRevealed ? allStats.resumeQuality.toFixed(1) : '?'}
+                        {allStats.resumeQuality.toFixed(1)}
                       </div>
-                      <div className="text-muted-foreground">Resume Quality</div>
+                      <div className="text-muted-foreground">Presentation</div>
                     </div>
                     <div className="text-center">
                       <div className="text-neon-green font-bold text-base">
-                        {isRevealed ? allStats.layout.toFixed(1) : '?'}
+                        {allStats.content.toFixed(1)}
                       </div>
-                      <div className="text-muted-foreground">Layout & Design</div>
+                      <div className="text-muted-foreground">Content</div>
                     </div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-neon-pink font-bold text-base">
-                      {isRevealed ? allStats.content.toFixed(1) : '?'}
-                    </div>
-                    <div className="text-muted-foreground">Content Quality</div>
                   </div>
                 </div>
               </div>
@@ -225,11 +154,9 @@ export function LiveDisplay({ ratings }: LiveDisplayProps) {
           </Card>
         </div>
 
-        {/* Current Feedback Box - spans full width under score boxes */}
+        {/* Current Feedback Box */}
         {currentFeedback && (
-          <Card className={`mb-4 rating-glow border-neon-pink transition-all duration-700 delay-400 ${
-            isRevealed ? 'animate-fade-in' : 'opacity-30'
-          }`}>
+          <Card className="mb-4 rating-glow border-neon-pink">
             <CardContent className="p-3">
               <div className="flex items-center gap-3">
                 <MessageSquare className="w-5 h-5 text-neon-pink flex-shrink-0" />
@@ -240,23 +167,7 @@ export function LiveDisplay({ ratings }: LiveDisplayProps) {
             </CardContent>
           </Card>
         )}
-
       </div>
-
-      {/* Unrevealed State Message */}
-      {!isRevealed && displayedRatings.filter(r => r.overall > 0).length > 0 && (
-        <div className="text-center mt-8">
-          <Card className="border-neon-orange/30 bg-neon-orange/5 max-w-md mx-auto">
-            <CardContent className="p-6">
-              <Eye className="w-12 h-12 text-neon-orange mx-auto mb-3" />
-              <h3 className="text-xl font-bold text-neon-orange mb-2">Results Hidden</h3>
-              <p className="text-muted-foreground">
-                Click "Reveal Results" when you're ready to show the ratings!
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-      )}
     </div>
   );
 }

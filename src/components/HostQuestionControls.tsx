@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { MessageSquare, ThumbsUp, Clock } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { MessageSquare, ThumbsUp, Clock, Eye, EyeOff } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 interface Question {
   id: string;
@@ -15,13 +16,14 @@ interface Question {
   target_person: string;
 }
 
-interface QuestionsSectionProps {
+interface HostQuestionControlsProps {
   currentTarget: string | null;
-  showControls?: boolean;
 }
 
-export function QuestionsSection({ currentTarget, showControls = false }: QuestionsSectionProps) {
+export function HostQuestionControls({ currentTarget }: HostQuestionControlsProps) {
+  const { toast } = useToast();
   const [questions, setQuestions] = useState<Question[]>([]);
+  const [isResultsHidden, setIsResultsHidden] = useState(false);
 
   useEffect(() => {
     if (!currentTarget) {
@@ -47,7 +49,7 @@ export function QuestionsSection({ currentTarget, showControls = false }: Questi
 
     // Subscribe to real-time updates
     const channel = supabase
-      .channel('questions-section')
+      .channel('host-questions-section')
       .on(
         'postgres_changes',
         {
@@ -65,19 +67,13 @@ export function QuestionsSection({ currentTarget, showControls = false }: Questi
       .on(
         'postgres_changes',
         {
-          event: 'UPDATE',
+          event: 'DELETE',
           schema: 'public',
           table: 'questions'
         },
         (payload) => {
-          const updatedQuestion = payload.new as Question;
-          if (updatedQuestion.target_person === currentTarget) {
-            setQuestions(prev => 
-              prev.map(q => 
-                q.id === updatedQuestion.id ? updatedQuestion : q
-              )
-            );
-          }
+          const deletedQuestion = payload.old as Question;
+          setQuestions(prev => prev.filter(q => q.id !== deletedQuestion.id));
         }
       )
       .subscribe();
@@ -88,7 +84,8 @@ export function QuestionsSection({ currentTarget, showControls = false }: Questi
   }, [currentTarget]);
 
   const markAsAnswered = async (questionId: string) => {
-    // Delete the question instead of just marking as answered
+    console.log('HostQuestionControls: Marking question as answered:', questionId);
+    
     const { error } = await supabase
       .from('questions')
       .delete()
@@ -96,7 +93,27 @@ export function QuestionsSection({ currentTarget, showControls = false }: Questi
     
     if (!error) {
       setQuestions(prev => prev.filter(q => q.id !== questionId));
+      toast({
+        title: "Question Answered! ✅",
+        description: "Question removed from display",
+      });
+    } else {
+      console.error('Error deleting question:', error);
+      toast({
+        title: "Error",
+        description: "Failed to remove question",
+        variant: "destructive",
+      });
     }
+  };
+
+  const toggleResultsVisibility = () => {
+    setIsResultsHidden(!isResultsHidden);
+    // This could be expanded to actually hide results on display
+    toast({
+      title: isResultsHidden ? "Results Shown! 👁️" : "Results Hidden! 🙈",
+      description: isResultsHidden ? "Results are now visible on display" : "Results are now hidden from display",
+    });
   };
 
   const formatTimeAgo = (timestamp: string) => {
@@ -111,21 +128,41 @@ export function QuestionsSection({ currentTarget, showControls = false }: Questi
   if (!currentTarget) {
     return (
       <div className="text-center p-4 text-muted-foreground">
-        Select a target to view questions
+        Select a target to manage questions
       </div>
     );
   }
 
   return (
-    <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <h3 className="font-semibold flex items-center gap-2">
-          <MessageSquare className="w-4 h-4 text-neon-cyan" />
-          Questions ({questions.length})
-        </h3>
-        <Badge variant="outline" className="text-xs">Live Q&A</Badge>
+    <div className="space-y-4">
+      {/* Results Visibility Control */}
+      <div className="flex justify-between items-center">
+        <div>
+          <h3 className="font-semibold flex items-center gap-2">
+            <MessageSquare className="w-4 h-4 text-neon-cyan" />
+            Question Management ({questions.length})
+          </h3>
+        </div>
+        <Button
+          onClick={toggleResultsVisibility}
+          variant={isResultsHidden ? "default" : "outline"}
+          size="sm"
+        >
+          {isResultsHidden ? (
+            <>
+              <Eye className="w-4 h-4 mr-2" />
+              Show Results
+            </>
+          ) : (
+            <>
+              <EyeOff className="w-4 h-4 mr-2" />
+              Hide Results
+            </>
+          )}
+        </Button>
       </div>
       
+      {/* Questions List */}
       <div className="space-y-2 max-h-96 overflow-y-auto">
         {questions.length === 0 ? (
           <div className="text-center p-4 text-muted-foreground">
@@ -133,20 +170,18 @@ export function QuestionsSection({ currentTarget, showControls = false }: Questi
           </div>
         ) : (
           questions.map((question) => (
-            <Card key={question.id} className={`p-3 ${question.is_answered ? 'bg-green-50 border-green-200' : ''}`}>
+            <Card key={question.id} className="p-3">
               <div className="space-y-2">
                 <div className="flex items-start justify-between gap-2">
                   <p className="text-sm font-medium flex-1">{question.question}</p>
-                  {showControls && (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => markAsAnswered(question.id)}
-                      className="text-xs"
-                    >
-                      Answered
-                    </Button>
-                  )}
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => markAsAnswered(question.id)}
+                    className="text-xs bg-green-50 hover:bg-green-100 text-green-700 border-green-200"
+                  >
+                    Answered
+                  </Button>
                 </div>
                 
                 <div className="flex items-center justify-between text-xs text-muted-foreground">
