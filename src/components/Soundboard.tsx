@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Volume2 } from "lucide-react";
+import { audioManager } from "@/utils/audioManager";
 
 const SOUND_OPTIONS = [
   { name: "applause", emoji: "👏", label: "Applause" },
@@ -21,6 +22,10 @@ const SOUND_OPTIONS = [
 const Soundboard = () => {
   const playSound = async (soundName: string) => {
     try {
+      // Play the actual audio sound
+      await audioManager.playSound(soundName);
+      
+      // Also send to database for visual effects on display
       const { error } = await supabase
         .from('sounds')
         .insert({
