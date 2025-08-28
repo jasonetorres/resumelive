@@ -268,6 +268,29 @@ export const ScheduleManager: React.FC = () => {
 
   useEffect(() => {
     fetchTimeSlots();
+
+    // Set up real-time subscription for bookings
+    const channel = supabase
+      .channel('bookings-changes')
+      .on('postgres_changes', 
+        { event: 'INSERT', schema: 'public', table: 'bookings' },
+        () => {
+          console.log('New booking created');
+          fetchTimeSlots(); // Refresh the list
+        }
+      )
+      .on('postgres_changes', 
+        { event: 'DELETE', schema: 'public', table: 'bookings' },
+        () => {
+          console.log('Booking deleted');
+          fetchTimeSlots(); // Refresh the list
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   return (
