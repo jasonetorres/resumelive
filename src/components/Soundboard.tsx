@@ -30,12 +30,8 @@ export const Soundboard = () => {
 
       if (error) throw error;
 
-      // Play sound locally for host feedback
-      const audio = new Audio(`/sounds/${soundName}.mp3`);
-      audio.play().catch(() => {
-        // Fallback to system beep if audio file doesn't exist
-        console.log(`Playing sound: ${soundName}`);
-      });
+      // Visual feedback only for host
+      console.log(`Playing sound: ${soundName}`);
 
       toast.success(`Played ${soundName} sound`);
     } catch (error) {

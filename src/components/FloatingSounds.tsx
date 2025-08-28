@@ -40,12 +40,8 @@ export const FloatingSounds = () => {
 
     setFloatingSounds(prev => [...prev, newSound]);
 
-    // Play sound if audio file exists
-    const audio = new Audio(`/sounds/${soundName}.mp3`);
-    audio.play().catch(() => {
-      // Fallback beep or silence if audio file doesn't exist
-      console.log(`Sound effect: ${soundName}`);
-    });
+    // Visual effect only - no audio
+    console.log(`Sound effect: ${soundName}`);
 
     // Remove after animation duration
     setTimeout(() => {

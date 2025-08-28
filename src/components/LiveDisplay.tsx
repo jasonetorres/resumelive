@@ -241,41 +241,6 @@ export function LiveDisplay({ ratings }: LiveDisplayProps) {
           </Card>
         )}
 
-        {/* Recent Ratings Stream - Compact */}
-        {displayedRatings.filter(r => r.overall > 0).length > 0 && (
-          <div className={`flex-1 min-h-0 transition-all duration-700 delay-300 ${
-            isRevealed ? 'animate-fade-in' : 'opacity-30'
-          }`}>
-            <h3 className="text-sm font-semibold text-neon-pink mb-2 flex items-center gap-1">
-              <Star className="w-4 h-4" />
-              Recent Ratings
-            </h3>
-            <div className="grid grid-cols-2 gap-2 h-full overflow-hidden">
-              {displayedRatings.filter(r => r.overall > 0).slice(0, 12).map((rating, index) => (
-                <div
-                  key={rating.id}
-                  className={`flex items-center gap-2 p-2 rounded-lg bg-muted/50 border border-border/50 transition-all duration-500 ${
-                    isRevealed ? 'animate-fade-in opacity-100' : 'blur-sm opacity-30'
-                  }`}
-                  style={{ 
-                    animationDelay: isRevealed ? `${800 + index * 50}ms` : '0ms' 
-                  }}
-                >
-                  <Badge 
-                    variant="outline" 
-                    className="text-xs border-neon-purple/50"
-                  >
-                    R
-                  </Badge>
-                  <StarRating value={isRevealed ? rating.overall : 0} readonly size="sm" />
-                  <span className="text-xs font-semibold text-neon-orange">
-                    {isRevealed ? rating.overall : '?'}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
 
       {/* Unrevealed State Message */}

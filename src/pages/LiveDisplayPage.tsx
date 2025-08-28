@@ -4,18 +4,16 @@ import { TargetManager } from '@/components/TargetManager';
 import { QRCodeGenerator } from '@/components/QRCodeGenerator';
 import { LiveParticipantCounter } from '@/components/LiveParticipantCounter';
 import { FloatingReactions } from '@/components/FloatingReactions';
-import { FloatingChatMessages } from '@/components/FloatingChatMessages';
 import { FloatingFeedback } from '@/components/FloatingFeedback';
 import { FloatingQuestions } from '@/components/FloatingQuestions';
 import { FloatingSounds } from '@/components/FloatingSounds';
-import { LiveChat } from '@/components/LiveChat';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { FileText, RotateCcw, Users, Bell, MessageSquare } from 'lucide-react';
+import { FileText, RotateCcw, Users, Bell } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -204,7 +202,7 @@ const LiveDisplayPage = () => {
     }
     
     try {
-      // Only delete ratings (scores), not chat messages
+      // Delete ratings for current target
       const { error } = await (supabase as any)
         .from('ratings')
         .delete()
@@ -215,50 +213,18 @@ const LiveDisplayPage = () => {
         return;
       }
       
-      // Clear local ratings state but keep chat
+      // Clear local ratings state
       setRatings([]);
       
       toast({
         title: "Scores Reset! 🔄",
-        description: "All ratings have been cleared. Chat history is preserved.",
+        description: "All ratings have been cleared.",
       });
     } catch (error) {
       console.error('Exception while resetting scores:', error);
     }
   };
 
-  const handleClearChat = async () => {
-    try {
-      // Delete ALL chat messages (not just for current target)
-      const { error } = await supabase
-        .from('chat_messages')
-        .delete()
-        .neq('id', '00000000-0000-0000-0000-000000000000'); // Delete all rows by using a condition that's always true
-      
-      if (error) {
-        console.error('Error clearing chat:', error);
-        toast({
-          title: "Error",
-          description: "Failed to clear chat messages.",
-          variant: "destructive",
-        });
-        return;
-      }
-      
-      console.log('All chat messages cleared successfully');
-      toast({
-        title: "Chat Cleared! 💬",
-        description: "All chat messages have been cleared.",
-      });
-    } catch (error) {
-      console.error('Exception while clearing chat:', error);
-      toast({
-        title: "Error",
-        description: "An error occurred while clearing chat.",
-        variant: "destructive",
-      });
-    }
-  };
 
   const handlePasswordSubmit = () => {
     if (passwordInput === 'torcresumes') {
@@ -378,15 +344,6 @@ const LiveDisplayPage = () => {
               <Button 
                 variant="outline" 
                 size="sm"
-                onClick={handleClearChat}
-                className="border-neon-cyan text-neon-cyan hover:bg-neon-cyan/10"
-              >
-                <MessageSquare className="w-4 h-4 mr-1" />
-                Clear Chat
-              </Button>
-              <Button 
-                variant="outline" 
-                size="sm"
                 onClick={handleClearStats}
                 className="border-destructive text-destructive hover:bg-destructive/10"
               >
@@ -445,34 +402,22 @@ const LiveDisplayPage = () => {
                   />
                 </div>
                 
-                {/* Split between Live Ratings and Chat */}
+                {/* Live Ratings Only */}
                 <div className="flex-1 overflow-hidden">
-                  <ResizablePanelGroup direction="vertical" className="h-full">
-                    {/* Live Ratings */}
-                    <ResizablePanel defaultSize={50} minSize={30}>
-                      <div className="h-full flex flex-col">
-                        <div className="p-3 border-b border-border bg-card/80 flex-shrink-0">
-                          <div className="flex items-center justify-between">
-                            <h3 className="font-semibold flex items-center gap-2">
-                              <Bell className="w-4 h-4 text-neon-pink" />
-                              Live Ratings ({transformedRatings.length})
-                            </h3>
-                            <Badge variant="outline" className="text-xs">Real-time</Badge>
-                          </div>
-                        </div>
-                        <div className="flex-1 overflow-auto">
-                          <LiveDisplay ratings={transformedRatings} />
-                        </div>
+                  <div className="h-full flex flex-col">
+                    <div className="p-3 border-b border-border bg-card/80 flex-shrink-0">
+                      <div className="flex items-center justify-between">
+                        <h3 className="font-semibold flex items-center gap-2">
+                          <Bell className="w-4 h-4 text-neon-pink" />
+                          Live Ratings ({transformedRatings.length})
+                        </h3>
+                        <Badge variant="outline" className="text-xs">Real-time</Badge>
                       </div>
-                    </ResizablePanel>
-                    
-                    <ResizableHandle withHandle />
-                    
-                    {/* Live Chat */}
-                    <ResizablePanel defaultSize={50} minSize={30}>
-                      <LiveChat currentTarget={currentTarget} viewOnly={true} />
-                    </ResizablePanel>
-                  </ResizablePanelGroup>
+                    </div>
+                    <div className="flex-1 overflow-auto">
+                      <LiveDisplay ratings={transformedRatings} />
+                    </div>
+                  </div>
                 </div>
               </div>
             </ResizablePanel>

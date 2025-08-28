@@ -49,7 +49,7 @@ const Index = () => {
         </Card>
 
         {/* Main Cards */}
-        <div className="grid md:grid-cols-2 gap-8 mb-12">
+        <div className="grid md:grid-cols-3 gap-8 mb-12">
           <Card className="glow-effect border-neon-purple/50 hover:border-neon-purple transition-all duration-300">
             <CardHeader className="text-center">
               <div className="mx-auto mb-4 w-16 h-16 bg-gradient-to-r from-neon-purple to-neon-pink rounded-full flex items-center justify-center">
@@ -64,6 +64,26 @@ const Index = () => {
               <Link to="/rate">
                 <Button className="w-full bg-gradient-to-r from-neon-purple to-neon-pink hover:from-neon-pink hover:to-neon-purple text-primary-foreground glow-effect">
                   Open Rating Page
+                  <Lightning className="w-4 h-4 ml-2" weight="fill" />
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
+
+          <Card className="glow-effect border-neon-green/50 hover:border-neon-green transition-all duration-300">
+            <CardHeader className="text-center">
+              <div className="mx-auto mb-4 w-16 h-16 bg-gradient-to-r from-neon-green to-neon-cyan rounded-full flex items-center justify-center">
+                <Monitor className="w-8 h-8 text-white" weight="bold" />
+              </div>
+              <CardTitle className="text-2xl text-neon-green">Host Panel</CardTitle>
+            </CardHeader>
+            <CardContent className="text-center space-y-4">
+              <p className="text-muted-foreground">
+                Host controls for soundboard, resume switching, and display management
+              </p>
+              <Link to="/host">
+                <Button className="w-full bg-gradient-to-r from-neon-green to-neon-cyan hover:from-neon-cyan hover:to-neon-green text-primary-foreground glow-effect">
+                  Open Host Panel
                   <Lightning className="w-4 h-4 ml-2" weight="fill" />
                 </Button>
               </Link>
