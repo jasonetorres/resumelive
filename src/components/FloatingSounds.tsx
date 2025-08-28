@@ -78,7 +78,7 @@ export const FloatingSounds = () => {
       {floatingSounds.map((sound) => (
         <div
           key={sound.id}
-          className="absolute text-7xl animate-bounce-and-fade"
+          className="absolute text-9xl animate-bounce-and-fade"
           style={{
             left: `${sound.position.left}%`,
             top: `${sound.position.top}%`,
