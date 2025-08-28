@@ -110,6 +110,7 @@ const LiveDisplayPage = () => {
           table: 'current_target'
         },
         async (payload) => {
+          console.log('LiveDisplayPage: Target change received:', payload);
           const newTarget = payload.new.target_person;
           setCurrentTarget(newTarget);
           
@@ -123,6 +124,7 @@ const LiveDisplayPage = () => {
               .order('created_at', { ascending: false });
             
             setRatings((ratingsData || []) as Rating[]);
+            console.log('LiveDisplayPage: Updated ratings for new target:', ratingsData);
           } else {
             setRatings([]);
           }
@@ -404,14 +406,15 @@ const LiveDisplayPage = () => {
                   />
                 </div>
                 
-                {/* Timer Section */}
-                <div className="p-3 border-b border-border bg-card/80 flex-shrink-0">
-                  <Timer />
-                </div>
+                {/* Live Ratings and Questions */}
+                <div className="flex-1 overflow-hidden flex flex-col">
+                  {/* Timer Section */}
+                  <div className="p-3 border-b border-border bg-card/80 flex-shrink-0">
+                    <Timer />
+                  </div>
 
-                {/* Live Ratings */}
-                <div className="flex-1 overflow-hidden">
-                  <div className="h-full flex flex-col">
+                  {/* Live Ratings Section - Takes up remaining space */}
+                  <div className="flex-1 flex flex-col min-h-0">
                     <div className="p-3 border-b border-border bg-card/80 flex-shrink-0">
                       <div className="flex items-center justify-between">
                         <h3 className="font-semibold flex items-center gap-2">
@@ -421,12 +424,14 @@ const LiveDisplayPage = () => {
                         <Badge variant="outline" className="text-xs">Real-time</Badge>
                       </div>
                     </div>
-                    <div className="flex-1 overflow-auto" style={{ maxHeight: 'calc(50% - 60px)' }}>
+                    <div className="flex-1 overflow-auto min-h-0 max-h-64">
                       <LiveDisplay ratings={transformedRatings} />
                     </div>
-                    
-                    {/* Questions Section */}
-                    <div className="border-t border-border bg-card/80 p-3 flex-1 overflow-hidden" style={{ maxHeight: 'calc(50% - 60px)' }}>
+                  </div>
+                  
+                  {/* Questions Section - Fixed height */}
+                  <div className="border-t border-border bg-card/80 p-3 flex-shrink-0 h-48 overflow-hidden">
+                    <div className="h-full overflow-auto">
                       <QuestionsSection currentTarget={currentTarget} />
                     </div>
                   </div>

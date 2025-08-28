@@ -68,6 +68,8 @@ export function TimerController() {
   }, []);
 
   const startTimer = async () => {
+    console.log('TimerController: Starting timer with:', inputMinutes, 'minutes', inputSeconds, 'seconds');
+    
     const { error } = await supabase
       .from('timer')
       .update({
@@ -80,10 +82,13 @@ export function TimerController() {
       .eq('id', 1);
 
     if (!error) {
+      console.log('TimerController: Timer started successfully');
       toast({
         title: "Timer Started! ⏰",
         description: `Timer set for ${inputMinutes}:${inputSeconds.toString().padStart(2, '0')}`,
       });
+    } else {
+      console.error('TimerController: Error starting timer:', error);
     }
   };
 

@@ -12,6 +12,7 @@ export const DisplayController = () => {
   const clearData = async (dataType: 'ratings' | 'reactions' | 'questions' | 'all') => {
     setClearing(dataType);
     try {
+      console.log('DisplayController: Clearing data type:', dataType);
       let operations = [];
       
       if (dataType === 'ratings' || dataType === 'all') {
@@ -29,6 +30,7 @@ export const DisplayController = () => {
 
       await Promise.all(operations);
       
+      console.log('DisplayController: Successfully cleared:', dataType);
       const message = dataType === 'all' ? 'All data cleared! 🗑️' : `${dataType} cleared! ✅`;
       toast({
         title: "Success",

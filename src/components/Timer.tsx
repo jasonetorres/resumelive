@@ -64,24 +64,27 @@ export function Timer() {
           schema: 'public',
           table: 'timer'
         },
-        (payload) => {
-          const newState = payload.new as TimerState;
-          setTimerState(newState);
-          
-          if (newState.is_running && newState.started_at) {
-            const startTime = new Date(newState.started_at).getTime();
-            const currentTime = Date.now();
-            const elapsedSeconds = Math.floor((currentTime - startTime) / 1000);
-            const totalSeconds = newState.minutes * 60 + newState.seconds;
-            const remainingSeconds = Math.max(0, totalSeconds - elapsedSeconds);
-            
-            setDisplayMinutes(Math.floor(remainingSeconds / 60));
-            setDisplaySeconds(remainingSeconds % 60);
-          } else {
-            setDisplayMinutes(newState.minutes);
-            setDisplaySeconds(newState.seconds);
-          }
-        }
+         (payload) => {
+           console.log('Timer: Received timer update:', payload);
+           const newState = payload.new as TimerState;
+           setTimerState(newState);
+           
+           if (newState.is_running && newState.started_at) {
+             const startTime = new Date(newState.started_at).getTime();
+             const currentTime = Date.now();
+             const elapsedSeconds = Math.floor((currentTime - startTime) / 1000);
+             const totalSeconds = newState.minutes * 60 + newState.seconds;
+             const remainingSeconds = Math.max(0, totalSeconds - elapsedSeconds);
+             
+             setDisplayMinutes(Math.floor(remainingSeconds / 60));
+             setDisplaySeconds(remainingSeconds % 60);
+             console.log('Timer: Updated display time to:', Math.floor(remainingSeconds / 60), ':', remainingSeconds % 60);
+           } else {
+             setDisplayMinutes(newState.minutes);
+             setDisplaySeconds(newState.seconds);
+             console.log('Timer: Set display time to initial:', newState.minutes, ':', newState.seconds);
+           }
+         }
       )
       .subscribe();
 

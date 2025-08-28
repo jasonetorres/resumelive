@@ -48,10 +48,12 @@ export const ResumeController = () => {
       const { data, error } = await supabase
         .from('current_target')
         .select('target_person')
+        .eq('id', 1)
         .single();
 
       if (error && error.code !== 'PGRST116') throw error;
       setCurrentTarget(data?.target_person || '');
+      console.log('ResumeController: Current target fetched:', data?.target_person);
     } catch (error) {
       console.error('Error fetching current target:', error);
     }
@@ -79,6 +81,8 @@ export const ResumeController = () => {
 
     setLoading(true);
     try {
+      console.log('ResumeController: Changing resume to:', selectedResumeData.name);
+      
       const { error } = await supabase
         .from('current_target')
         .upsert({ 
@@ -90,6 +94,8 @@ export const ResumeController = () => {
       if (error) throw error;
 
       setCurrentTarget(selectedResumeData.name);
+      console.log('ResumeController: Resume changed successfully to:', selectedResumeData.name);
+      
       toast({
         title: "Success! 📄",
         description: `Resume changed to: ${selectedResumeData.name}`,
