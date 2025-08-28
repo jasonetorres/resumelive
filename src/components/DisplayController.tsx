@@ -2,10 +2,11 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
+import { useToast } from "@/hooks/use-toast";
 import { Trash2, RotateCcw, Zap } from "lucide-react";
 
 export const DisplayController = () => {
+  const { toast } = useToast();
   const [clearing, setClearing] = useState<string | null>(null);
 
   const clearData = async (dataType: 'ratings' | 'reactions' | 'questions' | 'all') => {
@@ -28,11 +29,18 @@ export const DisplayController = () => {
 
       await Promise.all(operations);
       
-      const message = dataType === 'all' ? 'All data cleared' : `${dataType} cleared`;
-      toast.success(message);
+      const message = dataType === 'all' ? 'All data cleared! 🗑️' : `${dataType} cleared! ✅`;
+      toast({
+        title: "Success",
+        description: message,
+      });
     } catch (error) {
       console.error(`Error clearing ${dataType}:`, error);
-      toast.error(`Failed to clear ${dataType}`);
+      toast({
+        title: "Error",
+        description: `Failed to clear ${dataType}`,
+        variant: "destructive",
+      });
     } finally {
       setClearing(null);
     }

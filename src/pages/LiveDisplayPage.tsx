@@ -421,12 +421,12 @@ const LiveDisplayPage = () => {
                         <Badge variant="outline" className="text-xs">Real-time</Badge>
                       </div>
                     </div>
-                    <div className="flex-1 overflow-auto max-h-80">
+                    <div className="flex-1 overflow-auto" style={{ maxHeight: 'calc(50% - 60px)' }}>
                       <LiveDisplay ratings={transformedRatings} />
                     </div>
                     
                     {/* Questions Section */}
-                    <div className="border-t border-border bg-card/80 p-3">
+                    <div className="border-t border-border bg-card/80 p-3 flex-1 overflow-hidden" style={{ maxHeight: 'calc(50% - 60px)' }}>
                       <QuestionsSection currentTarget={currentTarget} />
                     </div>
                   </div>

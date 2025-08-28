@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
+import { useToast } from "@/hooks/use-toast";
 import { FileText, RefreshCw } from "lucide-react";
 
 interface Resume {
@@ -13,6 +13,7 @@ interface Resume {
 }
 
 export const ResumeController = () => {
+  const { toast } = useToast();
   const [resumes, setResumes] = useState<Resume[]>([]);
   const [selectedResume, setSelectedResume] = useState<string>("");
   const [currentTarget, setCurrentTarget] = useState<string>("");
@@ -34,7 +35,11 @@ export const ResumeController = () => {
       setResumes(data || []);
     } catch (error) {
       console.error('Error fetching resumes:', error);
-      toast.error('Failed to load resumes');
+      toast({
+        title: "Error",
+        description: "Failed to load resumes",
+        variant: "destructive",
+      });
     }
   };
 
@@ -54,7 +59,21 @@ export const ResumeController = () => {
 
   const changeResume = async () => {
     if (!selectedResume) {
-      toast.error('Please select a resume first');
+      toast({
+        title: "Error",
+        description: "Please select a resume first",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const selectedResumeData = resumes.find(r => r.id === selectedResume);
+    if (!selectedResumeData) {
+      toast({
+        title: "Error",
+        description: "Selected resume not found",
+        variant: "destructive",
+      });
       return;
     }
 
@@ -64,25 +83,32 @@ export const ResumeController = () => {
         .from('current_target')
         .upsert({ 
           id: 1, 
-          target_person: selectedResume,
+          target_person: selectedResumeData.name,
           updated_at: new Date().toISOString()
         });
 
       if (error) throw error;
 
-      setCurrentTarget(selectedResume);
-      toast.success('Resume changed successfully');
+      setCurrentTarget(selectedResumeData.name);
+      toast({
+        title: "Success! 📄",
+        description: `Resume changed to: ${selectedResumeData.name}`,
+      });
     } catch (error) {
       console.error('Error changing resume:', error);
-      toast.error('Failed to change resume');
+      toast({
+        title: "Error",
+        description: "Failed to change resume",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
   };
 
   const getCurrentResumeName = () => {
-    const resume = resumes.find(r => r.id === currentTarget);
-    return resume?.name || 'No resume selected';
+    // currentTarget stores the resume name, not ID
+    return currentTarget || 'No resume selected';
   };
 
   return (
