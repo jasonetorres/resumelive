@@ -17,6 +17,11 @@ const HostPage = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [passwordInput, setPasswordInput] = useState('');
 
+  // Debug logging
+  console.log('HostPage: Component mounted');
+  console.log('HostPage: isAuthenticated =', isAuthenticated);
+  console.log('HostPage: passwordInput =', passwordInput);
+
   const handlePasswordSubmit = () => {
     if (passwordInput === 'torcresumes') {
       setIsAuthenticated(true);
@@ -70,15 +75,17 @@ const HostPage = () => {
 
   // Password protection check
   if (!isAuthenticated) {
+    console.log('HostPage: Rendering password form');
     return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 flex items-center justify-center p-4">
-        <Card className="w-full max-w-md border-2 border-neon-purple/20 bg-card/50 backdrop-blur">
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <Card className="w-full max-w-md border border-border bg-card">
           <CardHeader>
-            <CardTitle className="text-center text-neon-purple">Host Access</CardTitle>
+            <CardTitle className="text-center text-primary">Host Access</CardTitle>
+            <CardDescription className="text-center">Enter password to access host controls</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <label className="text-sm font-medium mb-2 block">Enter Password</label>
+              <label className="text-sm font-medium mb-2 block text-foreground">Enter Password</label>
               <Input
                 type="password"
                 value={passwordInput}
@@ -90,7 +97,7 @@ const HostPage = () => {
             </div>
             <Button 
               onClick={handlePasswordSubmit}
-              className="w-full bg-neon-purple hover:bg-neon-purple/90"
+              className="w-full"
             >
               Access Host Panel
             </Button>
