@@ -6,7 +6,7 @@ interface StarRatingProps {
   value?: number;
   onChange?: (rating: number) => void;
   readonly?: boolean;
-  size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
+  size?: 'sm' | 'md' | 'lg' | 'xl';
   className?: string;
 }
 
@@ -23,8 +23,7 @@ export function StarRating({
     sm: 'w-4 h-4',
     md: 'w-6 h-6',
     lg: 'w-8 h-8 md:w-10 md:h-10',
-    xl: 'w-16 h-16 md:w-20 md:h-20',
-    '2xl': 'w-32 h-32 md:w-40 md:h-40' // 200% bigger than xl
+    xl: 'w-16 h-16 md:w-20 md:h-20' // Triple the md size
   };
 
   const handleClick = (rating: number) => {
