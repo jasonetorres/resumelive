@@ -102,6 +102,26 @@ All colors MUST be HSL.
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
+
+    /* Gaming/Stream colors - same as light mode */
+    --neon-purple: 280 100% 70%;
+    --neon-cyan: 190 100% 50%;
+    --neon-pink: 340 100% 60%;
+    --neon-green: 120 100% 50%;
+    --neon-orange: 30 100% 60%;
+    --neon-blue: 225 100% 50%;
+    
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--neon-purple)), hsl(var(--neon-pink)));
+    --gradient-secondary: linear-gradient(135deg, hsl(var(--neon-cyan)), hsl(var(--neon-green)));
+    --gradient-accent: linear-gradient(45deg, hsl(var(--neon-pink)), hsl(var(--neon-orange)));
+    
+    /* Animations */
+    --glow-purple: 0 0 20px hsl(var(--neon-purple) / 0.5);
+    --glow-cyan: 0 0 20px hsl(var(--neon-cyan) / 0.5);
+    --glow-pink: 0 0 20px hsl(var(--neon-pink) / 0.5);
+    --glow-blue: 0 0 20px hsl(var(--neon-blue) / 0.5);
+
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
