@@ -180,24 +180,6 @@ export function LiveDisplay({ ratings }: LiveDisplayProps) {
                   <div className="flex justify-center">
                     <StarRating value={Math.round(allStats.average)} readonly size="md" />
                   </div>
-                  
-                  {/* Category Breakdown */}
-                  <div className="space-y-2">
-                    <div className="grid grid-cols-2 gap-2 text-xs">
-                      <div className="text-center">
-                        <div className="text-neon-cyan font-bold text-base">
-                          {allStats.resumeQuality.toFixed(1)}
-                        </div>
-                        <div className="text-muted-foreground">Presentation</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-neon-green font-bold text-base">
-                          {allStats.content.toFixed(1)}
-                        </div>
-                        <div className="text-muted-foreground">Content</div>
-                      </div>
-                    </div>
-                  </div>
                 </div>
               </CardContent>
             </Card>
