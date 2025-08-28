@@ -41,7 +41,7 @@ const RateInputPage = () => {
     // Fetch current target
     const fetchCurrentTarget = async () => {
       console.log('RateInputPage: Fetching current target...');
-      const { data } = await (supabase as any)
+      const { data } = await supabase
         .from('current_target')
         .select('target_person')
         .eq('id', 1)
@@ -147,7 +147,17 @@ const RateInputPage = () => {
       throw new Error('No target set');
     }
 
-    const { error } = await (supabase as any)
+    console.log('RateInputPage: Submitting rating:', { 
+      target_person: currentTarget,
+      overall: rating.overall,
+      presentation: rating.presentation,
+      content: rating.content,
+      category: rating.category,
+      agreement: rating.agreement,
+      reaction: rating.reaction 
+    });
+
+    const { data, error } = await supabase
       .from('ratings')
       .insert({
         target_person: currentTarget,
@@ -158,13 +168,20 @@ const RateInputPage = () => {
         category: rating.category,
         agreement: rating.agreement,
         reaction: rating.reaction,
-      });
+      })
+      .select();
 
     if (error) {
       console.error('Error submitting rating:', error);
+      toast({
+        title: "Error Submitting Rating",
+        description: `Failed to submit rating: ${error.message}`,
+        variant: "destructive",
+      });
       throw error;
     }
 
+    console.log('RateInputPage: Rating submitted successfully:', data);
     toast({
       title: "Rating Submitted! ⭐",
       description: "Your vote has been cast! You can vote again with different ratings.",

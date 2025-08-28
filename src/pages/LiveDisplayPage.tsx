@@ -172,8 +172,10 @@ const LiveDisplayPage = () => {
           
           // Get current target from state at time of callback
           setCurrentTarget(currentTargetAtTime => {
+            console.log('LiveDisplayPage: Checking rating target:', newRating.target_person, 'vs current:', currentTargetAtTime);
             // Show real-time notification for new ratings matching current target
             if (newRating.target_person === currentTargetAtTime && newRating.overall !== null && newRating.overall > 0) {
+              console.log('LiveDisplayPage: Adding new rating to display');
               setRatings(prev => [newRating, ...prev]);
               
               // Show toast notification
