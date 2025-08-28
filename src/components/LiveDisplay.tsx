@@ -173,12 +173,28 @@ export function LiveDisplay({ ratings }: LiveDisplayProps) {
                 <div className="text-xs text-muted-foreground">({resumeRatings.length} votes)</div>
               </CardHeader>
               <CardContent className="pb-3">
-                <div className="text-center space-y-3">
-                  <div className="text-4xl font-bold text-neon-orange">
+                <div className="text-center space-y-4">
+                  <div className="text-5xl font-bold text-neon-orange mb-2">
                     {allStats.average.toFixed(1)}
                   </div>
-                  <div className="flex justify-center">
-                    <StarRating value={Math.round(allStats.average)} readonly size="xl" />
+                  <div className="flex justify-center items-center gap-1">
+                    {[1, 2, 3, 4, 5].map((star) => {
+                      const isFilled = Math.round(allStats.average) >= star;
+                      return (
+                        <Star
+                          key={star}
+                          fill={isFilled ? "currentColor" : "none"}
+                          className={`w-6 h-6 transition-all duration-300 ${
+                            isFilled 
+                              ? "text-neon-orange drop-shadow-[0_0_8px_hsl(var(--neon-orange))]" 
+                              : "text-muted-foreground/40"
+                          }`}
+                        />
+                      );
+                    })}
+                  </div>
+                  <div className="text-xs text-muted-foreground/70 font-medium">
+                    OUT OF 5 STARS
                   </div>
                 </div>
               </CardContent>
