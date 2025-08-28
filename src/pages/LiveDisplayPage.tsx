@@ -8,7 +8,6 @@ import { FloatingFeedback } from '@/components/FloatingFeedback';
 import { FloatingQuestions } from '@/components/FloatingQuestions';
 import { FloatingSounds } from '@/components/FloatingSounds';
 import { QuestionsSection } from '@/components/QuestionsSection';
-import { Timer } from '@/components/Timer';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -432,17 +431,12 @@ const LiveDisplayPage = () => {
                     />
                   </div>
                 </div>
-                
-                {/* Timer Section - Fixed */}
-                <div className="p-2 border-b border-border bg-card/80 flex-shrink-0">
-                  <Timer />
-                </div>
 
                 {/* Resizable Content Area */}
                 <div className="flex-1 min-h-0">
                   <ResizablePanelGroup direction="vertical">
                     {/* Live Ratings Section - Resizable */}
-                    <ResizablePanel defaultSize={60} minSize={30}>
+                    <ResizablePanel defaultSize={70} minSize={40}>
                       <div className="h-full flex flex-col bg-card/80">
                         <div className="p-2 border-b border-border flex-shrink-0">
                           <div className="flex items-center justify-between">
@@ -462,7 +456,7 @@ const LiveDisplayPage = () => {
                     <ResizableHandle />
                     
                     {/* Questions Section - Resizable */}
-                    <ResizablePanel defaultSize={40} minSize={20}>
+                    <ResizablePanel defaultSize={30} minSize={20}>
                       <div className="h-full flex flex-col bg-card/80">
                         <div className="p-2 bg-card/80 flex-shrink-0 border-b border-border">
                           <h3 className="text-sm font-semibold flex items-center gap-2">

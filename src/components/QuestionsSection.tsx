@@ -45,46 +45,23 @@ export function QuestionsSection({ currentTarget, showControls = false }: Questi
 
     fetchQuestions();
 
-    // Subscribe to real-time updates
+    // Subscribe to real-time updates - use a unique channel name with timestamp
     const channel = supabase
-      .channel('questions-section')
+      .channel(`questions-display-${currentTarget.replace(/[^a-zA-Z0-9]/g, '')}-${Date.now()}`)
       .on(
         'postgres_changes',
         {
           event: 'INSERT',
           schema: 'public',
-          table: 'questions'
+          table: 'questions',
+          filter: `target_person=eq.${currentTarget}`
         },
         (payload) => {
+          console.log('QuestionsSection: New question added:', payload);
           const newQuestion = payload.new as Question;
-          if (newQuestion.target_person === currentTarget) {
-            setQuestions(prev => [newQuestion, ...prev]);
-          }
+          setQuestions(prev => [newQuestion, ...prev]);
         }
       )
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'questions'
-        },
-        (payload) => {
-          const updatedQuestion = payload.new as Question;
-          if (updatedQuestion.target_person === currentTarget) {
-            setQuestions(prev => 
-              prev.map(q => 
-                q.id === updatedQuestion.id ? updatedQuestion : q
-              )
-            );
-          }
-        }
-      )
-      .subscribe();
-
-    // Subscribe to questions deletion (for real-time removal)
-    const questionsChannel = supabase
-      .channel('questions-display-section')
       .on(
         'postgres_changes',
         {
@@ -93,18 +70,28 @@ export function QuestionsSection({ currentTarget, showControls = false }: Questi
           table: 'questions'
         },
         (payload) => {
-          console.log('QuestionsSection: Question deleted:', payload);
+          console.log('QuestionsSection: Question deleted from display:', payload);
           const deletedQuestion = payload.old as Question;
-          if (deletedQuestion.target_person === currentTarget) {
-            setQuestions(prev => prev.filter(q => q.id !== deletedQuestion.id));
-          }
+          setQuestions(prev => prev.filter(q => q.id !== deletedQuestion.id));
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'questions',
+          filter: `target_person=eq.${currentTarget}`
+        },
+        (payload) => {
+          const updatedQuestion = payload.new as Question;
+          setQuestions(prev => prev.map(q => q.id === updatedQuestion.id ? updatedQuestion : q));
         }
       )
       .subscribe();
 
     return () => {
       supabase.removeChannel(channel);
-      supabase.removeChannel(questionsChannel);
     };
   }, [currentTarget]);
 
