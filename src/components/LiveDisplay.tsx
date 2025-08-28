@@ -167,7 +167,7 @@ export function LiveDisplay({ ratings }: LiveDisplayProps) {
                   <div className="text-4xl font-bold text-neon-orange">
                     {allStats.average.toFixed(1)}
                   </div>
-                  <div>
+                  <div className="flex justify-center">
                     <StarRating value={Math.round(allStats.average)} readonly size="md" />
                   </div>
                   
