@@ -413,9 +413,9 @@ const LiveDisplayPage = () => {
                   <Timer />
                 </div>
 
-                {/* Live Ratings Section */}
-                <div className="flex-1 flex flex-col min-h-0">
-                  <div className="p-2 border-b border-border bg-card/80 flex-shrink-0">
+                {/* Live Ratings Section - Fixed Height */}
+                <div className="border-b border-border bg-card/80 flex-shrink-0" style={{ height: '300px' }}>
+                  <div className="p-2 border-b border-border flex-shrink-0">
                     <div className="flex items-center justify-between">
                       <h3 className="text-sm font-semibold flex items-center gap-2">
                         <Bell className="w-3 h-3 text-neon-pink" />
@@ -424,20 +424,20 @@ const LiveDisplayPage = () => {
                       <Badge variant="outline" className="text-xs">Live</Badge>
                     </div>
                   </div>
-                  <div className="flex-1 overflow-auto min-h-0" style={{ maxHeight: '45%' }}>
+                  <div className="h-full overflow-auto p-2" style={{ height: 'calc(100% - 45px)' }}>
                     <LiveDisplay ratings={transformedRatings} />
                   </div>
                 </div>
                 
-                {/* Questions Section */}
-                <div className="flex-1 flex flex-col min-h-0 border-t border-border">
-                  <div className="p-2 bg-card/80 flex-shrink-0">
+                {/* Questions Section - Takes remaining space */}
+                <div className="flex-1 flex flex-col min-h-0">
+                  <div className="p-2 bg-card/80 flex-shrink-0 border-b border-border">
                     <h3 className="text-sm font-semibold flex items-center gap-2">
                       <MessageSquare className="w-3 h-3 text-neon-cyan" />
                       Questions
                     </h3>
                   </div>
-                  <div className="flex-1 overflow-auto min-h-0 p-2">
+                  <div className="flex-1 overflow-auto p-2 min-h-0">
                     <QuestionsSection currentTarget={currentTarget} />
                   </div>
                 </div>
