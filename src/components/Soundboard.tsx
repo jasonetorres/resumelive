@@ -30,6 +30,8 @@ const Soundboard = () => {
 
   const playSound = async (soundName: string) => {
     try {
+      console.log(`Soundboard: Playing sound ${soundName}`);
+      
       // Play the actual audio sound
       await audioManager.playSound(soundName);
       
@@ -43,8 +45,7 @@ const Soundboard = () => {
 
       if (error) throw error;
 
-      // Visual feedback only for host
-      console.log(`Playing sound: ${soundName}`);
+      console.log(`Soundboard: Sound ${soundName} sent to database`);
 
       toast.success(`Played ${soundName} sound`);
     } catch (error) {
