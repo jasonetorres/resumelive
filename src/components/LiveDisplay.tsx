@@ -68,6 +68,16 @@ export function LiveDisplay({ ratings }: LiveDisplayProps) {
   }, []);
   
   useEffect(() => {
+    console.log('LiveDisplay: Ratings prop changed:', ratings.length, ratings);
+    
+    // If ratings is empty, clear displayed ratings immediately
+    if (ratings.length === 0) {
+      console.log('LiveDisplay: Clearing displayed ratings due to empty ratings prop');
+      setDisplayedRatings([]);
+      setCurrentFeedback('');
+      return;
+    }
+    
     // Add new ratings with animation
     const newRatings = ratings.filter(
       rating => !displayedRatings.find(dr => dr.id === rating.id)

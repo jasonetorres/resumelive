@@ -196,23 +196,13 @@ const LiveDisplayPage = () => {
           table: 'ratings'
         },
         (payload) => {
-          console.log('LiveDisplayPage: Rating deleted:', payload);
+          console.log('LiveDisplayPage: Rating deleted via realtime:', payload);
           const deletedRating = payload.old as Rating;
-          setRatings(prev => prev.filter(r => r.id !== deletedRating.id));
-          
-          // Check if this was a bulk delete (clear all)
-          setTimeout(() => {
-            setRatings(prev => {
-              if (prev.length === 0) {
-                console.log('LiveDisplayPage: All ratings cleared');
-                toast({
-                  title: "Ratings Cleared! 🗑️",
-                  description: "All ratings have been removed from display",
-                });
-              }
-              return prev;
-            });
-          }, 100); // Small delay to allow multiple deletes to process
+          setRatings(prev => {
+            const updated = prev.filter(r => r.id !== deletedRating.id);
+            console.log('LiveDisplayPage: Ratings after delete:', updated.length);
+            return updated;
+          });
         }
       )
       .subscribe();
