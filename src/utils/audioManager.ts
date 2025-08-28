@@ -442,8 +442,11 @@ class AudioManager {
   }
 
   async playSound(soundName: string): Promise<void> {
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    
     console.log(`AudioManager: Attempting to play ${soundName}`);
     console.log(`AudioManager: userInteracted = ${this.userInteracted}`);
+    console.log(`AudioManager: isMobile = ${isMobile}`);
     
     if (!this.userInteracted) {
       console.warn('AudioManager: User has not interacted with the page yet. Audio is disabled.');
@@ -453,6 +456,13 @@ class AudioManager {
     const sound = this.sounds[soundName];
     console.log(`AudioManager: Sound object exists: ${!!sound}`);
     console.log(`AudioManager: Sound state: ${sound ? sound.state() : 'N/A'}`);
+    
+    // On mobile devices, force fallback to Web Audio API for better compatibility
+    if (isMobile) {
+      console.log(`AudioManager: Mobile device detected, using Web Audio API fallback for ${soundName}`);
+      this.createFallbackSound(soundName);
+      return;
+    }
     
     // Check if the sound is loaded. If not, use the fallback.
     if (sound && sound.state() === 'loaded') {
