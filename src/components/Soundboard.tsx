@@ -11,7 +11,7 @@ const SOUND_OPTIONS = [
   { name: "ding", emoji: "🔔", label: "Ding" },
   { name: "woosh", emoji: "💨", label: "Woosh" },
   { name: "fanfare", emoji: "🎺", label: "Fanfare" },
-  { name: "boing", emoji: "🤸", label: "Boing" },
+  { name: "boing", emoji: "🌀", label: "Boing" },
   { name: "cricket", emoji: "🦗", label: "Cricket" },
   { name: "trombone", emoji: "📯", label: "Sad Trombone" },
   { name: "confetti", emoji: "🎉", label: "Confetti" },

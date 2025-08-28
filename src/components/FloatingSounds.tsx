@@ -15,7 +15,7 @@ const SOUND_EMOJIS: Record<string, string> = {
   ding: "🔔",
   woosh: "💨",
   fanfare: "🎺",
-  boing: "🤸",
+  boing: "🌀",
   cricket: "🦗",
   trombone: "📯",
   confetti: "🎉",
