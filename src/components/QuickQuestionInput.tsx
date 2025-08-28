@@ -21,9 +21,23 @@ export function QuickQuestionInput({ currentTarget }: QuickQuestionInputProps) {
 
   console.log('QuickQuestionInput: Component rendered with currentTarget:', currentTarget);
 
-  // Add this to ensure we can see the component is mounting
+  // Get user's first name from session storage and populate author name
   React.useEffect(() => {
     console.log('QuickQuestionInput: Component MOUNTED');
+    
+    // Get the user's first name from session storage
+    const leadData = sessionStorage.getItem('leadData');
+    if (leadData) {
+      try {
+        const parsedLeadData = JSON.parse(leadData);
+        if (parsedLeadData.firstName) {
+          setAuthorName(parsedLeadData.firstName);
+        }
+      } catch (error) {
+        console.error('Error parsing lead data:', error);
+      }
+    }
+    
     return () => console.log('QuickQuestionInput: Component UNMOUNTED');
   }, []);
 
@@ -55,7 +69,7 @@ export function QuickQuestionInput({ currentTarget }: QuickQuestionInputProps) {
 
       console.log('QuickQuestionInput: Question submitted successfully!');
       setQuestion('');
-      setAuthorName('');
+      // Keep the author name so they don't have to re-enter it for subsequent questions
       toast({
         title: "Question Sent! 📝",
         description: "Your question will appear on the conference display!"
