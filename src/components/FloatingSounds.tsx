@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { audioManager } from "@/utils/audioManager";
 
 interface FloatingSound {
   id: string;
@@ -40,8 +41,9 @@ export const FloatingSounds = () => {
 
     setFloatingSounds(prev => [...prev, newSound]);
 
-    // Visual effect only - no audio
-    console.log(`Sound effect: ${soundName}`);
+    // Play the sound on the display
+    audioManager.playSound(soundName);
+    console.log(`FloatingSounds: Playing ${soundName} on display`);
 
     // Remove after animation duration
     setTimeout(() => {
