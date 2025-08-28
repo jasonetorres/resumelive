@@ -8,6 +8,8 @@ import { DisplayController } from "@/components/DisplayController";
 import { HostQuestionControls } from "@/components/HostQuestionControls";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { Link } from "react-router-dom";
+import { Home, Monitor, Star, Users, Calendar, Database, ExternalLink } from "lucide-react";
 
 const HostPage = () => {
   const { toast } = useToast();
@@ -161,6 +163,64 @@ const HostPage = () => {
           </CardContent>
         </Card>
         </div>
+
+        {/* Navigation Section */}
+        <Card className="mt-8">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <ExternalLink className="h-5 w-5" />
+              Quick Navigation
+            </CardTitle>
+            <CardDescription>
+              Access all pages of the site from here
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+              <Link to="/">
+                <Button variant="outline" className="w-full h-16 flex flex-col gap-1">
+                  <Home className="h-5 w-5" />
+                  <span className="text-xs">Home</span>
+                </Button>
+              </Link>
+              
+              <Link to="/live-display">
+                <Button variant="outline" className="w-full h-16 flex flex-col gap-1">
+                  <Monitor className="h-5 w-5" />
+                  <span className="text-xs">Live Display</span>
+                </Button>
+              </Link>
+              
+              <Link to="/rate">
+                <Button variant="outline" className="w-full h-16 flex flex-col gap-1">
+                  <Star className="h-5 w-5" />
+                  <span className="text-xs">Rate Input</span>
+                </Button>
+              </Link>
+              
+              <Link to="/lead-form">
+                <Button variant="outline" className="w-full h-16 flex flex-col gap-1">
+                  <Users className="h-5 w-5" />
+                  <span className="text-xs">Lead Form</span>
+                </Button>
+              </Link>
+              
+              <Link to="/schedule">
+                <Button variant="outline" className="w-full h-16 flex flex-col gap-1">
+                  <Calendar className="h-5 w-5" />
+                  <span className="text-xs">Schedule</span>
+                </Button>
+              </Link>
+              
+              <Link to="/formdisplay">
+                <Button variant="outline" className="w-full h-16 flex flex-col gap-1">
+                  <Database className="h-5 w-5" />
+                  <span className="text-xs">Dashboard</span>
+                </Button>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
