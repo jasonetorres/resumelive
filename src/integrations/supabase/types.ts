@@ -328,6 +328,36 @@ export type Database = {
         }
         Relationships: []
       }
+      timer: {
+        Row: {
+          id: number
+          is_running: boolean
+          minutes: number
+          paused_at: string | null
+          seconds: number
+          started_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          id?: number
+          is_running?: boolean
+          minutes?: number
+          paused_at?: string | null
+          seconds?: number
+          started_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          id?: number
+          is_running?: boolean
+          minutes?: number
+          paused_at?: string | null
+          seconds?: number
+          started_at?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

@@ -2,6 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Soundboard } from "@/components/Soundboard";
 import { ResumeController } from "@/components/ResumeController";
 import { DisplayController } from "@/components/DisplayController";
+import { TimerController } from "@/components/TimerController";
 
 const HostPage = () => {
   return (
@@ -38,6 +39,18 @@ const HostPage = () => {
             </CardHeader>
             <CardContent>
               <ResumeController />
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>⏰ Timer Control</CardTitle>
+              <CardDescription>
+                Control the presentation timer displayed live
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <TimerController />
             </CardContent>
           </Card>
 

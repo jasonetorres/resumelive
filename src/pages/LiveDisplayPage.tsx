@@ -7,6 +7,8 @@ import { FloatingReactions } from '@/components/FloatingReactions';
 import { FloatingFeedback } from '@/components/FloatingFeedback';
 import { FloatingQuestions } from '@/components/FloatingQuestions';
 import { FloatingSounds } from '@/components/FloatingSounds';
+import { QuestionsSection } from '@/components/QuestionsSection';
+import { Timer } from '@/components/Timer';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -402,7 +404,12 @@ const LiveDisplayPage = () => {
                   />
                 </div>
                 
-                {/* Live Ratings Only */}
+                {/* Timer Section */}
+                <div className="p-3 border-b border-border bg-card/80 flex-shrink-0">
+                  <Timer />
+                </div>
+
+                {/* Live Ratings */}
                 <div className="flex-1 overflow-hidden">
                   <div className="h-full flex flex-col">
                     <div className="p-3 border-b border-border bg-card/80 flex-shrink-0">
@@ -414,8 +421,13 @@ const LiveDisplayPage = () => {
                         <Badge variant="outline" className="text-xs">Real-time</Badge>
                       </div>
                     </div>
-                    <div className="flex-1 overflow-auto">
+                    <div className="flex-1 overflow-auto max-h-80">
                       <LiveDisplay ratings={transformedRatings} />
+                    </div>
+                    
+                    {/* Questions Section */}
+                    <div className="border-t border-border bg-card/80 p-3">
+                      <QuestionsSection currentTarget={currentTarget} />
                     </div>
                   </div>
                 </div>
