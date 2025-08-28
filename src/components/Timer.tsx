@@ -56,7 +56,7 @@ export function Timer() {
 
     // Subscribe to timer updates
     const channel = supabase
-      .channel('timer-updates')
+      .channel('timer-controller-updates')
       .on(
         'postgres_changes',
         {

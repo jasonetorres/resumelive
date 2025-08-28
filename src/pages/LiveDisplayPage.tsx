@@ -114,6 +114,14 @@ const LiveDisplayPage = () => {
           const newTarget = payload.new.target_person;
           setCurrentTarget(newTarget);
           
+          // Find and set the corresponding resume
+          const matchingResume = resumes.find(r => r.name === newTarget);
+          if (matchingResume) {
+            setSelectedResume(matchingResume);
+            setSelectedResumeId(matchingResume.id);
+            setShowResumeView(true);
+          }
+          
           // Fetch ratings for new target (only real ratings)
           if (newTarget) {
             const { data: ratingsData } = await (supabase as any)
