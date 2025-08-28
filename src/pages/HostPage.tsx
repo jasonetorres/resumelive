@@ -1,13 +1,33 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { Soundboard } from "@/components/Soundboard";
 import { ResumeController } from "@/components/ResumeController";
 import { DisplayController } from "@/components/DisplayController";
 import { HostQuestionControls } from "@/components/HostQuestionControls";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const HostPage = () => {
+  const { toast } = useToast();
   const [currentTarget, setCurrentTarget] = useState<string | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [passwordInput, setPasswordInput] = useState('');
+
+  const handlePasswordSubmit = () => {
+    if (passwordInput === 'torcresumes') {
+      setIsAuthenticated(true);
+      setPasswordInput('');
+    } else {
+      toast({
+        title: "Access Denied",
+        description: "Incorrect password",
+        variant: "destructive"
+      });
+      setPasswordInput('');
+    }
+  };
 
   // Fetch current target for question management
   useEffect(() => {
@@ -45,6 +65,38 @@ const HostPage = () => {
       supabase.removeChannel(channel);
     };
   }, []);
+
+  // Password protection check
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md border-2 border-neon-purple/20 bg-card/50 backdrop-blur">
+          <CardHeader>
+            <CardTitle className="text-center text-neon-purple">Host Access</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <label className="text-sm font-medium mb-2 block">Enter Password</label>
+              <Input
+                type="password"
+                value={passwordInput}
+                onChange={(e) => setPasswordInput(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handlePasswordSubmit()}
+                placeholder="Enter host password"
+                className="w-full"
+              />
+            </div>
+            <Button 
+              onClick={handlePasswordSubmit}
+              className="w-full bg-neon-purple hover:bg-neon-purple/90"
+            >
+              Access Host Panel
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20 p-4">
