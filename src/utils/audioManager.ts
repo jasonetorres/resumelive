@@ -62,7 +62,7 @@ class AudioManager {
       woosh: '/sounds/woosh.mp3',
       fanfare: '/sounds/fanfare.mp3',
       boing: '/sounds/boing.mp3',
-      cricket: '/sounds/cricket.mp3',
+      cricket: '/sounds/crickets.mp3',
       trombone: '/sounds/trombone.mp3',
       confetti: '/sounds/confetti.mp3',
       buzzer: '/sounds/buzzer.mp3',
