@@ -397,7 +397,7 @@ const LiveDisplayPage = () => {
             {/* Live Display Sidebar - Right Side */}
             <ResizablePanel defaultSize={30} minSize={25}>
               <div className="h-full flex flex-col bg-card">
-                {/* QR Code Section - Compact */}
+                {/* QR Code Section - Fixed */}
                 <div className="p-2 border-b border-border bg-card/80 flex-shrink-0">
                   <div className="text-center">
                     <QRCodeGenerator 
@@ -408,38 +408,49 @@ const LiveDisplayPage = () => {
                   </div>
                 </div>
                 
-                {/* Timer Section - Compact */}
+                {/* Timer Section - Fixed */}
                 <div className="p-2 border-b border-border bg-card/80 flex-shrink-0">
                   <Timer />
                 </div>
 
-                {/* Live Ratings Section - Fixed Height */}
-                <div className="border-b border-border bg-card/80 flex-shrink-0" style={{ height: '300px' }}>
-                  <div className="p-2 border-b border-border flex-shrink-0">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-sm font-semibold flex items-center gap-2">
-                        <Bell className="w-3 h-3 text-neon-pink" />
-                        Ratings ({transformedRatings.length})
-                      </h3>
-                      <Badge variant="outline" className="text-xs">Live</Badge>
-                    </div>
-                  </div>
-                  <div className="h-full overflow-auto p-2" style={{ height: 'calc(100% - 45px)' }}>
-                    <LiveDisplay ratings={transformedRatings} />
-                  </div>
-                </div>
-                
-                {/* Questions Section - Takes remaining space */}
-                <div className="flex-1 flex flex-col min-h-0">
-                  <div className="p-2 bg-card/80 flex-shrink-0 border-b border-border">
-                    <h3 className="text-sm font-semibold flex items-center gap-2">
-                      <MessageSquare className="w-3 h-3 text-neon-cyan" />
-                      Questions
-                    </h3>
-                  </div>
-                  <div className="flex-1 overflow-auto p-2 min-h-0">
-                    <QuestionsSection currentTarget={currentTarget} />
-                  </div>
+                {/* Resizable Content Area */}
+                <div className="flex-1 min-h-0">
+                  <ResizablePanelGroup direction="vertical">
+                    {/* Live Ratings Section - Resizable */}
+                    <ResizablePanel defaultSize={60} minSize={30}>
+                      <div className="h-full flex flex-col bg-card/80">
+                        <div className="p-2 border-b border-border flex-shrink-0">
+                          <div className="flex items-center justify-between">
+                            <h3 className="text-sm font-semibold flex items-center gap-2">
+                              <Bell className="w-3 h-3 text-neon-pink" />
+                              Ratings ({transformedRatings.length})
+                            </h3>
+                            <Badge variant="outline" className="text-xs">Live</Badge>
+                          </div>
+                        </div>
+                        <div className="flex-1 overflow-auto p-2">
+                          <LiveDisplay ratings={transformedRatings} />
+                        </div>
+                      </div>
+                    </ResizablePanel>
+                    
+                    <ResizableHandle />
+                    
+                    {/* Questions Section - Resizable */}
+                    <ResizablePanel defaultSize={40} minSize={20}>
+                      <div className="h-full flex flex-col bg-card/80">
+                        <div className="p-2 bg-card/80 flex-shrink-0 border-b border-border">
+                          <h3 className="text-sm font-semibold flex items-center gap-2">
+                            <MessageSquare className="w-3 h-3 text-neon-cyan" />
+                            Questions
+                          </h3>
+                        </div>
+                        <div className="flex-1 overflow-auto p-2 min-h-0">
+                          <QuestionsSection currentTarget={currentTarget} />
+                        </div>
+                      </div>
+                    </ResizablePanel>
+                  </ResizablePanelGroup>
                 </div>
               </div>
             </ResizablePanel>
