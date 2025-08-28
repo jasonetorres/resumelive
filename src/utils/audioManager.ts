@@ -15,16 +15,40 @@ class AudioManager {
       
       this.userInteracted = true;
       console.log('AudioManager: Audio enabled by user interaction');
+      console.log('AudioManager: User agent:', navigator.userAgent);
+      console.log('AudioManager: Is mobile:', /iPhone|iPad|iPod|Android/i.test(navigator.userAgent));
+      
+      // Try to unlock audio context immediately on mobile
+      if (typeof window !== 'undefined' && (window.AudioContext || (window as any).webkitAudioContext)) {
+        const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
+        const tempContext = new AudioContext();
+        if (tempContext.state === 'suspended') {
+          tempContext.resume().then(() => {
+            console.log('AudioManager: Audio context resumed successfully');
+            tempContext.close();
+          }).catch(err => {
+            console.error('AudioManager: Failed to resume audio context:', err);
+            tempContext.close();
+          });
+        } else {
+          tempContext.close();
+        }
+      }
       
       // Remove listeners after first interaction
-      document.removeEventListener('click', enableAudio);
-      document.removeEventListener('touchstart', enableAudio);
+      document.removeEventListener('click', enableAudio, { passive: true } as any);
+      document.removeEventListener('touchstart', enableAudio, { passive: true } as any);
+      document.removeEventListener('touchend', enableAudio, { passive: true } as any);
       document.removeEventListener('keydown', enableAudio);
     };
 
-    document.addEventListener('click', enableAudio);
-    document.addEventListener('touchstart', enableAudio);
+    // Add more mobile-friendly event listeners
+    document.addEventListener('click', enableAudio, { passive: true } as any);
+    document.addEventListener('touchstart', enableAudio, { passive: true } as any);
+    document.addEventListener('touchend', enableAudio, { passive: true } as any);
     document.addEventListener('keydown', enableAudio);
+    
+    console.log('AudioManager: User interaction listeners set up');
   }
 
   private initializeSounds(): void {
@@ -419,6 +443,7 @@ class AudioManager {
 
   async playSound(soundName: string): Promise<void> {
     console.log(`AudioManager: Attempting to play ${soundName}`);
+    console.log(`AudioManager: userInteracted = ${this.userInteracted}`);
     
     if (!this.userInteracted) {
       console.warn('AudioManager: User has not interacted with the page yet. Audio is disabled.');
@@ -426,13 +451,22 @@ class AudioManager {
     }
 
     const sound = this.sounds[soundName];
+    console.log(`AudioManager: Sound object exists: ${!!sound}`);
+    console.log(`AudioManager: Sound state: ${sound ? sound.state() : 'N/A'}`);
     
     // Check if the sound is loaded. If not, use the fallback.
     if (sound && sound.state() === 'loaded') {
-      sound.play();
-      console.log(`AudioManager: Playing preloaded audio for ${soundName}`);
+      try {
+        sound.play();
+        console.log(`AudioManager: Playing preloaded audio for ${soundName}`);
+      } catch (error) {
+        console.error(`AudioManager: Error playing preloaded audio for ${soundName}:`, error);
+        console.log(`AudioManager: Falling back to Web Audio API for ${soundName}`);
+        this.createFallbackSound(soundName);
+      }
     } else {
       console.warn(`AudioManager: Audio for ${soundName} not loaded or failed to load. Using fallback.`);
+      console.log(`AudioManager: Sound state: ${sound ? sound.state() : 'sound object missing'}`);
       this.createFallbackSound(soundName);
     }
   }
