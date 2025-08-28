@@ -156,7 +156,7 @@ const LiveDisplayPage = () => {
       )
       .subscribe();
 
-    // Subscribe to new ratings - with target filtering
+    // Subscribe to ratings changes (insert and delete)
     const ratingsChannel = supabase
       .channel('ratings-changes-display')
       .on(
@@ -186,6 +186,33 @@ const LiveDisplayPage = () => {
             }
             return currentTargetAtTime; // Return unchanged
           });
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'DELETE',
+          schema: 'public',
+          table: 'ratings'
+        },
+        (payload) => {
+          console.log('LiveDisplayPage: Rating deleted:', payload);
+          const deletedRating = payload.old as Rating;
+          setRatings(prev => prev.filter(r => r.id !== deletedRating.id));
+          
+          // Check if this was a bulk delete (clear all)
+          setTimeout(() => {
+            setRatings(prev => {
+              if (prev.length === 0) {
+                console.log('LiveDisplayPage: All ratings cleared');
+                toast({
+                  title: "Ratings Cleared! 🗑️",
+                  description: "All ratings have been removed from display",
+                });
+              }
+              return prev;
+            });
+          }, 100); // Small delay to allow multiple deletes to process
         }
       )
       .subscribe();
