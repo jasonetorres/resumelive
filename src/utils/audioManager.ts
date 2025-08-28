@@ -10,6 +10,8 @@ interface SoundConfig {
 class AudioManager {
   private sounds: Map<string, Howl> = new Map();
   private initialized = false;
+  private audioContext: AudioContext | null = null;
+  private userInteracted = false;
 
   // Sound configurations with multiple fallback URLs
   private soundConfigs: SoundConfig[] = [
@@ -112,8 +114,31 @@ class AudioManager {
     }
   ];
 
+  // Initialize audio context on first user interaction
+  private async initializeAudioContext(): Promise<void> {
+    if (this.audioContext || this.userInteracted) return;
+    
+    try {
+      // Create audio context
+      this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      
+      // Resume audio context if suspended
+      if (this.audioContext.state === 'suspended') {
+        await this.audioContext.resume();
+      }
+      
+      this.userInteracted = true;
+      console.log('AudioManager: Audio context initialized and resumed');
+    } catch (error) {
+      console.error('AudioManager: Failed to initialize audio context:', error);
+    }
+  }
+
   private async initializeSounds(): Promise<void> {
     if (this.initialized) return;
+
+    // Ensure audio context is ready
+    await this.initializeAudioContext();
 
     console.log('AudioManager: Initializing sounds with Howler.js...');
 
@@ -123,13 +148,14 @@ class AudioManager {
         const howl = new Howl({
           src: config.urls,
           volume: config.volume || 0.5,
-          preload: true,
+          preload: false, // Don't preload to avoid autoplay issues
           html5: true, // Use HTML5 Audio for better compatibility
+          format: ['mp3', 'wav'],
           onload: () => {
             console.log(`AudioManager: Successfully loaded ${config.name}`);
           },
           onloaderror: (id, error) => {
-            console.warn(`AudioManager: Failed to load ${config.name}:`, error);
+            console.warn(`AudioManager: Failed to load ${config.name}, using fallback`);
             // Create a simple fallback tone
             this.createFallbackSound(config.name);
           }
@@ -175,36 +201,71 @@ class AudioManager {
 
   async playSound(soundName: string): Promise<void> {
     try {
+      // Ensure user has interacted and audio context is ready
+      await this.initializeAudioContext();
+      
       await this.initializeSounds();
       
       const sound = this.sounds.get(soundName);
       if (sound) {
         // Stop any currently playing instance of this sound
         sound.stop();
+        
+        // Load the sound if not already loaded
+        if (sound.state() === 'unloaded') {
+          sound.load();
+        }
+        
         // Play the sound
-        sound.play();
+        const playId = sound.play();
         console.log(`AudioManager: Playing ${soundName}`);
+        
+        // Handle play failure
+        sound.once('playerror', () => {
+          console.warn(`AudioManager: Playback failed for ${soundName}, trying fallback`);
+          this.playFallbackBeep(soundName);
+        });
       } else {
         console.warn(`AudioManager: Sound ${soundName} not found`);
         // Play a simple fallback beep
-        this.playFallbackBeep();
+        this.playFallbackBeep(soundName);
       }
     } catch (error) {
       console.error(`AudioManager: Error playing ${soundName}:`, error);
-      this.playFallbackBeep();
+      this.playFallbackBeep(soundName);
     }
   }
 
-  private playFallbackBeep(): void {
+  private playFallbackBeep(soundName: string): void {
     try {
-      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      if (!this.audioContext) {
+        this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      }
+      
+      const audioContext = this.audioContext;
       const oscillator = audioContext.createOscillator();
       const gainNode = audioContext.createGain();
       
       oscillator.connect(gainNode);
       gainNode.connect(audioContext.destination);
       
-      oscillator.frequency.value = 800;
+      // Different frequencies for different sounds
+      const frequencies: Record<string, number> = {
+        applause: 800,
+        airhorn: 220,
+        drumroll: 150,
+        ding: 1200,
+        woosh: 400,
+        fanfare: 523,
+        boing: 800,
+        cricket: 3000,
+        trombone: 220,
+        confetti: 1500,
+        buzzer: 150,
+        cheer: 600
+      };
+      
+      oscillator.frequency.value = frequencies[soundName] || 440;
       oscillator.type = 'sine';
       
       gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
@@ -212,6 +273,8 @@ class AudioManager {
       
       oscillator.start(audioContext.currentTime);
       oscillator.stop(audioContext.currentTime + 0.3);
+      
+      console.log(`AudioManager: Played fallback beep for ${soundName}`);
     } catch (error) {
       console.error('AudioManager: Fallback beep failed:', error);
     }
