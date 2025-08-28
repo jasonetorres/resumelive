@@ -156,7 +156,7 @@ const LiveDisplayPage = () => {
       )
       .subscribe();
 
-    // Subscribe to new ratings
+    // Subscribe to new ratings - with target filtering
     const ratingsChannel = supabase
       .channel('ratings-changes-display')
       .on(
@@ -167,18 +167,23 @@ const LiveDisplayPage = () => {
           table: 'ratings'
         },
         (payload) => {
+          console.log('LiveDisplayPage: New rating received:', payload);
           const newRating = payload.new as Rating;
           
-          // Show real-time notification for new ratings
-          if (newRating.target_person === currentTarget && newRating.overall !== null && newRating.overall > 0) {
-            setRatings(prev => [newRating, ...prev]);
-            
-            // Show toast notification
-            toast({
-              title: "New Rating Received! ⭐",
-              description: `${newRating.overall}/5 stars for ${newRating.category}`,
-            });
-          }
+          // Get current target from state at time of callback
+          setCurrentTarget(currentTargetAtTime => {
+            // Show real-time notification for new ratings matching current target
+            if (newRating.target_person === currentTargetAtTime && newRating.overall !== null && newRating.overall > 0) {
+              setRatings(prev => [newRating, ...prev]);
+              
+              // Show toast notification
+              toast({
+                title: "New Rating Received! ⭐",
+                description: `${newRating.overall}/5 stars for ${newRating.category}`,
+              });
+            }
+            return currentTargetAtTime; // Return unchanged
+          });
         }
       )
       .subscribe();

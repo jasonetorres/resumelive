@@ -137,19 +137,28 @@ export function HostQuestionControls({ currentTarget }: HostQuestionControlsProp
   const markAsAnswered = async (questionId: string) => {
     console.log('HostQuestionControls: Marking question as answered:', questionId);
     
-    const { error } = await supabase
-      .from('questions')
-      .delete()
-      .eq('id', questionId);
-    
-    if (!error) {
-      setQuestions(prev => prev.filter(q => q.id !== questionId));
-      toast({
-        title: "Question Answered! ✅",
-        description: "Question removed from display",
-      });
-    } else {
-      console.error('Error deleting question:', error);
+    try {
+      const { error } = await supabase
+        .from('questions')
+        .delete()
+        .eq('id', questionId);
+      
+      if (error) {
+        console.error('Error deleting question:', error);
+        toast({
+          title: "Error",
+          description: "Failed to remove question: " + error.message,
+          variant: "destructive",
+        });
+      } else {
+        setQuestions(prev => prev.filter(q => q.id !== questionId));
+        toast({
+          title: "Question Answered! ✅",
+          description: "Question removed from display",
+        });
+      }
+    } catch (error) {
+      console.error('Exception while deleting question:', error);
       toast({
         title: "Error",
         description: "Failed to remove question",
