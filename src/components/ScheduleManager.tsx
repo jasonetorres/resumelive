@@ -240,6 +240,32 @@ export const ScheduleManager: React.FC = () => {
     }
   };
 
+  const bulkDeleteTimeSlots = async () => {
+    if (timeSlots.length === 0) {
+      toast.error('No time slots to delete');
+      return;
+    }
+
+    if (!confirm(`Are you sure you want to delete ALL ${timeSlots.length} time slots? This will also cancel any existing bookings. This action cannot be undone.`)) {
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('time_slots')
+        .delete()
+        .neq('id', '00000000-0000-0000-0000-000000000000'); // Delete all rows
+
+      if (error) throw error;
+
+      toast.success('All time slots deleted successfully');
+      fetchTimeSlots();
+    } catch (error) {
+      console.error('Error deleting time slots:', error);
+      toast.error('Failed to delete time slots');
+    }
+  };
+
   useEffect(() => {
     fetchTimeSlots();
   }, []);
@@ -383,10 +409,23 @@ export const ScheduleManager: React.FC = () => {
       {/* Time Slots List */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Clock className="h-4 w-4" />
-            Time Slots ({timeSlots.length})
-          </CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-2">
+              <Clock className="h-4 w-4" />
+              Time Slots ({timeSlots.length})
+            </CardTitle>
+            {timeSlots.length > 0 && (
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={bulkDeleteTimeSlots}
+                className="flex items-center gap-2"
+              >
+                <Trash2 className="h-4 w-4" />
+                Clear All
+              </Button>
+            )}
+          </div>
         </CardHeader>
         <CardContent>
           {isLoading ? (
