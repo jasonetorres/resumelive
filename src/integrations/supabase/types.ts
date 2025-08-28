@@ -277,6 +277,27 @@ export type Database = {
         }
         Relationships: []
       }
+      sounds: {
+        Row: {
+          created_at: string
+          id: string
+          sound_name: string
+          target_person: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          sound_name: string
+          target_person?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          sound_name?: string
+          target_person?: string
+        }
+        Relationships: []
+      }
       time_slots: {
         Row: {
           created_at: string

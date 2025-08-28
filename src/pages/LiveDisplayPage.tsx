@@ -7,6 +7,7 @@ import { FloatingReactions } from '@/components/FloatingReactions';
 import { FloatingChatMessages } from '@/components/FloatingChatMessages';
 import { FloatingFeedback } from '@/components/FloatingFeedback';
 import { FloatingQuestions } from '@/components/FloatingQuestions';
+import { FloatingSounds } from '@/components/FloatingSounds';
 import { LiveChat } from '@/components/LiveChat';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
 import { Button } from '@/components/ui/button';
@@ -480,6 +481,7 @@ const LiveDisplayPage = () => {
         <FloatingReactions currentTarget={currentTarget} />
         <FloatingQuestions currentTarget={currentTarget} />
         <FloatingFeedback currentTarget={currentTarget} />
+        <FloatingSounds />
       </div>
     );
   }
