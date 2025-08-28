@@ -101,6 +101,24 @@ export type Database = {
         }
         Relationships: []
       }
+      display_settings: {
+        Row: {
+          id: number
+          results_hidden: boolean
+          updated_at: string
+        }
+        Insert: {
+          id?: number
+          results_hidden?: boolean
+          updated_at?: string
+        }
+        Update: {
+          id?: number
+          results_hidden?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
       leads: {
         Row: {
           created_at: string

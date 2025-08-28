@@ -26,9 +26,42 @@ export function HostQuestionControls({ currentTarget }: HostQuestionControlsProp
   const [isResultsHidden, setIsResultsHidden] = useState(false);
 
   useEffect(() => {
+    // Fetch initial display settings
+    const fetchDisplaySettings = async () => {
+      const { data } = await supabase
+        .from('display_settings')
+        .select('results_hidden')
+        .eq('id', 1)
+        .single();
+      
+      if (data) {
+        setIsResultsHidden(data.results_hidden);
+      }
+    };
+
+    fetchDisplaySettings();
+
+    // Subscribe to display settings changes
+    const settingsChannel = supabase
+      .channel('display-settings-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'display_settings'
+        },
+        (payload) => {
+          setIsResultsHidden(payload.new.results_hidden);
+        }
+      )
+      .subscribe();
+
     if (!currentTarget) {
       setQuestions([]);
-      return;
+      return () => {
+        supabase.removeChannel(settingsChannel);
+      };
     }
 
     // Fetch initial questions
@@ -80,8 +113,26 @@ export function HostQuestionControls({ currentTarget }: HostQuestionControlsProp
 
     return () => {
       supabase.removeChannel(channel);
+      supabase.removeChannel(settingsChannel);
     };
   }, [currentTarget]);
+
+  const toggleResultsVisibility = async () => {
+    const newHiddenState = !isResultsHidden;
+    
+    const { error } = await supabase
+      .from('display_settings')
+      .update({ results_hidden: newHiddenState })
+      .eq('id', 1);
+    
+    if (!error) {
+      setIsResultsHidden(newHiddenState);
+      toast({
+        title: newHiddenState ? "Results Hidden! 🙈" : "Results Shown! 👁️",
+        description: newHiddenState ? "Results are now hidden from display" : "Results are now visible on display",
+      });
+    }
+  };
 
   const markAsAnswered = async (questionId: string) => {
     console.log('HostQuestionControls: Marking question as answered:', questionId);
@@ -105,15 +156,6 @@ export function HostQuestionControls({ currentTarget }: HostQuestionControlsProp
         variant: "destructive",
       });
     }
-  };
-
-  const toggleResultsVisibility = () => {
-    setIsResultsHidden(!isResultsHidden);
-    // This could be expanded to actually hide results on display
-    toast({
-      title: isResultsHidden ? "Results Shown! 👁️" : "Results Hidden! 🙈",
-      description: isResultsHidden ? "Results are now visible on display" : "Results are now hidden from display",
-    });
   };
 
   const formatTimeAgo = (timestamp: string) => {

@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { StarRating } from './StarRating';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Button } from '@/components/ui/button';
+import { supabase } from '@/integrations/supabase/client';
 
 import { TrendingUp, Users, MessageSquare, Star, Sparkles, ThumbsUp, ThumbsDown } from 'lucide-react';
 
@@ -26,8 +26,46 @@ interface LiveDisplayProps {
 export function LiveDisplay({ ratings }: LiveDisplayProps) {
   const [displayedRatings, setDisplayedRatings] = useState<Rating[]>([]);
   const [currentFeedback, setCurrentFeedback] = useState<string>('');
+  const [isResultsHidden, setIsResultsHidden] = useState(false);
   
   console.log('LiveDisplay: Received ratings:', ratings.length, ratings);
+
+  useEffect(() => {
+    // Fetch initial display settings
+    const fetchDisplaySettings = async () => {
+      const { data } = await supabase
+        .from('display_settings')
+        .select('results_hidden')
+        .eq('id', 1)
+        .single();
+      
+      if (data) {
+        setIsResultsHidden(data.results_hidden);
+      }
+    };
+
+    fetchDisplaySettings();
+
+    // Subscribe to display settings changes
+    const settingsChannel = supabase
+      .channel('live-display-settings')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'display_settings'
+        },
+        (payload) => {
+          setIsResultsHidden(payload.new.results_hidden);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(settingsChannel);
+    };
+  }, []);
   
   useEffect(() => {
     // Add new ratings with animation
@@ -111,63 +149,82 @@ export function LiveDisplay({ ratings }: LiveDisplayProps) {
         </div>
       </div>
 
-      {/* Results Section - Always Visible */}
-      <div className="flex-1 overflow-hidden">
-        <div className="flex justify-center mb-3 flex-shrink-0">
-          {/* Single Score Card */}
-          <Card className="glow-effect border-neon-purple/50 transition-all duration-500 max-w-md w-full">
-            <CardHeader className="pb-2 text-center">
-              <CardTitle className="flex items-center justify-center gap-2 text-neon-purple text-base">
-                <TrendingUp className="w-4 h-4" />
-                SCORE
-              </CardTitle>
-              <div className="text-xs text-muted-foreground">({resumeRatings.length} votes)</div>
-            </CardHeader>
-            <CardContent className="pb-3">
-              <div className="text-center space-y-3">
-                <div className="text-4xl font-bold text-neon-orange">
-                  {allStats.average.toFixed(1)}
-                </div>
-                <div>
-                  <StarRating value={Math.round(allStats.average)} readonly size="md" />
-                </div>
-                
-                {/* Category Breakdown */}
-                <div className="space-y-2">
-                  <div className="grid grid-cols-2 gap-2 text-xs">
-                    <div className="text-center">
-                      <div className="text-neon-cyan font-bold text-base">
-                        {allStats.resumeQuality.toFixed(1)}
+      {/* Results Section - Show/Hide based on settings */}
+      {!isResultsHidden && (
+        <div className="flex-1 overflow-hidden">
+          <div className="flex justify-center mb-3 flex-shrink-0">
+            {/* Single Score Card */}
+            <Card className="glow-effect border-neon-purple/50 transition-all duration-500 max-w-md w-full">
+              <CardHeader className="pb-2 text-center">
+                <CardTitle className="flex items-center justify-center gap-2 text-neon-purple text-base">
+                  <TrendingUp className="w-4 h-4" />
+                  SCORE
+                </CardTitle>
+                <div className="text-xs text-muted-foreground">({resumeRatings.length} votes)</div>
+              </CardHeader>
+              <CardContent className="pb-3">
+                <div className="text-center space-y-3">
+                  <div className="text-4xl font-bold text-neon-orange">
+                    {allStats.average.toFixed(1)}
+                  </div>
+                  <div>
+                    <StarRating value={Math.round(allStats.average)} readonly size="md" />
+                  </div>
+                  
+                  {/* Category Breakdown */}
+                  <div className="space-y-2">
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      <div className="text-center">
+                        <div className="text-neon-cyan font-bold text-base">
+                          {allStats.resumeQuality.toFixed(1)}
+                        </div>
+                        <div className="text-muted-foreground">Presentation</div>
                       </div>
-                      <div className="text-muted-foreground">Presentation</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-neon-green font-bold text-base">
-                        {allStats.content.toFixed(1)}
+                      <div className="text-center">
+                        <div className="text-neon-green font-bold text-base">
+                          {allStats.content.toFixed(1)}
+                        </div>
+                        <div className="text-muted-foreground">Content</div>
                       </div>
-                      <div className="text-muted-foreground">Content</div>
                     </div>
                   </div>
                 </div>
-              </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Current Feedback Box */}
+          {currentFeedback && (
+            <Card className="mb-4 rating-glow border-neon-pink">
+              <CardContent className="p-3">
+                <div className="flex items-center gap-3">
+                  <MessageSquare className="w-5 h-5 text-neon-pink flex-shrink-0" />
+                  <div className="text-sm font-medium text-foreground">
+                    "{currentFeedback}"
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      )}
+
+      {/* Hidden Results Message */}
+      {isResultsHidden && (
+        <div className="flex-1 flex items-center justify-center">
+          <Card className="border-muted bg-muted/10">
+            <CardContent className="p-8 text-center">
+              <div className="text-4xl mb-4">🙈</div>
+              <h3 className="text-xl font-semibold text-muted-foreground mb-2">
+                Results Hidden
+              </h3>
+              <p className="text-muted-foreground">
+                Results are currently hidden by the host
+              </p>
             </CardContent>
           </Card>
         </div>
-
-        {/* Current Feedback Box */}
-        {currentFeedback && (
-          <Card className="mb-4 rating-glow border-neon-pink">
-            <CardContent className="p-3">
-              <div className="flex items-center gap-3">
-                <MessageSquare className="w-5 h-5 text-neon-pink flex-shrink-0" />
-                <div className="text-sm font-medium text-foreground">
-                  "{currentFeedback}"
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-      </div>
+      )}
     </div>
   );
 }
