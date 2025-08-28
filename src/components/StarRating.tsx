@@ -45,7 +45,7 @@ export function StarRating({
   };
 
   return (
-    <div className={cn("flex gap-1", className)}>
+    <div className={cn("flex gap-0.5 items-center justify-center", className)}>
       {[1, 2, 3, 4, 5].map((star) => {
         const isFilled = (hoverValue || value) >= star;
         return (
