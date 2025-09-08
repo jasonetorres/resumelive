@@ -157,7 +157,6 @@ export const LeadForm: React.FC<LeadFormProps> = ({ onSuccess }) => {
             last_name: data.lastName,
             email: data.email,
             job_title: data.jobTitle,
-            approval_status: 'approved' // Auto-approve if it passes validation
           }
         ])
         .select()
