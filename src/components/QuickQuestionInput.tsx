@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { validateQuestion } from '@/utils/validation';
-import { RateLimiter } from '@/utils/rateLimiter';
 import { ContentModerator } from '@/utils/contentModerator';
 import { MessageSquare, Send } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -19,7 +18,6 @@ export function QuickQuestionInput({ currentTarget }: QuickQuestionInputProps) {
   const [question, setQuestion] = useState('');
   const [authorName, setAuthorName] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [rateLimiter] = useState(() => new RateLimiter());
   const { toast } = useToast();
   const isMobile = useIsMobile();
 
@@ -50,17 +48,6 @@ export function QuickQuestionInput({ currentTarget }: QuickQuestionInputProps) {
     
     if (!question.trim() || !currentTarget) {
       console.log('QuickQuestionInput: Validation failed', { hasQuestion: !!question.trim(), hasTarget: !!currentTarget });
-      return;
-    }
-
-    // Check rate limiting
-    const rateLimitCheck = await rateLimiter.checkRateLimit('question_submission');
-    if (!rateLimitCheck.allowed) {
-      toast({
-        title: "Slow down!",
-        description: rateLimitCheck.reason,
-        variant: "destructive"
-      });
       return;
     }
 
@@ -122,11 +109,17 @@ export function QuickQuestionInput({ currentTarget }: QuickQuestionInputProps) {
       console.log('QuickQuestionInput: Question submitted successfully!');
       
       // Log the action
-      await rateLimiter.logAction('question_submission', {
-        question: moderation.filtered,
-        wasModerated: moderation.wasModerated,
-        flags: moderation.flags
-      });
+      await ContentModerator.logModerationAction(
+        'question_submission_success',
+        'question',
+        'question',
+        'Question successfully submitted',
+        { 
+          question: moderation.filtered,
+          wasModerated: moderation.wasModerated,
+          flags: moderation.flags
+        }
+      );
 
       setQuestion('');
       // Keep the author name so they don't have to re-enter it for subsequent questions

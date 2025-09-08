@@ -5,7 +5,6 @@ import { z } from 'zod';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { validateEmail, validateName, validateJobTitle } from '@/utils/validation';
-import { RateLimiter } from '@/utils/rateLimiter';
 import { ContentModerator } from '@/utils/contentModerator';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -47,7 +46,6 @@ export const LeadForm: React.FC<LeadFormProps> = ({ onSuccess }) => {
   const [leadId, setLeadId] = useState<string | null>(null);
   const [booking, setBooking] = useState<Booking | null>(null);
   const [showScheduling, setShowScheduling] = useState(false);
-  const [rateLimiter] = useState(() => new RateLimiter());
   const { toast } = useToast();
 
   // Helper function to format time in 12-hour format
@@ -82,17 +80,6 @@ export const LeadForm: React.FC<LeadFormProps> = ({ onSuccess }) => {
     setIsSubmitting(true);
     
     try {
-      // Check rate limiting first
-      const rateLimitCheck = await rateLimiter.checkRateLimit('lead_submission');
-      if (!rateLimitCheck.allowed) {
-        toast({
-          title: "Too many attempts",
-          description: rateLimitCheck.reason,
-          variant: "destructive",
-        });
-        return;
-      }
-
       // Validate email
       const emailValidation = validateEmail(data.email);
       if (!emailValidation.isValid) {
@@ -196,11 +183,13 @@ export const LeadForm: React.FC<LeadFormProps> = ({ onSuccess }) => {
       }
 
       // Log successful registration
-      await rateLimiter.logAction('lead_submission', {
-        leadId: leadData.id,
-        email: data.email,
-        name: `${data.firstName} ${data.lastName}`
-      });
+      await ContentModerator.logModerationAction(
+        'lead_submission_success',
+        leadData.id,
+        'lead',
+        'Lead successfully registered',
+        { email: data.email, name: `${data.firstName} ${data.lastName}` }
+      );
 
       // Store lead ID for potential scheduling
       setLeadId(leadData.id);

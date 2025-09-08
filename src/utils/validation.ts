@@ -276,19 +276,6 @@ export function validateQuestion(question: string): ValidationResult {
   return { isValid: true };
 }
 
-// Rate limiting utilities
-export interface RateLimit {
-  maxAttempts: number;
-  windowMinutes: number;
-}
-
-export const RATE_LIMITS: Record<string, RateLimit> = {
-  lead_submission: { maxAttempts: 3, windowMinutes: 60 }, // 3 submissions per hour
-  question_submission: { maxAttempts: 10, windowMinutes: 15 }, // 10 questions per 15 minutes
-  rating_submission: { maxAttempts: 50, windowMinutes: 15 }, // 50 ratings per 15 minutes
-  chat_message: { maxAttempts: 20, windowMinutes: 5 } // 20 chat messages per 5 minutes
-};
-
 export function generateSessionId(): string {
   return `session-${Date.now()}-${Math.random().toString(36).substring(2)}`;
 }
