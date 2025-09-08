@@ -85,20 +85,10 @@ export class ContentModerator {
   }
 
   static async checkBlockedEmail(email: string): Promise<boolean> {
-    try {
-      const domain = email.split('@')[1]?.toLowerCase();
-      
-      const { data } = await supabase
-        .from('blocked_emails')
-        .select('id')
-        .or(`email.eq.${email},domain.eq.${domain}`)
-        .limit(1);
-
-      return (data && data.length > 0) || false;
-    } catch (error) {
-      console.error('Error checking blocked emails:', error);
-      return false;
-    }
+    // Simplified check - could be expanded with a database table later
+    const blockedDomains = ['spam.com', 'fake.com', 'test.example'];
+    const domain = email.split('@')[1]?.toLowerCase();
+    return blockedDomains.includes(domain || '') || false;
   }
 
   static async logModerationAction(
@@ -109,16 +99,15 @@ export class ContentModerator {
     metadata?: any
   ): Promise<void> {
     try {
-      await supabase
-        .from('moderation_log')
-        .insert({
-          action_type: actionType,
-          target_id: targetId,
-          target_type: targetType,
-          reason: reason,
-          moderator: 'system',
-          metadata: metadata
-        });
+      // Log to console for now - could be expanded with a database table later
+      console.log('Moderation Action:', {
+        actionType,
+        targetId,
+        targetType,
+        reason,
+        metadata,
+        timestamp: new Date().toISOString()
+      });
     } catch (error) {
       console.error('Failed to log moderation action:', error);
     }
