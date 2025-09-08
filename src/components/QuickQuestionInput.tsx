@@ -5,6 +5,9 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { validateQuestion } from '@/utils/validation';
+import { RateLimiter } from '@/utils/rateLimiter';
+import { ContentModerator } from '@/utils/contentModerator';
 import { MessageSquare, Send } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -16,6 +19,7 @@ export function QuickQuestionInput({ currentTarget }: QuickQuestionInputProps) {
   const [question, setQuestion] = useState('');
   const [authorName, setAuthorName] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [rateLimiter] = useState(() => new RateLimiter());
   const { toast } = useToast();
   const isMobile = useIsMobile();
 
@@ -49,6 +53,53 @@ export function QuickQuestionInput({ currentTarget }: QuickQuestionInputProps) {
       return;
     }
 
+    // Check rate limiting
+    const rateLimitCheck = await rateLimiter.checkRateLimit('question_submission');
+    if (!rateLimitCheck.allowed) {
+      toast({
+        title: "Slow down!",
+        description: rateLimitCheck.reason,
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Validate question content
+    const questionValidation = validateQuestion(question);
+    if (!questionValidation.isValid) {
+      toast({
+        title: "Question not allowed",
+        description: questionValidation.reason,
+        variant: "destructive"
+      });
+      await ContentModerator.logModerationAction(
+        'question_validation_failed',
+        question,
+        'question',
+        questionValidation.reason || 'Question validation failed',
+        { severity: questionValidation.severity }
+      );
+      return;
+    }
+
+    // Moderate the question content
+    const moderation = ContentModerator.moderateText(question);
+    if (moderation.flags.includes('blocked')) {
+      toast({
+        title: "Question blocked",
+        description: "Your question contains inappropriate content and cannot be submitted.",
+        variant: "destructive"
+      });
+      await ContentModerator.logModerationAction(
+        'question_blocked',
+        question,
+        'question',
+        'Question blocked due to inappropriate content',
+        { flags: moderation.flags, severity: moderation.severity }
+      );
+      return;
+    }
+
     console.log('QuickQuestionInput: Starting submission...');
     setIsSubmitting(true);
     
@@ -58,8 +109,9 @@ export function QuickQuestionInput({ currentTarget }: QuickQuestionInputProps) {
         .from('questions')
         .insert({
           target_person: currentTarget,
-          question: question.trim(),
-          author_name: authorName.trim() || null
+          question: moderation.filtered,
+          author_name: authorName.trim() || null,
+          moderation_status: moderation.wasModerated ? 'pending' : 'approved'
         });
 
       if (error) {
@@ -68,6 +120,14 @@ export function QuickQuestionInput({ currentTarget }: QuickQuestionInputProps) {
       }
 
       console.log('QuickQuestionInput: Question submitted successfully!');
+      
+      // Log the action
+      await rateLimiter.logAction('question_submission', {
+        question: moderation.filtered,
+        wasModerated: moderation.wasModerated,
+        flags: moderation.flags
+      });
+
       setQuestion('');
       // Keep the author name so they don't have to re-enter it for subsequent questions
       toast({

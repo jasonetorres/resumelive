@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
 import { ScheduleManager } from "@/components/ScheduleManager";
+import { ModerationDashboard } from "@/components/ModerationDashboard";
 import { Link } from "react-router-dom";
 
 interface Lead {
@@ -40,6 +41,7 @@ export default function FormDisplay() {
   const [passwordInput, setPasswordInput] = useState("");
   const [schedulingEnabled, setSchedulingEnabled] = useState(false);
   const [showScheduleManager, setShowScheduleManager] = useState(false);
+  const [showModerationDashboard, setShowModerationDashboard] = useState(false);
   const [stats, setStats] = useState<LeadStats>({
     total: 0,
     today: 0,
@@ -443,6 +445,14 @@ export default function FormDisplay() {
               View Schedule
             </Button>
           </Link>
+            <Button 
+              onClick={() => setShowModerationDashboard(!showModerationDashboard)}
+              variant="outline" 
+              size="sm"
+              className="border-red-500 text-red-500 hover:bg-red-500/10"
+            >
+              🛡️ Security
+            </Button>
           <Button 
             onClick={handleClearAllForNewEvent}
             variant="outline" 
@@ -458,6 +468,20 @@ export default function FormDisplay() {
           </Button>
         </div>
       </div>
+
+      {/* Security/Moderation Dashboard */}
+      {showModerationDashboard && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              🛡️ Security & Moderation Dashboard
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ModerationDashboard />
+          </CardContent>
+        </Card>
+      )}
 
       {/* Scheduling Control */}
       <Card>

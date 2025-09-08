@@ -4,6 +4,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { validateEmail, validateName, validateJobTitle } from '@/utils/validation';
+import { RateLimiter } from '@/utils/rateLimiter';
+import { ContentModerator } from '@/utils/contentModerator';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -44,6 +47,7 @@ export const LeadForm: React.FC<LeadFormProps> = ({ onSuccess }) => {
   const [leadId, setLeadId] = useState<string | null>(null);
   const [booking, setBooking] = useState<Booking | null>(null);
   const [showScheduling, setShowScheduling] = useState(false);
+  const [rateLimiter] = useState(() => new RateLimiter());
   const { toast } = useToast();
 
   // Helper function to format time in 12-hour format
@@ -78,6 +82,84 @@ export const LeadForm: React.FC<LeadFormProps> = ({ onSuccess }) => {
     setIsSubmitting(true);
     
     try {
+      // Check rate limiting first
+      const rateLimitCheck = await rateLimiter.checkRateLimit('lead_submission');
+      if (!rateLimitCheck.allowed) {
+        toast({
+          title: "Too many attempts",
+          description: rateLimitCheck.reason,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Validate email
+      const emailValidation = validateEmail(data.email);
+      if (!emailValidation.isValid) {
+        toast({
+          title: "Invalid email",
+          description: emailValidation.reason,
+          variant: "destructive",
+        });
+        await ContentModerator.logModerationAction(
+          'email_validation_failed',
+          data.email,
+          'lead',
+          emailValidation.reason || 'Email validation failed',
+          { severity: emailValidation.severity }
+        );
+        return;
+      }
+
+      // Check if email is blocked
+      const isBlocked = await ContentModerator.checkBlockedEmail(data.email);
+      if (isBlocked) {
+        toast({
+          title: "Email not allowed",
+          description: "This email address is not permitted for registration.",
+          variant: "destructive",
+        });
+        await ContentModerator.logModerationAction(
+          'blocked_email_attempt',
+          data.email,
+          'lead',
+          'Attempted to use blocked email'
+        );
+        return;
+      }
+
+      // Validate names
+      const firstNameValidation = validateName(data.firstName);
+      if (!firstNameValidation.isValid) {
+        toast({
+          title: "Invalid first name",
+          description: firstNameValidation.reason,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const lastNameValidation = validateName(data.lastName);
+      if (!lastNameValidation.isValid) {
+        toast({
+          title: "Invalid last name",
+          description: lastNameValidation.reason,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Validate job title
+      const jobTitleValidation = validateJobTitle(data.jobTitle);
+      if (!jobTitleValidation.isValid) {
+        toast({
+          title: "Invalid job title",
+          description: jobTitleValidation.reason,
+          variant: "destructive",
+        });
+        return;
+      }
+
       // Store in Supabase leads table and get the created lead ID
       const { data: leadData, error } = await supabase
         .from('leads')
@@ -88,6 +170,7 @@ export const LeadForm: React.FC<LeadFormProps> = ({ onSuccess }) => {
             last_name: data.lastName,
             email: data.email,
             job_title: data.jobTitle,
+            approval_status: 'approved' // Auto-approve if it passes validation
           }
         ])
         .select()
@@ -100,11 +183,24 @@ export const LeadForm: React.FC<LeadFormProps> = ({ onSuccess }) => {
             description: "This email has already been used to join the session.",
             variant: "destructive",
           });
+          await ContentModerator.logModerationAction(
+            'duplicate_email_attempt',
+            data.email,
+            'lead',
+            'Attempted to register with existing email'
+          );
         } else {
           throw error;
         }
         return;
       }
+
+      // Log successful registration
+      await rateLimiter.logAction('lead_submission', {
+        leadId: leadData.id,
+        email: data.email,
+        name: `${data.firstName} ${data.lastName}`
+      });
 
       // Store lead ID for potential scheduling
       setLeadId(leadData.id);
