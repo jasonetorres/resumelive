@@ -134,19 +134,19 @@ export function LiveDisplay({ ratings }: LiveDisplayProps) {
     <div className="h-full bg-gradient-to-br from-background via-background to-background/80 p-2 relative overflow-hidden flex flex-col">
       {/* Header */}
       <div className="text-center mb-4">
-        <h1 className="text-3xl font-bold bg-gradient-to-r from-neon-purple via-neon-pink to-neon-orange bg-clip-text text-transparent mb-2">
+        <h1 className="text-3xl font-bold text-foreground mb-2">
           🚀 RESUME RATINGS LIVE 🚀
         </h1>
         <p className="text-base text-muted-foreground mb-3">feedback tool for resumes, live!</p>
         <div className="flex justify-center items-center gap-6 flex-wrap">
-          <div className="flex items-center gap-2 text-neon-cyan">
+          <div className="flex items-center gap-2 text-primary">
             <Users className="w-5 h-5" />
             <span className="text-lg font-semibold">{displayedRatings.filter(r => r.overall > 0).length} Live Votes</span>
           </div>
           
           {agreementStats.total > 0 && (
             <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2 text-neon-green">
+              <div className="flex items-center gap-2 text-primary">
                 <ThumbsUp className="w-4 h-4" />
                 <span className="font-semibold">{agreementStats.agree}</span>
               </div>
@@ -164,9 +164,9 @@ export function LiveDisplay({ ratings }: LiveDisplayProps) {
         <div className="flex-1 overflow-hidden">
           <div className="flex justify-center mb-3 flex-shrink-0">
             {/* Single Score Card */}
-            <Card className="glow-effect border-neon-purple/50 transition-all duration-500 max-w-md w-full">
+            <Card className="glow-effect transition-all duration-500 max-w-md w-full">
               <CardHeader className="pb-2 text-center">
-                <CardTitle className="flex items-center justify-center gap-2 text-neon-purple text-base">
+                <CardTitle className="flex items-center justify-center gap-2 text-primary text-base">
                   <TrendingUp className="w-4 h-4" />
                   SCORE
                 </CardTitle>
@@ -174,7 +174,7 @@ export function LiveDisplay({ ratings }: LiveDisplayProps) {
               </CardHeader>
               <CardContent className="pb-3">
                 <div className="text-center space-y-4">
-                  <div className="text-5xl font-bold text-neon-orange mb-2">
+                  <div className="text-5xl font-bold text-primary mb-2">
                     {allStats.average.toFixed(1)}
                   </div>
                   <div className="flex justify-center items-center gap-1">
@@ -186,7 +186,7 @@ export function LiveDisplay({ ratings }: LiveDisplayProps) {
                           fill={isFilled ? "currentColor" : "none"}
                           className={`w-6 h-6 transition-all duration-300 ${
                             isFilled 
-                              ? "text-neon-orange drop-shadow-[0_0_8px_hsl(var(--neon-orange))]" 
+                              ? "text-primary drop-shadow-[0_0_8px_hsl(var(--primary))]" 
                               : "text-muted-foreground/40"
                           }`}
                         />
@@ -203,10 +203,10 @@ export function LiveDisplay({ ratings }: LiveDisplayProps) {
 
           {/* Current Feedback Box */}
           {currentFeedback && (
-            <Card className="mb-4 rating-glow border-neon-pink">
+            <Card className="mb-4 rating-glow border-primary">
               <CardContent className="p-3">
                 <div className="flex items-center gap-3">
-                  <MessageSquare className="w-5 h-5 text-neon-pink flex-shrink-0" />
+                  <MessageSquare className="w-5 h-5 text-primary flex-shrink-0" />
                   <div className="text-sm font-medium text-foreground">
                     "{currentFeedback}"
                   </div>

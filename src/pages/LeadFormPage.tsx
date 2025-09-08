@@ -32,7 +32,7 @@ const LeadFormPage = () => {
               alt="Conference Logo" 
               className="w-12 h-12 sm:w-14 sm:h-14"
             />
-            <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-neon-purple to-neon-pink bg-clip-text text-transparent">
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
               Conference Registration
             </h1>
             <img 

@@ -18,7 +18,7 @@ const Index = () => {
               alt="Stream Ratings Logo" 
               className="w-16 h-16"
             />
-            <h1 className="text-6xl font-bold bg-gradient-to-r from-neon-purple via-neon-pink to-neon-orange bg-clip-text text-transparent">
+            <h1 className="text-6xl font-bold text-foreground">
               Resume Ratings
             </h1>
             <img 
@@ -33,12 +33,12 @@ const Index = () => {
         </div>
 
         {/* Resume Upload Section */}
-        <Card className="glow-effect border-neon-orange/50 hover:border-neon-orange transition-all duration-300 mb-8">
+        <Card className="glow-effect transition-all duration-300 mb-8">
           <CardHeader className="text-center">
-            <div className="mx-auto mb-4 w-16 h-16 bg-gradient-to-r from-neon-orange to-neon-pink rounded-full flex items-center justify-center">
+            <div className="mx-auto mb-4 w-16 h-16 bg-primary rounded-full flex items-center justify-center">
               <Upload className="w-8 h-8 text-white" weight="bold" />
             </div>
-            <CardTitle className="text-2xl text-neon-orange">Upload Resume</CardTitle>
+            <CardTitle className="text-2xl text-primary">Upload Resume</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground text-center mb-4">
@@ -50,19 +50,19 @@ const Index = () => {
 
         {/* Main Cards */}
         <div className="grid md:grid-cols-3 gap-8 mb-12">
-          <Card className="glow-effect border-neon-purple/50 hover:border-neon-purple transition-all duration-300">
+          <Card className="glow-effect transition-all duration-300">
             <CardHeader className="text-center">
-              <div className="mx-auto mb-4 w-16 h-16 bg-gradient-to-r from-neon-purple to-neon-pink rounded-full flex items-center justify-center">
+              <div className="mx-auto mb-4 w-16 h-16 bg-primary rounded-full flex items-center justify-center">
                 <DeviceMobile className="w-8 h-8 text-white" weight="bold" />
               </div>
-              <CardTitle className="text-2xl text-neon-purple">Rate Content</CardTitle>
+              <CardTitle className="text-2xl text-primary">Rate Content</CardTitle>
             </CardHeader>
             <CardContent className="text-center space-y-4">
               <p className="text-muted-foreground">
                 Viewers use this page to submit live ratings for resumes and LinkedIn profiles
               </p>
               <Link to="/rate">
-                <Button className="w-full bg-gradient-to-r from-neon-purple to-neon-pink hover:from-neon-pink hover:to-neon-purple text-primary-foreground glow-effect">
+                <Button className="w-full bg-primary hover:opacity-90 text-primary-foreground glow-effect">
                   Open Rating Page
                   <Lightning className="w-4 h-4 ml-2" weight="fill" />
                 </Button>
@@ -70,19 +70,19 @@ const Index = () => {
             </CardContent>
           </Card>
 
-          <Card className="glow-effect border-neon-green/50 hover:border-neon-green transition-all duration-300">
+          <Card className="glow-effect transition-all duration-300">
             <CardHeader className="text-center">
-              <div className="mx-auto mb-4 w-16 h-16 bg-gradient-to-r from-neon-green to-neon-cyan rounded-full flex items-center justify-center">
+              <div className="mx-auto mb-4 w-16 h-16 bg-primary rounded-full flex items-center justify-center">
                 <Monitor className="w-8 h-8 text-white" weight="bold" />
               </div>
-              <CardTitle className="text-2xl text-neon-green">Host Panel</CardTitle>
+              <CardTitle className="text-2xl text-primary">Host Panel</CardTitle>
             </CardHeader>
             <CardContent className="text-center space-y-4">
               <p className="text-muted-foreground">
                 Host controls for soundboard, resume switching, and display management
               </p>
               <Link to="/host">
-                <Button className="w-full bg-gradient-to-r from-neon-green to-neon-cyan hover:from-neon-cyan hover:to-neon-green text-primary-foreground glow-effect">
+                <Button className="w-full bg-primary hover:opacity-90 text-primary-foreground glow-effect">
                   Open Host Panel
                   <Lightning className="w-4 h-4 ml-2" weight="fill" />
                 </Button>
@@ -90,19 +90,19 @@ const Index = () => {
             </CardContent>
           </Card>
 
-          <Card className="glow-effect border-neon-cyan/50 hover:border-neon-cyan transition-all duration-300">
+          <Card className="glow-effect transition-all duration-300">
             <CardHeader className="text-center">
-              <div className="mx-auto mb-4 w-16 h-16 bg-gradient-to-r from-neon-cyan to-neon-green rounded-full flex items-center justify-center">
+              <div className="mx-auto mb-4 w-16 h-16 bg-primary rounded-full flex items-center justify-center">
                 <Monitor className="w-8 h-8 text-white" weight="bold" />
               </div>
-              <CardTitle className="text-2xl text-neon-cyan">Stream Display</CardTitle>
+              <CardTitle className="text-2xl text-primary">Stream Display</CardTitle>
             </CardHeader>
             <CardContent className="text-center space-y-4">
               <p className="text-muted-foreground">
                 Real-time display for your stream overlay showing live ratings and feedback
               </p>
               <Link to="/display">
-                <Button className="w-full bg-gradient-to-r from-neon-cyan to-neon-green hover:from-neon-green hover:to-neon-cyan text-primary-foreground glow-effect">
+                <Button className="w-full bg-primary hover:opacity-90 text-primary-foreground glow-effect">
                   Open Display
                   <Monitor className="w-4 h-4 ml-2" weight="bold" />
                 </Button>

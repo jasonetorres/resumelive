@@ -113,7 +113,7 @@ export function RatingInput({ onSubmit, currentTarget }: RatingInputProps) {
       {/* Quick Reactions Section - Outside the voting form */}
       <Card className="glow-effect border-neon-orange/30 bg-card/90 backdrop-blur">
         <CardHeader className="text-center pb-4">
-          <CardTitle className="text-xl bg-gradient-to-r from-neon-orange to-neon-pink bg-clip-text text-transparent">
+          <CardTitle className="text-xl text-primary">
             Quick Reactions
           </CardTitle>
           <p className="text-sm text-muted-foreground">
@@ -153,7 +153,7 @@ export function RatingInput({ onSubmit, currentTarget }: RatingInputProps) {
       {currentTarget ? (
         <Card className="glow-effect border-neon-purple/30 bg-card/90 backdrop-blur">
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl bg-gradient-to-r from-neon-purple to-neon-pink bg-clip-text text-transparent">
+            <CardTitle className="text-2xl text-primary">
               Cast Your Vote
             </CardTitle>
           </CardHeader>

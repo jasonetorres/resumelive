@@ -90,7 +90,7 @@ export function VotingForm({ onSubmit, currentTarget }: VotingFormProps) {
   return (
     <Card className="glow-effect border-neon-purple/30 bg-card/90 backdrop-blur">
       <CardHeader className="text-center">
-        <CardTitle className="text-2xl bg-gradient-to-r from-neon-purple to-neon-pink bg-clip-text text-transparent">
+        <CardTitle className="text-2xl text-primary">
           Cast Your Vote
         </CardTitle>
       </CardHeader>
@@ -119,8 +119,8 @@ export function VotingForm({ onSubmit, currentTarget }: VotingFormProps) {
         </div>
 
         {averageRating > 0 && (
-          <div className="text-center p-4 rounded-lg bg-gradient-to-r from-neon-purple/20 to-neon-pink/20 border border-neon-purple/30">
-            <div className="text-2xl font-bold text-neon-orange">
+          <div className="text-center p-4 rounded-lg bg-secondary border border-border">
+            <div className="text-2xl font-bold text-primary">
               {averageRating.toFixed(1)}/5
             </div>
             <div className="text-sm text-muted-foreground">Average Score</div>
@@ -155,7 +155,7 @@ export function VotingForm({ onSubmit, currentTarget }: VotingFormProps) {
         <Button
           onClick={handleSubmit}
           disabled={isSubmitting || overall === 0 || resumeQuality === 0 || layout === 0 || content === 0}
-          className="w-full bg-gradient-to-r from-neon-purple to-neon-pink hover:from-neon-pink hover:to-neon-purple text-primary-foreground font-bold py-3 glow-effect transform transition-all duration-200 hover:scale-105 active:scale-95"
+          className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-3 glow-effect transform transition-all duration-200 hover:scale-105 active:scale-95"
         >
           {isSubmitting ? (
             <div className="flex items-center gap-2">

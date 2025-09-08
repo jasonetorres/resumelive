@@ -87,7 +87,7 @@ export function MobileVotingForm({ onSubmit, currentTarget }: MobileVotingFormPr
   return (
     <Card className="glow-effect border-neon-purple/30 bg-card/90 backdrop-blur">
       <CardHeader className="text-center pb-4">
-        <CardTitle className="text-xl bg-gradient-to-r from-neon-purple to-neon-pink bg-clip-text text-transparent">
+        <CardTitle className="text-xl text-primary">
           Cast Your Vote
         </CardTitle>
       </CardHeader>
@@ -152,8 +152,8 @@ export function MobileVotingForm({ onSubmit, currentTarget }: MobileVotingFormPr
 
         {/* Average Score Display */}
         {averageRating > 0 && (
-          <div className="text-center p-4 rounded-lg bg-gradient-to-r from-neon-purple/20 to-neon-pink/20 border border-neon-purple/30">
-            <div className="text-2xl font-bold text-neon-orange">
+          <div className="text-center p-4 rounded-lg bg-secondary border border-border">
+            <div className="text-2xl font-bold text-primary">
               {averageRating.toFixed(1)}/5
             </div>
             <div className="text-sm text-muted-foreground">Average Score</div>
@@ -191,7 +191,7 @@ export function MobileVotingForm({ onSubmit, currentTarget }: MobileVotingFormPr
         <Button
           onClick={handleSubmit}
           disabled={isSubmitting || overall === 0 || resumeQuality === 0 || layout === 0 || content === 0}
-          className="w-full bg-gradient-to-r from-neon-purple to-neon-pink hover:from-neon-pink hover:to-neon-purple font-bold py-3 text-base glow-effect"
+          className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-3 text-base glow-effect"
         >
           {isSubmitting ? (
             <div className="flex items-center gap-2">
