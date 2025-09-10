@@ -97,8 +97,7 @@ export function QuickQuestionInput({ currentTarget }: QuickQuestionInputProps) {
         .insert({
           target_person: currentTarget,
           question: moderation.filtered,
-          author_name: authorName.trim() || null,
-          moderation_status: moderation.wasModerated ? 'pending' : 'approved'
+          author_name: authorName.trim() || null
         });
 
       if (error) {
