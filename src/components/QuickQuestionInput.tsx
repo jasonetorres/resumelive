@@ -59,13 +59,6 @@ export function QuickQuestionInput({ currentTarget }: QuickQuestionInputProps) {
         description: questionValidation.reason,
         variant: "destructive"
       });
-      await ContentModerator.logModerationAction(
-        'question_validation_failed',
-        question,
-        'question',
-        questionValidation.reason || 'Question validation failed',
-        { severity: questionValidation.severity }
-      );
       return;
     }
 
@@ -77,13 +70,6 @@ export function QuickQuestionInput({ currentTarget }: QuickQuestionInputProps) {
         description: "Your question contains inappropriate content and cannot be submitted.",
         variant: "destructive"
       });
-      await ContentModerator.logModerationAction(
-        'question_blocked',
-        question,
-        'question',
-        'Question blocked due to inappropriate content',
-        { flags: moderation.flags, severity: moderation.severity }
-      );
       return;
     }
 
@@ -107,19 +93,6 @@ export function QuickQuestionInput({ currentTarget }: QuickQuestionInputProps) {
 
       console.log('QuickQuestionInput: Question submitted successfully!');
       
-      // Log the action
-      await ContentModerator.logModerationAction(
-        'question_submission_success',
-        'question',
-        'question',
-        'Question successfully submitted',
-        { 
-          question: moderation.filtered,
-          wasModerated: moderation.wasModerated,
-          flags: moderation.flags
-        }
-      );
-
       setQuestion('');
       // Keep the author name so they don't have to re-enter it for subsequent questions
       toast({

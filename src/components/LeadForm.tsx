@@ -164,17 +164,78 @@ export const LeadForm: React.FC<LeadFormProps> = ({ onSuccess }) => {
 
       if (error) {
         if (error.code === '23505') { // Unique constraint violation
+          // Email already exists - let them "log back in"
+          const { data: existingLead, error: fetchError } = await supabase
+            .from('leads')
+            .select('*')
+            .eq('email', data.email)
+            .single();
+
+          if (fetchError) {
+            toast({
+              title: "Error",
+              description: "Failed to retrieve your information. Please try again.",
+              variant: "destructive",
+            });
+            return;
+          }
+
+          // Store the existing lead data
+          setLeadId(existingLead.id);
+          
+          // Store in session storage
+          sessionStorage.setItem('leadData', JSON.stringify({
+            firstName: existingLead.first_name || data.firstName,
+            lastName: existingLead.last_name || data.lastName,
+            email: existingLead.email,
+            jobTitle: existingLead.job_title,
+            submittedAt: existingLead.created_at,
+            leadId: existingLead.id,
+          }));
+          
           toast({
-            title: "Email already registered",
-            description: "This email has already been used to join the session.",
-            variant: "destructive",
+            title: "Welcome back! 👋",
+            description: "We found your previous registration. You're all set!",
           });
-          await ContentModerator.logModerationAction(
-            'duplicate_email_attempt',
-            data.email,
-            'lead',
-            'Attempted to register with existing email'
-          );
+
+          // Check if they have an existing booking
+          const { data: existingBooking } = await supabase
+            .from('bookings')
+            .select(`
+              id,
+              time_slots (*)
+            `)
+            .eq('lead_id', existingLead.id)
+            .single();
+
+          if (existingBooking) {
+            // They have a booking, show it
+            setBooking({
+              id: existingBooking.id,
+              time_slot: existingBooking.time_slots as any
+            });
+          } else {
+            // Check if scheduling is enabled for new booking
+            const { data: settings } = await supabase
+              .from('scheduling_settings')
+              .select('scheduling_enabled')
+              .eq('id', 1)
+              .single();
+
+            if (settings?.scheduling_enabled) {
+              setShowScheduling(true);
+            } else {
+              // Use the existing lead data for the form
+              const formData = {
+                firstName: existingLead.first_name || data.firstName,
+                lastName: existingLead.last_name || data.lastName,
+                email: existingLead.email,
+                jobTitle: existingLead.job_title
+              };
+              onSuccess(formData);
+            }
+          }
+          return;
         } else {
           throw error;
         }
