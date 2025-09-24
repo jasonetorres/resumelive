@@ -8,6 +8,8 @@ interface LeadFormData {
   lastName: string;
   email: string;
   jobTitle: string;
+  skills?: string;
+  experienceLevel?: string;
 }
 
 const LeadFormPage = () => {

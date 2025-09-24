@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -15,18 +15,22 @@ import { Loader2, Users, Trophy, CheckCircle, Calendar } from 'lucide-react';
 import { ScheduleBooking } from './ScheduleBooking';
 import { format, parse } from 'date-fns';
 import { parseISO } from 'date-fns';
+import { ATSAnalyzer } from '@/utils/atsAnalyzer';
+import { ATSScoreDisplay } from './ATSScoreDisplay';
 
 const leadSchema = z.object({
   firstName: z.string().min(2, 'First name must be at least 2 characters'),
   lastName: z.string().min(2, 'Last name must be at least 2 characters'),
   email: z.string().email('Please enter a valid email address'),
   jobTitle: z.string().min(2, 'Job title must be at least 2 characters'),
+  skills: z.string().optional(),
+  experienceLevel: z.string().optional(),
 });
 
 type LeadFormData = z.infer<typeof leadSchema>;
 
 interface LeadFormProps {
-  onSuccess: (leadData: LeadFormData) => void;
+  onSuccess: (leadData: LeadFormData & { skills?: string; experienceLevel?: string }) => void;
 }
 
 interface TimeSlot {
@@ -46,6 +50,8 @@ export const LeadForm: React.FC<LeadFormProps> = ({ onSuccess }) => {
   const [leadId, setLeadId] = useState<string | null>(null);
   const [booking, setBooking] = useState<Booking | null>(null);
   const [showScheduling, setShowScheduling] = useState(false);
+  const [atsEnabled, setAtsEnabled] = useState(false);
+  const [atsAnalysis, setAtsAnalysis] = useState<any>(null);
   const { toast } = useToast();
 
   // Helper function to format time in 12-hour format
@@ -73,8 +79,25 @@ export const LeadForm: React.FC<LeadFormProps> = ({ onSuccess }) => {
       lastName: '',
       email: '',
       jobTitle: '',
+      skills: '',
+      experienceLevel: '',
     },
   });
+
+  // Check if ATS is enabled
+  useEffect(() => {
+    const checkATSEnabled = async () => {
+      const { data } = await supabase
+        .from('ats_settings')
+        .select('ats_enabled')
+        .eq('id', 1)
+        .single();
+      
+      setAtsEnabled(data?.ats_enabled || false);
+    };
+    
+    checkATSEnabled();
+  }, []);
 
   const onSubmit = async (data: LeadFormData) => {
     setIsSubmitting(true);
@@ -147,18 +170,38 @@ export const LeadForm: React.FC<LeadFormProps> = ({ onSuccess }) => {
         return;
       }
 
+      // Prepare lead data with ATS analysis if enabled
+      const leadData: any = {
+        name: `${data.firstName} ${data.lastName}`, // Keep name for backward compatibility
+        first_name: data.firstName,
+        last_name: data.lastName,
+        email: data.email,
+        job_title: data.jobTitle,
+      };
+
+      // If ATS is enabled and we have skills/experience, add them and analyze
+      if (atsEnabled) {
+        if (data.skills) {
+          const skillsArray = data.skills.split(',').map(s => s.trim()).filter(s => s);
+          leadData.skills = skillsArray;
+          
+          // Perform ATS analysis
+          const analysis = ATSAnalyzer.analyzeText(`${data.jobTitle} ${data.skills} ${data.experienceLevel || ''}`);
+          leadData.ats_score = analysis.score;
+          leadData.keywords = analysis.keywordsFound;
+          
+          setAtsAnalysis(analysis);
+        }
+        
+        if (data.experienceLevel) {
+          leadData.experience_level = data.experienceLevel;
+        }
+      }
+
       // Store in Supabase leads table and get the created lead ID
-      const { data: leadData, error } = await supabase
+      const { data: newLead, error } = await supabase
         .from('leads')
-        .insert([
-          {
-            name: `${data.firstName} ${data.lastName}`, // Keep name for backward compatibility
-            first_name: data.firstName,
-            last_name: data.lastName,
-            email: data.email,
-            job_title: data.jobTitle,
-          }
-        ])
+        .insert([leadData])
         .select()
         .single();
 
@@ -191,6 +234,8 @@ export const LeadForm: React.FC<LeadFormProps> = ({ onSuccess }) => {
             jobTitle: existingLead.job_title,
             submittedAt: existingLead.created_at,
             leadId: existingLead.id,
+            skills: data.skills,
+            experienceLevel: data.experienceLevel,
           }));
           
           toast({
@@ -230,7 +275,9 @@ export const LeadForm: React.FC<LeadFormProps> = ({ onSuccess }) => {
                 firstName: existingLead.first_name || data.firstName,
                 lastName: existingLead.last_name || data.lastName,
                 email: existingLead.email,
-                jobTitle: existingLead.job_title
+                jobTitle: existingLead.job_title,
+                skills: data.skills,
+                experienceLevel: data.experienceLevel,
               };
               onSuccess(formData);
             }
@@ -242,17 +289,17 @@ export const LeadForm: React.FC<LeadFormProps> = ({ onSuccess }) => {
         return;
       }
 
-      // Log successful registration
+      // Log successful registration  
       await ContentModerator.logModerationAction(
         'lead_submission_success',
-        leadData.id,
+        newLead.id,
         'lead',
         'Lead successfully registered',
         { email: data.email, name: `${data.firstName} ${data.lastName}` }
       );
 
       // Store lead ID for potential scheduling
-      setLeadId(leadData.id);
+      setLeadId(newLead.id);
 
       // Check if scheduling is enabled
       const { data: settings } = await supabase
@@ -265,7 +312,7 @@ export const LeadForm: React.FC<LeadFormProps> = ({ onSuccess }) => {
       sessionStorage.setItem('leadData', JSON.stringify({
         ...data,
         submittedAt: new Date().toISOString(),
-        leadId: leadData.id,
+        leadId: newLead.id,
       }));
       
       toast({
@@ -476,6 +523,53 @@ export const LeadForm: React.FC<LeadFormProps> = ({ onSuccess }) => {
           )}
         />
 
+        {atsEnabled && (
+          <>
+            <FormField
+              control={form.control}
+              name="skills"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm">Skills (Optional)</FormLabel>
+                  <FormControl>
+                    <Input 
+                      placeholder="JavaScript, React, Node.js, etc." 
+                      {...field}
+                      disabled={isSubmitting}
+                      className="border-muted-foreground/20 focus:border-neon-purple h-9"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="experienceLevel"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm">Experience Level (Optional)</FormLabel>
+                  <FormControl>
+                    <select
+                      {...field}
+                      disabled={isSubmitting}
+                      className="w-full p-2 bg-background border border-muted-foreground/20 text-foreground rounded-md h-9 focus:border-neon-purple"
+                    >
+                      <option value="">Select experience level</option>
+                      <option value="entry">Entry Level (0-2 years)</option>
+                      <option value="mid">Mid Level (3-5 years)</option>
+                      <option value="senior">Senior Level (6-10 years)</option>
+                      <option value="lead">Lead/Principal (10+ years)</option>
+                    </select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </>
+        )}
+
         <Button 
           type="submit" 
           className="w-full bg-gradient-to-r from-neon-purple to-neon-pink hover:from-neon-purple/80 hover:to-neon-pink/80 text-white font-semibold mt-4 h-9"
@@ -494,6 +588,17 @@ export const LeadForm: React.FC<LeadFormProps> = ({ onSuccess }) => {
           )}
         </Button>
       </form>
+
+      {atsAnalysis && (
+        <div className="mt-6">
+          <ATSScoreDisplay
+            score={atsAnalysis.score}
+            formattingScore={atsAnalysis.formattingScore}
+            skillsExtracted={atsAnalysis.skillsExtracted}
+            suggestions={atsAnalysis.suggestions}
+          />
+        </div>
+      )}
     </Form>
   );
 };

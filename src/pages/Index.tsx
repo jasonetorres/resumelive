@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { Star, Users, Monitor, DeviceMobile, Lightning, TrendUp, Upload } from 'phosphor-react';
 import { ResumeManager } from '@/components/ResumeManager';
 import { RealtimeTest } from '@/components/RealtimeTest';
+import { ATSToggle } from '@/components/ATSToggle';
 
 const Index = () => {
   return (
@@ -47,6 +48,11 @@ const Index = () => {
             <ResumeManager className="max-w-4xl mx-auto" />
           </CardContent>
         </Card>
+
+        {/* ATS Toggle Section */}
+        <div className="mb-8">
+          <ATSToggle />
+        </div>
 
         {/* Main Cards */}
         <div className="grid md:grid-cols-3 gap-8 mb-12">

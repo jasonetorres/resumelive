@@ -14,6 +14,24 @@ export type Database = {
   }
   public: {
     Tables: {
+      ats_settings: {
+        Row: {
+          ats_enabled: boolean
+          id: number
+          updated_at: string
+        }
+        Insert: {
+          ats_enabled?: boolean
+          id?: number
+          updated_at?: string
+        }
+        Update: {
+          ats_enabled?: boolean
+          id?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       bookings: {
         Row: {
           created_at: string
@@ -121,33 +139,45 @@ export type Database = {
       }
       leads: {
         Row: {
+          ats_score: number | null
           created_at: string
           email: string
+          experience_level: string | null
           first_name: string | null
           id: string
           job_title: string
+          keywords: string[] | null
           last_name: string | null
           name: string
+          skills: string[] | null
           updated_at: string
         }
         Insert: {
+          ats_score?: number | null
           created_at?: string
           email: string
+          experience_level?: string | null
           first_name?: string | null
           id?: string
           job_title: string
+          keywords?: string[] | null
           last_name?: string | null
           name: string
+          skills?: string[] | null
           updated_at?: string
         }
         Update: {
+          ats_score?: number | null
           created_at?: string
           email?: string
+          experience_level?: string | null
           first_name?: string | null
           id?: string
           job_title?: string
+          keywords?: string[] | null
           last_name?: string | null
           name?: string
+          skills?: string[] | null
           updated_at?: string
         }
         Relationships: []
@@ -247,6 +277,45 @@ export type Database = {
           presentation?: number | null
           reaction?: string | null
           target_person?: string
+        }
+        Relationships: []
+      }
+      resume_analysis: {
+        Row: {
+          analysis_data: Json | null
+          ats_score: number | null
+          created_at: string
+          formatting_score: number | null
+          id: string
+          keywords_found: string[] | null
+          lead_id: string
+          resume_id: string | null
+          skills_extracted: string[] | null
+          suggestions: string[] | null
+        }
+        Insert: {
+          analysis_data?: Json | null
+          ats_score?: number | null
+          created_at?: string
+          formatting_score?: number | null
+          id?: string
+          keywords_found?: string[] | null
+          lead_id: string
+          resume_id?: string | null
+          skills_extracted?: string[] | null
+          suggestions?: string[] | null
+        }
+        Update: {
+          analysis_data?: Json | null
+          ats_score?: number | null
+          created_at?: string
+          formatting_score?: number | null
+          id?: string
+          keywords_found?: string[] | null
+          lead_id?: string
+          resume_id?: string | null
+          skills_extracted?: string[] | null
+          suggestions?: string[] | null
         }
         Relationships: []
       }
