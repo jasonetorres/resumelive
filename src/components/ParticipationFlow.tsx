@@ -25,21 +25,21 @@ export function ParticipationFlow({ currentTarget, onSubmitRating }: Participati
   
   return (
     <div className="space-y-6">
-      {/* 1. Quick Reactions - First */}
+      {/* 1. Upload Your Resume - First */}
+      <PersonalResumeUploader />
+      
+      {/* 2. Quick Reactions - Second */}
       <QuickReactions />
       
-      {/* 2. Cast Your Vote - Second (Mobile optimized) */}
+      {/* 3. Cast Your Vote - Third (Mobile optimized) */}
       {isMobile ? (
         <MobileVotingForm onSubmit={onSubmitRating} currentTarget={currentTarget} />
       ) : (
         <VotingForm onSubmit={onSubmitRating} currentTarget={currentTarget} />
       )}
       
-      {/* 3. Quick Question Input - Third */}
+      {/* 4. Quick Question Input - Fourth */}
       <QuickQuestionInput currentTarget={currentTarget} />
-      
-      {/* 4. Upload Your Resume - Fourth */}
-      <PersonalResumeUploader />
     </div>
   );
 }
