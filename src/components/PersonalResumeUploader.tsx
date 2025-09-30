@@ -97,6 +97,11 @@ export function PersonalResumeUploader({ className, onUploadSuccess }: PersonalR
     setUploadedFiles(prev => prev.filter((_, i) => i !== index));
   };
 
+  // Hide component after successful upload
+  if (uploadedFiles.length > 0) {
+    return null;
+  }
+
   return (
     <div className={className}>
       <Card className="border-neon-purple/20 glow-effect">
