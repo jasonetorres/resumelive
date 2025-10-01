@@ -122,16 +122,19 @@ export type Database = {
       display_settings: {
         Row: {
           id: number
+          orientation: string
           results_hidden: boolean
           updated_at: string
         }
         Insert: {
           id?: number
+          orientation?: string
           results_hidden?: boolean
           updated_at?: string
         }
         Update: {
           id?: number
+          orientation?: string
           results_hidden?: boolean
           updated_at?: string
         }

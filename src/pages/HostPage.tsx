@@ -7,6 +7,7 @@ import { ResumeController } from "@/components/ResumeController";
 import { DisplayController } from "@/components/DisplayController";
 import { HostQuestionControls } from "@/components/HostQuestionControls";
 import { SignupToggle } from "@/components/SignupToggle";
+import { OrientationToggle } from "@/components/OrientationToggle";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "react-router-dom";
@@ -172,6 +173,7 @@ const HostPage = () => {
         </Card>
 
         <SignupToggle />
+        <OrientationToggle />
         </div>
 
         {/* Navigation Section */}

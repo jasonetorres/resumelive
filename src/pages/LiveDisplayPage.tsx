@@ -51,6 +51,7 @@ const LiveDisplayPage = () => {
   const [showResumeView, setShowResumeView] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [passwordInput, setPasswordInput] = useState('');
+  const [orientation, setOrientation] = useState<'landscape' | 'portrait'>('landscape');
 
   // Get the rating page URL for QR code - now points to registration form
   const ratingPageUrl = `${window.location.origin}/register`;
@@ -107,6 +108,39 @@ const LiveDisplayPage = () => {
     };
 
     fetchInitialData();
+
+    // Subscribe to orientation changes
+    const orientationChannel = supabase
+      .channel('orientation-changes-display')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'display_settings'
+        },
+        (payload) => {
+          console.log('LiveDisplayPage: Orientation change received:', payload);
+          const newOrientation = payload.new.orientation as 'landscape' | 'portrait';
+          setOrientation(newOrientation || 'landscape');
+        }
+      )
+      .subscribe();
+
+    // Fetch initial orientation
+    const fetchOrientation = async () => {
+      const { data } = await supabase
+        .from('display_settings')
+        .select('orientation')
+        .eq('id', 1)
+        .maybeSingle();
+      
+      if (data) {
+        setOrientation((data.orientation as 'landscape' | 'portrait') || 'landscape');
+      }
+    };
+
+    fetchOrientation();
 
     // Subscribe to target changes
     const targetChannel = supabase
@@ -210,6 +244,7 @@ const LiveDisplayPage = () => {
     return () => {
       supabase.removeChannel(targetChannel);
       supabase.removeChannel(ratingsChannel);
+      supabase.removeChannel(orientationChannel);
     };
   }, []); // Remove currentTarget dependency to avoid race conditions
 
@@ -415,9 +450,9 @@ const LiveDisplayPage = () => {
 
         {/* Main Content Area - Full Height */}
         <div className="flex-1 overflow-hidden">
-          <ResizablePanelGroup direction="horizontal" className="h-full">
-            {/* Resume Display Panel - Left Side */}
-            <ResizablePanel defaultSize={70} minSize={60}>
+          <ResizablePanelGroup direction={orientation === 'portrait' ? 'vertical' : 'horizontal'} className="h-full">
+            {/* Resume Display Panel */}
+            <ResizablePanel defaultSize={orientation === 'portrait' ? 70 : 70} minSize={60}>
               <div className="h-full flex flex-col bg-card">
                 <div className="p-3 border-b border-border bg-card/80 flex-shrink-0">
                   <h2 className="text-lg font-semibold text-center">Currently Reviewing: {selectedResume.name}</h2>
@@ -442,59 +477,107 @@ const LiveDisplayPage = () => {
             
             <ResizableHandle withHandle />
             
-            {/* Live Display Sidebar - Right Side */}
+            {/* Live Display Sidebar/Bottom */}
             <ResizablePanel defaultSize={30} minSize={25}>
               <div className="h-full flex flex-col bg-card">
-                {/* QR Code Section - Fixed */}
-                <div className="p-2 border-b border-border bg-card/80 flex-shrink-0">
-                  <div className="text-center">
-                    <QRCodeGenerator 
-                      url={ratingPageUrl} 
-                      title="Scan to Rate"
-                      size={80}
-                    />
-                  </div>
-                </div>
+                {orientation === 'portrait' ? (
+                  // Portrait mode - horizontal layout
+                  <div className="h-full flex flex-row">
+                    {/* QR Code Section */}
+                    <div className="p-2 border-r border-border bg-card/80 flex-shrink-0 flex items-center justify-center">
+                      <div className="text-center">
+                        <QRCodeGenerator 
+                          url={ratingPageUrl} 
+                          title="Scan to Rate"
+                          size={80}
+                        />
+                      </div>
+                    </div>
 
-                {/* Resizable Content Area */}
-                <div className="flex-1 min-h-0">
-                  <ResizablePanelGroup direction="vertical">
-                    {/* Live Ratings Section - Resizable */}
-                    <ResizablePanel defaultSize={70} minSize={40}>
-                      <div className="h-full flex flex-col bg-card/80">
-                        <div className="p-2 border-b border-border flex-shrink-0">
-                          <div className="flex items-center justify-between">
-                            <h3 className="text-sm font-semibold flex items-center gap-2">
-                              <Bell className="w-3 h-3 text-neon-pink" />
-                              Ratings ({transformedRatings.length})
-                            </h3>
-                            <Badge variant="outline" className="text-xs">Live</Badge>
-                          </div>
-                        </div>
-                        <div className="flex-1 overflow-auto p-2">
-                          <LiveDisplay ratings={transformedRatings} />
-                        </div>
-                      </div>
-                    </ResizablePanel>
-                    
-                    <ResizableHandle />
-                    
-                    {/* Questions Section - Resizable */}
-                    <ResizablePanel defaultSize={30} minSize={20}>
-                      <div className="h-full flex flex-col bg-card/80">
-                        <div className="p-2 bg-card/80 flex-shrink-0 border-b border-border">
+                    {/* Live Ratings Section - Horizontal */}
+                    <div className="flex-1 flex flex-col bg-card/80 border-r border-border">
+                      <div className="p-2 border-b border-border flex-shrink-0">
+                        <div className="flex items-center justify-between">
                           <h3 className="text-sm font-semibold flex items-center gap-2">
-                            <MessageSquare className="w-3 h-3 text-neon-cyan" />
-                            Questions
+                            <Bell className="w-3 h-3 text-neon-pink" />
+                            Ratings ({transformedRatings.length})
                           </h3>
-                        </div>
-                        <div className="flex-1 overflow-auto p-2 min-h-0">
-                          <QuestionsSection currentTarget={currentTarget} />
+                          <Badge variant="outline" className="text-xs">Live</Badge>
                         </div>
                       </div>
-                    </ResizablePanel>
-                  </ResizablePanelGroup>
-                </div>
+                      <div className="flex-1 overflow-auto p-2">
+                        <LiveDisplay ratings={transformedRatings} />
+                      </div>
+                    </div>
+                    
+                    {/* Questions Section - Horizontal */}
+                    <div className="flex-1 flex flex-col bg-card/80">
+                      <div className="p-2 bg-card/80 flex-shrink-0 border-b border-border">
+                        <h3 className="text-sm font-semibold flex items-center gap-2">
+                          <MessageSquare className="w-3 h-3 text-neon-cyan" />
+                          Questions
+                        </h3>
+                      </div>
+                      <div className="flex-1 overflow-auto p-2">
+                        <QuestionsSection currentTarget={currentTarget} />
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  // Landscape mode - vertical layout (original)
+                  <>
+                    {/* QR Code Section - Fixed */}
+                    <div className="p-2 border-b border-border bg-card/80 flex-shrink-0">
+                      <div className="text-center">
+                        <QRCodeGenerator 
+                          url={ratingPageUrl} 
+                          title="Scan to Rate"
+                          size={80}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Resizable Content Area */}
+                    <div className="flex-1 min-h-0">
+                      <ResizablePanelGroup direction="vertical">
+                        {/* Live Ratings Section - Resizable */}
+                        <ResizablePanel defaultSize={70} minSize={40}>
+                          <div className="h-full flex flex-col bg-card/80">
+                            <div className="p-2 border-b border-border flex-shrink-0">
+                              <div className="flex items-center justify-between">
+                                <h3 className="text-sm font-semibold flex items-center gap-2">
+                                  <Bell className="w-3 h-3 text-neon-pink" />
+                                  Ratings ({transformedRatings.length})
+                                </h3>
+                                <Badge variant="outline" className="text-xs">Live</Badge>
+                              </div>
+                            </div>
+                            <div className="flex-1 overflow-auto p-2">
+                              <LiveDisplay ratings={transformedRatings} />
+                            </div>
+                          </div>
+                        </ResizablePanel>
+                        
+                        <ResizableHandle />
+                        
+                        {/* Questions Section - Resizable */}
+                        <ResizablePanel defaultSize={30} minSize={20}>
+                          <div className="h-full flex flex-col bg-card/80">
+                            <div className="p-2 bg-card/80 flex-shrink-0 border-b border-border">
+                              <h3 className="text-sm font-semibold flex items-center gap-2">
+                                <MessageSquare className="w-3 h-3 text-neon-cyan" />
+                                Questions
+                              </h3>
+                            </div>
+                            <div className="flex-1 overflow-auto p-2 min-h-0">
+                              <QuestionsSection currentTarget={currentTarget} />
+                            </div>
+                          </div>
+                        </ResizablePanel>
+                      </ResizablePanelGroup>
+                    </div>
+                  </>
+                )}
               </div>
             </ResizablePanel>
           </ResizablePanelGroup>
