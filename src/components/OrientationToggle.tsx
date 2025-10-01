@@ -94,7 +94,13 @@ export const OrientationToggle = () => {
   };
 
   if (loading) {
-    return null;
+    return (
+      <Card>
+        <CardContent className="flex items-center justify-center p-6">
+          <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+        </CardContent>
+      </Card>
+    );
   }
 
   return (
