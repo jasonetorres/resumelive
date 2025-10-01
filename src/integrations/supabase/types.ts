@@ -364,6 +364,24 @@ export type Database = {
         }
         Relationships: []
       }
+      signup_settings: {
+        Row: {
+          id: number
+          signup_enabled: boolean
+          updated_at: string
+        }
+        Insert: {
+          id?: number
+          signup_enabled?: boolean
+          updated_at?: string
+        }
+        Update: {
+          id?: number
+          signup_enabled?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
       sounds: {
         Row: {
           created_at: string
