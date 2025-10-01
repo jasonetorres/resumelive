@@ -425,13 +425,13 @@ const LiveDisplayPage = () => {
                 <div className="flex-1 p-4 overflow-hidden">
                   {selectedResume.file_type === 'application/pdf' ? (
                     <iframe
-                      src={`https://docs.google.com/viewer?url=${encodeURIComponent(`https://kotkjuhregqhczxhsynd.supabase.co/storage/v1/object/public/resumes/${selectedResume.file_path}`)}&embedded=true`}
+                      src={`https://docs.google.com/viewer?url=${encodeURIComponent(`${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/resumes/${selectedResume.file_path}`)}&embedded=true`}
                       className="w-full h-full border-0 rounded"
                       title={selectedResume.name}
                     />
                   ) : (
                     <img
-                      src={`https://kotkjuhregqhczxhsynd.supabase.co/storage/v1/object/public/resumes/${selectedResume.file_path}`}
+                      src={`${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/resumes/${selectedResume.file_path}`}
                       alt={selectedResume.name}
                       className="w-full h-full object-contain rounded"
                     />
