@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Upload, FileText, X, Eye, Download, Edit, Trash2, Plus, RefreshCw } from 'lucide-react';
+import { Upload, FileText, X, Eye, Download, CreditCard as Edit, Trash2, Plus, RefreshCw } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -197,7 +197,8 @@ export function ResumeManager({ className }: ResumeManagerProps) {
   };
 
   const getFileUrl = (filePath: string) => {
-    return `https://kpufipcunkgfpxhnhxxl.supabase.co/storage/v1/object/public/resumes/${filePath}`;
+    const { data } = supabase.storage.from('resumes').getPublicUrl(filePath);
+    return data.publicUrl;
   };
 
   const formatFileSize = (bytes: number) => {
