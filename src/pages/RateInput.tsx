@@ -6,7 +6,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Users, Wifi, AlertCircle } from 'lucide-react';
+import { Users, Wifi, CircleAlert as AlertCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface RatingData {
@@ -24,19 +24,35 @@ const RateInputPage = () => {
   const [currentTarget, setCurrentTarget] = useState<string | null>(null);
   const [participantCount, setParticipantCount] = useState(0);
   const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(true); // Force refresh
+  const [isLoading, setIsLoading] = useState(true);
   const [hasCompletedRegistration, setHasCompletedRegistration] = useState(false);
+  const [signupEnabled, setSignupEnabled] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check if user has completed registration
-    const registrationCompleted = sessionStorage.getItem('leadCompleted');
-    if (!registrationCompleted) {
-      // Redirect to registration if not completed
-      navigate('/register');
-      return;
-    }
-    setHasCompletedRegistration(true);
+    // Check signup settings first
+    const checkSignupSettings = async () => {
+      const { data } = await supabase
+        .from('signup_settings')
+        .select('signup_enabled')
+        .eq('id', 1)
+        .maybeSingle();
+
+      const signupRequired = data?.signup_enabled ?? true;
+      setSignupEnabled(signupRequired);
+
+      // Only check registration if signup is enabled
+      if (signupRequired) {
+        const registrationCompleted = sessionStorage.getItem('leadCompleted');
+        if (!registrationCompleted) {
+          navigate('/register');
+          return;
+        }
+      }
+      setHasCompletedRegistration(true);
+    };
+
+    checkSignupSettings();
 
     // Fetch current target
     const fetchCurrentTarget = async () => {
@@ -91,7 +107,7 @@ const RateInputPage = () => {
       console.log('RateInputPage: Cleaning up subscription');
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [navigate, toast]);
 
   // Separate effect for presence tracking
   useEffect(() => {

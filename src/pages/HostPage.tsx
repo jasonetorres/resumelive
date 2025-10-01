@@ -6,10 +6,11 @@ import { Soundboard } from "@/components/Soundboard";
 import { ResumeController } from "@/components/ResumeController";
 import { DisplayController } from "@/components/DisplayController";
 import { HostQuestionControls } from "@/components/HostQuestionControls";
+import { SignupToggle } from "@/components/SignupToggle";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "react-router-dom";
-import { Home, Monitor, Star, Users, Calendar, Database, ExternalLink } from "lucide-react";
+import { Chrome as Home, Monitor, Star, Users, Calendar, Database, ExternalLink } from "lucide-react";
 
 const HostPage = () => {
   const { toast } = useToast();
@@ -169,6 +170,8 @@ const HostPage = () => {
             <HostQuestionControls currentTarget={currentTarget} />
           </CardContent>
         </Card>
+
+        <SignupToggle />
         </div>
 
         {/* Navigation Section */}
