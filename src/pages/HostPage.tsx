@@ -194,7 +194,7 @@ const HostPage = () => {
                 </Button>
               </Link>
               
-              <Link to="/live-display">
+              <Link to="/display">
                 <Button variant="outline" className="w-full h-16 flex flex-col gap-1">
                   <Monitor className="h-5 w-5" />
                   <span className="text-xs">Live Display</span>
@@ -208,7 +208,7 @@ const HostPage = () => {
                 </Button>
               </Link>
               
-              <Link to="/lead-form">
+              <Link to="/register">
                 <Button variant="outline" className="w-full h-16 flex flex-col gap-1">
                   <Users className="h-5 w-5" />
                   <span className="text-xs">Lead Form</span>
