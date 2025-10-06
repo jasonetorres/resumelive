@@ -110,36 +110,21 @@ export function FloatingQuestions({ currentTarget }: FloatingQuestionsProps) {
   }, [currentTarget]);
 
   return (
-    <div className="fixed bottom-4 right-4 z-20 max-w-md space-y-3 pointer-events-none">
+    <div className="fixed bottom-4 right-4 z-20 max-w-md space-y-3 pointer-events-none flex flex-col items-start">
       {floatingQuestions.map((floatingQuestion) => (
         <div
           key={floatingQuestion.id}
-          className="animate-in slide-in-from-right duration-300 pointer-events-none"
+          className="bg-primary/90 text-primary-foreground rounded-2xl rounded-bl-sm px-4 py-3 shadow-lg animate-fade-in pointer-events-auto max-w-[85%]"
         >
-          <div className="backdrop-blur-sm text-white px-6 py-4 rounded-xl shadow-2xl border-2" style={{ backgroundColor: '#0044ff', borderColor: '#0044ff' }}>
-            {/* Question Header */}
-            <div className="flex items-center gap-3 mb-2">
-              <MessageSquare className="w-6 h-6 text-neon-cyan flex-shrink-0" />
-              <span className="text-lg font-bold text-neon-cyan">Question</span>
-              {floatingQuestion.upvotes > 0 && (
-                <div className="flex items-center gap-1 ml-auto bg-white/20 px-2 py-1 rounded-full">
-                  <ThumbsUp className="w-4 h-4" />
-                  <span className="text-sm font-bold">{floatingQuestion.upvotes}</span>
-                </div>
-              )}
-            </div>
-            
-            {/* Question Content */}
-            <div className="text-lg font-semibold break-words leading-snug mb-2">
-              {floatingQuestion.question}
-            </div>
-            
-            {/* Author */}
+          <p className="text-sm mb-1 break-words">{floatingQuestion.question}</p>
+          <div className="flex items-center justify-between gap-3 mt-2">
             {floatingQuestion.author_name && (
-              <div className="text-sm text-white/80 italic">
-                — {floatingQuestion.author_name}
-              </div>
+              <p className="text-xs opacity-80">— {floatingQuestion.author_name}</p>
             )}
+            <div className="flex items-center gap-1 text-xs opacity-80">
+              <ThumbsUp className="w-3 h-3" />
+              <span>{floatingQuestion.upvotes}</span>
+            </div>
           </div>
         </div>
       ))}
