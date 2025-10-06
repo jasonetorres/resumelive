@@ -110,45 +110,36 @@ export function FloatingQuestions({ currentTarget }: FloatingQuestionsProps) {
   }, [currentTarget]);
 
   return (
-    <div className="fixed inset-0 pointer-events-none z-20 overflow-hidden">
+    <div className="fixed bottom-4 right-4 z-20 max-w-md space-y-3 pointer-events-none">
       {floatingQuestions.map((floatingQuestion) => (
         <div
           key={floatingQuestion.id}
-          className="absolute animate-float-up pointer-events-none"
-          style={{
-            left: `${floatingQuestion.x}%`,
-            top: `${floatingQuestion.y}%`,
-            animationDuration: '30s',
-            animationTimingFunction: 'linear'
-          }}
+          className="animate-in slide-in-from-right duration-300 pointer-events-none"
         >
-          <div className="backdrop-blur-sm text-white px-12 py-8 rounded-3xl shadow-2xl border-4 max-w-2xl" style={{ backgroundColor: '#0044ff', borderColor: '#0044ff' }}>
+          <div className="backdrop-blur-sm text-white px-6 py-4 rounded-xl shadow-2xl border-2" style={{ backgroundColor: '#0044ff', borderColor: '#0044ff' }}>
             {/* Question Header */}
-            <div className="flex items-center gap-4 mb-4">
-              <MessageSquare className="w-10 h-10 text-neon-cyan flex-shrink-0" />
-              <span className="text-2xl font-bold text-neon-cyan">Question</span>
+            <div className="flex items-center gap-3 mb-2">
+              <MessageSquare className="w-6 h-6 text-neon-cyan flex-shrink-0" />
+              <span className="text-lg font-bold text-neon-cyan">Question</span>
               {floatingQuestion.upvotes > 0 && (
-                <div className="flex items-center gap-2 ml-auto bg-white/20 px-4 py-2 rounded-full">
-                  <ThumbsUp className="w-6 h-6" />
-                  <span className="text-xl font-bold">{floatingQuestion.upvotes}</span>
+                <div className="flex items-center gap-1 ml-auto bg-white/20 px-2 py-1 rounded-full">
+                  <ThumbsUp className="w-4 h-4" />
+                  <span className="text-sm font-bold">{floatingQuestion.upvotes}</span>
                 </div>
               )}
             </div>
             
             {/* Question Content */}
-            <div className="text-3xl font-bold break-words leading-relaxed mb-4">
+            <div className="text-lg font-semibold break-words leading-snug mb-2">
               {floatingQuestion.question}
             </div>
             
             {/* Author */}
             {floatingQuestion.author_name && (
-              <div className="text-lg text-white/80 italic">
+              <div className="text-sm text-white/80 italic">
                 — {floatingQuestion.author_name}
               </div>
             )}
-            
-            {/* Question bubble tail */}
-            <div className="absolute -bottom-4 left-12 w-8 h-8 rotate-45 border-r-4 border-b-4" style={{ backgroundColor: '#0044ff', borderColor: '#0044ff' }}></div>
           </div>
         </div>
       ))}

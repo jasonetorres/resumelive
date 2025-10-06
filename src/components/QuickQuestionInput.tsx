@@ -46,8 +46,26 @@ export function QuickQuestionInput({ currentTarget }: QuickQuestionInputProps) {
   const handleSubmitQuestion = async () => {
     console.log('QuickQuestionInput: handleSubmitQuestion called', { question: question.trim(), currentTarget });
     
-    if (!question.trim() || !currentTarget) {
-      console.log('QuickQuestionInput: Validation failed', { hasQuestion: !!question.trim(), hasTarget: !!currentTarget });
+    if (!question.trim()) {
+      toast({
+        title: "Question Required",
+        description: "Please enter a question before submitting",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!authorName.trim()) {
+      toast({
+        title: "Name Required",
+        description: "Please enter your name before submitting",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!currentTarget) {
+      console.log('QuickQuestionInput: Validation failed - no target');
       return;
     }
 
@@ -141,13 +159,12 @@ export function QuickQuestionInput({ currentTarget }: QuickQuestionInputProps) {
       <CardContent className="space-y-3">
         <div className="grid gap-3">
           <Input
-            placeholder="Your name (optional)"
+            placeholder="Your name (required)"
             value={authorName}
             onChange={(e) => setAuthorName(e.target.value)}
             className="bg-input/50 border-neon-blue/30 focus:border-neon-blue"
             maxLength={50}
-            readOnly={!!authorName}
-            disabled={!!authorName}
+            required
           />
           <Textarea
             placeholder="What would you like to ask this presenter?"
@@ -167,7 +184,7 @@ export function QuickQuestionInput({ currentTarget }: QuickQuestionInputProps) {
               console.log('QuickQuestionInput: Button clicked');
               handleSubmitQuestion();
             }}
-            disabled={!question.trim() || isSubmitting}
+            disabled={!question.trim() || !authorName.trim() || isSubmitting}
             className="bg-gradient-to-r from-neon-blue to-neon-cyan hover:from-neon-cyan hover:to-neon-blue text-primary-foreground font-medium"
             size={isMobile ? "sm" : "default"}
           >
