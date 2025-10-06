@@ -40,21 +40,24 @@ export const ScheduleManager: React.FC = () => {
   const [isAddingSlot, setIsAddingSlot] = useState(false);
   const [isGeneratingSlots, setIsGeneratingSlots] = useState(false);
   
-  // Helper function to format time in 12-hour format
+  // Helper function to format time in 12-hour format (handles HH:mm and HH:mm:ss)
   const formatTime = (timeString: string | null | undefined) => {
     if (!timeString || typeof timeString !== 'string') {
       return 'Invalid time';
     }
-    
     try {
-      const date = parse(timeString, 'HH:mm', new Date());
-      if (isNaN(date.getTime())) {
-        return timeString; // Return original if parsing fails
+      const parts = timeString.split(':');
+      const hours = parseInt(parts[0], 10);
+      const minutes = parseInt(parts[1], 10);
+      if (isNaN(hours) || isNaN(minutes)) {
+        return timeString;
       }
+      const date = new Date();
+      date.setHours(hours, minutes, 0, 0);
       return format(date, 'h:mm a');
     } catch (error) {
       console.error('Error formatting time:', timeString, error);
-      return timeString; // Return original if formatting fails
+      return timeString;
     }
   };
 

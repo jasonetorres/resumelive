@@ -42,17 +42,20 @@ export default function SchedulePage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [passwordInput, setPasswordInput] = useState('');
 
-  // Helper function to format time in 12-hour format
+  // Helper function to format time in 12-hour format (handles HH:mm and HH:mm:ss)
   const formatTime = (timeString: string | null | undefined) => {
     if (!timeString || typeof timeString !== 'string') {
       return 'Invalid time';
     }
-    
     try {
-      const date = parse(timeString, 'HH:mm', new Date());
-      if (isNaN(date.getTime())) {
+      const parts = timeString.split(':');
+      const hours = parseInt(parts[0], 10);
+      const minutes = parseInt(parts[1], 10);
+      if (isNaN(hours) || isNaN(minutes)) {
         return timeString;
       }
+      const date = new Date();
+      date.setHours(hours, minutes, 0, 0);
       return format(date, 'h:mm a');
     } catch (error) {
       console.error('Error formatting time:', timeString, error);
