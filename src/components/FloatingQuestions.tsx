@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { MessageSquare, ThumbsUp } from 'lucide-react';
 
 interface FloatingQuestion {
   id: string;
@@ -117,15 +116,9 @@ export function FloatingQuestions({ currentTarget }: FloatingQuestionsProps) {
           className="bg-primary/90 text-primary-foreground rounded-2xl rounded-bl-sm px-4 py-3 shadow-lg animate-fade-in pointer-events-auto max-w-[85%]"
         >
           <p className="text-sm mb-1 break-words">{floatingQuestion.question}</p>
-          <div className="flex items-center justify-between gap-3 mt-2">
-            {floatingQuestion.author_name && (
-              <p className="text-xs opacity-80">— {floatingQuestion.author_name}</p>
-            )}
-            <div className="flex items-center gap-1 text-xs opacity-80">
-              <ThumbsUp className="w-3 h-3" />
-              <span>{floatingQuestion.upvotes}</span>
-            </div>
-          </div>
+          {floatingQuestion.author_name && (
+            <p className="text-xs opacity-80 mt-2">— {floatingQuestion.author_name}</p>
+          )}
         </div>
       ))}
     </div>
