@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ParticipationFlow } from '@/components/ParticipationFlow';
 import { ScheduledBookingBanner } from '@/components/ScheduledBookingBanner';
+import { ScheduleAdvanceBanner } from '@/components/ScheduleAdvanceBanner';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
@@ -212,6 +213,9 @@ const RateInputPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 flex items-center justify-center p-3 sm:p-4">
       <div className="w-full max-w-lg">
+        {/* Schedule in Advance Banner */}
+        <ScheduleAdvanceBanner />
+        
         {/* Scheduled Booking Banner */}
         <ScheduledBookingBanner />
         
