@@ -51,12 +51,12 @@ export function FloatingQuestions({ currentTarget }: FloatingQuestionsProps) {
     console.log('FloatingQuestions: New question created:', newFloatingQuestion);
     setFloatingQuestions(prev => [...prev, newFloatingQuestion]);
 
-    // Remove the question after 30 seconds (longer for better readability)
+    // Remove the question after 15 seconds
     setTimeout(() => {
       console.log('FloatingQuestions: Removing question:', questionId);
       setFloatingQuestions(prev => prev.filter(fq => fq.id !== questionId));
       processedQuestions.current.delete(questionId);
-    }, 30000);
+    }, 15000);
   };
 
   useEffect(() => {
