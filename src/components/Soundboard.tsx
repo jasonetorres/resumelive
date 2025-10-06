@@ -15,7 +15,7 @@ const SOUND_OPTIONS = [
   { name: "woosh", emoji: "💨", label: "Woosh" },
   { name: "fanfare", emoji: "🎺", label: "Fanfare" },
   { name: "boing", emoji: "🌀", label: "Boing" },
-  { name: "cricket", emoji: "🦗", label: "Cricket" },
+  { name: "crickets", emoji: "🦗", label: "Cricket" },
   { name: "trombone", emoji: "📯", label: "Sad Trombone" },
   { name: "confetti", emoji: "🎉", label: "Confetti" },
   { name: "buzzer", emoji: "❌", label: "Buzzer" },
@@ -32,10 +32,8 @@ const Soundboard = () => {
     try {
       console.log(`Soundboard: Playing sound ${soundName}`);
       
-      // Play the actual audio sound
-      await audioManager.playSound(soundName);
-      
-      // Also send to database for visual effects on display
+      // Only send to database for visual effects on display
+      // The display will play the sound via FloatingSounds component
       const { error } = await supabase
         .from('sounds')
         .insert({
