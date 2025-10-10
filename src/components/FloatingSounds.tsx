@@ -14,7 +14,7 @@ const SOUND_EMOJIS: Record<string, string> = {
   airhorn: "📯",
   drumroll: "🥁",
   ding: "🔔",
-  woosh: "👎",
+  hatedit: "👎",
   fanfare: "🎺",
   toolman: "😕",
   crickets: "🦗",
@@ -34,12 +34,12 @@ export const FloatingSounds = () => {
       emoji,
       position: {
         left: Math.random() * 80 + 10, // 10% to 90%
-        top: Math.random() * 60 + 20,  // 20% to 80%
+        top: Math.random() * 60 + 20, // 20% to 80%
       },
       timestamp: Date.now(),
     };
 
-    setFloatingSounds(prev => [...prev, newSound]);
+    setFloatingSounds((prev) => [...prev, newSound]);
 
     // Play the sound on the display
     audioManager.playSound(soundName);
@@ -47,26 +47,26 @@ export const FloatingSounds = () => {
 
     // Remove after animation duration
     setTimeout(() => {
-      setFloatingSounds(prev => prev.filter(sound => sound.id !== newSound.id));
+      setFloatingSounds((prev) => prev.filter((sound) => sound.id !== newSound.id));
     }, 3000);
   };
 
   useEffect(() => {
     const channel = supabase
-      .channel('schema-db-changes')
+      .channel("schema-db-changes")
       .on(
-        'postgres_changes',
+        "postgres_changes",
         {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'sounds',
+          event: "INSERT",
+          schema: "public",
+          table: "sounds",
         },
         (payload) => {
           const soundData = payload.new as { sound_name: string; target_person: string };
-          if (soundData.target_person === 'GLOBAL') {
+          if (soundData.target_person === "GLOBAL") {
             addFloatingSound(soundData.sound_name);
           }
-        }
+        },
       )
       .subscribe();
 
@@ -84,7 +84,7 @@ export const FloatingSounds = () => {
           style={{
             left: `${sound.position.left}%`,
             top: `${sound.position.top}%`,
-            animation: 'bounceAndFade 3s ease-out forwards',
+            animation: "bounceAndFade 3s ease-out forwards",
           }}
         >
           {sound.emoji}
