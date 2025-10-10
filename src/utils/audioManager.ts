@@ -59,7 +59,7 @@ class AudioManager {
       airhorn: '/sounds/airhorn.mp3',
       drumroll: '/sounds/drumroll.mp3',
       ding: '/sounds/ding.mp3',
-      hatedit: '/sounds/hated%20it.mp3',
+      hatedit: '/sounds/hated-it.mp3',
       fanfare: '/sounds/fanfare.mp3',
       toolman: '/sounds/toolman.mp3',
       crickets: '/sounds/crickets.mp3',
