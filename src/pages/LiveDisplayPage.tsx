@@ -41,7 +41,6 @@ interface Resume {
 }
 
 const LiveDisplayPage = () => {
-  console.log('LiveDisplayPage: Component starting to render');
   const { toast } = useToast();
   const [ratings, setRatings] = useState<Rating[]>([]);
   const [currentTarget, setCurrentTarget] = useState<string | null>(null);
@@ -52,6 +51,13 @@ const LiveDisplayPage = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [passwordInput, setPasswordInput] = useState('');
   const [orientation, setOrientation] = useState<'landscape' | 'portrait'>('landscape');
+
+  console.log('LiveDisplayPage: Component render');
+  console.log('  isAuthenticated:', isAuthenticated);
+  console.log('  showResumeView:', showResumeView);
+  console.log('  selectedResume:', selectedResume?.name || 'null');
+  console.log('  currentTarget:', currentTarget);
+  console.log('  ratings count:', ratings.length);
 
   // Get the rating page URL for QR code - now points to registration form
   const ratingPageUrl = `${window.location.origin}/register`;
