@@ -20,6 +20,12 @@ interface Rating {
 const LiveDisplayPage = () => {
   const [ratings, setRatings] = useState<Rating[]>([]);
   const [currentTarget, setCurrentTarget] = useState<string | null>(null);
+  const currentTargetRef = React.useRef<string | null>(null);
+
+  // Keep ref in sync with state
+  useEffect(() => {
+    currentTargetRef.current = currentTarget;
+  }, [currentTarget]);
 
   useEffect(() => {
     // Fetch initial data
@@ -58,17 +64,20 @@ const LiveDisplayPage = () => {
           table: 'current_target'
         },
         async (payload) => {
+          console.log('LiveDisplayPage: Target change received:', payload);
           const newTarget = payload.new.target_person;
           setCurrentTarget(newTarget);
           
           // Fetch ratings for new target
           if (newTarget) {
+            console.log('LiveDisplayPage: Fetching ratings for new target:', newTarget);
             const { data: ratingsData } = await (supabase as any)
               .from('ratings')
               .select('*')
               .eq('target_person', newTarget)
               .order('created_at', { ascending: false });
             
+            console.log('LiveDisplayPage: Updated ratings for new target:', ratingsData);
             setRatings((ratingsData || []) as Rating[]);
           } else {
             setRatings([]);
@@ -77,7 +86,7 @@ const LiveDisplayPage = () => {
       )
       .subscribe();
 
-    // Subscribe to new ratings
+    // Subscribe to new ratings - keep subscription active always
     const ratingsChannel = supabase
       .channel('ratings-changes')
       .on(
@@ -90,8 +99,11 @@ const LiveDisplayPage = () => {
         (payload) => {
           const newRating = payload.new as Rating;
           console.log('LiveDisplayPage: New rating received:', newRating);
-          // Only add if it's for the current target and has actual rating data (not just quick reactions)
-          if (newRating.target_person === currentTarget && newRating.overall !== null) {
+          // Check against current target using ref (captures latest value)
+          const isForCurrentTarget = newRating.target_person === currentTargetRef.current;
+          const hasRatingData = newRating.overall !== null;
+          
+          if (isForCurrentTarget && hasRatingData) {
             console.log('LiveDisplayPage: Adding rating to display');
             setRatings(prev => [newRating, ...prev]);
           } else {
@@ -108,10 +120,9 @@ const LiveDisplayPage = () => {
         },
         (payload) => {
           const deletedRating = payload.old as Rating;
-          // Remove from current ratings if it was for current target
-          if (deletedRating.target_person === currentTarget) {
-            setRatings(prev => prev.filter(r => r.id !== deletedRating.id));
-          }
+          console.log('LiveDisplayPage: Rating deleted:', deletedRating);
+          // Always try to remove it from state
+          setRatings(prev => prev.filter(r => r.id !== deletedRating.id));
         }
       )
       .subscribe();
@@ -120,7 +131,7 @@ const LiveDisplayPage = () => {
       supabase.removeChannel(targetChannel);
       supabase.removeChannel(ratingsChannel);
     };
-  }, [currentTarget]);
+  }, []); // Remove currentTarget from dependencies to keep subscriptions stable
 
   // Transform ratings to match the LiveDisplay component's expected format
   const transformedRatings = ratings.map(rating => ({
