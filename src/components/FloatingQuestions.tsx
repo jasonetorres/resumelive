@@ -109,11 +109,11 @@ export function FloatingQuestions({ currentTarget }: FloatingQuestionsProps) {
   }, [currentTarget]);
 
   return (
-    <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-20 w-full max-w-2xl px-4 space-y-3 pointer-events-none flex flex-col items-start">
+    <div className="fixed top-20 right-4 z-20 w-full max-w-md space-y-3 pointer-events-none flex flex-col items-end">
       {floatingQuestions.map((floatingQuestion) => (
         <div
           key={floatingQuestion.id}
-          className="bg-primary/95 text-primary-foreground rounded-2xl rounded-bl-sm px-5 py-4 shadow-xl animate-fade-in pointer-events-auto w-full max-w-xl"
+          className="bg-primary/95 text-primary-foreground rounded-2xl rounded-bl-sm px-5 py-4 shadow-xl animate-fade-in pointer-events-auto w-full"
         >
           <p className="text-base mb-1 break-words">{floatingQuestion.question}</p>
           {floatingQuestion.author_name && (

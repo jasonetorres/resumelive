@@ -139,14 +139,14 @@ export function LiveDisplay({ ratings }: LiveDisplayProps) {
         </h1>
         <p className="text-base text-muted-foreground mb-3">feedback tool for resumes, live!</p>
         <div className="flex justify-center items-center gap-6 flex-wrap">
-          <div className="flex items-center gap-2 text-primary">
+          <div className="flex items-center gap-2 text-white">
             <Users className="w-5 h-5" />
             <span className="text-lg font-semibold">{displayedRatings.filter(r => r.overall > 0).length} Live Votes</span>
           </div>
           
           {agreementStats.total > 0 && (
             <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2 text-primary">
+              <div className="flex items-center gap-2 text-white">
                 <ThumbsUp className="w-4 h-4" />
                 <span className="font-semibold">{agreementStats.agree}</span>
               </div>
@@ -166,7 +166,7 @@ export function LiveDisplay({ ratings }: LiveDisplayProps) {
             {/* Single Score Card */}
             <Card className="glow-effect transition-all duration-500 max-w-md w-full">
               <CardHeader className="pb-2 text-center">
-                <CardTitle className="flex items-center justify-center gap-2 text-primary text-base">
+                <CardTitle className="flex items-center justify-center gap-2 text-white text-base">
                   <TrendingUp className="w-4 h-4" />
                   SCORE
                 </CardTitle>
@@ -174,7 +174,7 @@ export function LiveDisplay({ ratings }: LiveDisplayProps) {
               </CardHeader>
               <CardContent className="pb-3">
                 <div className="text-center space-y-4">
-                  <div className="text-5xl font-bold text-primary mb-2">
+                  <div className="text-5xl font-bold text-white mb-2">
                     {allStats.average.toFixed(1)}
                   </div>
                   <div className="flex justify-center items-center gap-1">
@@ -186,7 +186,7 @@ export function LiveDisplay({ ratings }: LiveDisplayProps) {
                           fill={isFilled ? "currentColor" : "none"}
                           className={`w-6 h-6 transition-all duration-300 ${
                             isFilled 
-                              ? "text-primary drop-shadow-[0_0_8px_hsl(var(--primary))]" 
+                              ? "text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]" 
                               : "text-muted-foreground/40"
                           }`}
                         />
