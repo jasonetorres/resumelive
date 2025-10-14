@@ -157,23 +157,25 @@ const LiveDisplayPage = () => {
           const newTarget = payload.new.target_person;
           setCurrentTarget(newTarget);
           
-          // Find and set the corresponding resume using current resumes state
-          setResumes(currentResumes => {
-            const matchingResume = currentResumes.find(r => r.name === newTarget);
+          // Fetch the matching resume directly from database
+          if (newTarget) {
+            const { data: matchingResume } = await supabase
+              .from('resumes')
+              .select('*')
+              .eq('name', newTarget)
+              .maybeSingle();
+            
             if (matchingResume) {
               console.log('LiveDisplayPage: Found matching resume:', matchingResume.name);
-              setSelectedResume(matchingResume);
+              setSelectedResume(matchingResume as Resume);
               setSelectedResumeId(matchingResume.id);
               setShowResumeView(true);
             } else {
               console.log('LiveDisplayPage: No matching resume found for:', newTarget);
               setShowResumeView(false);
             }
-            return currentResumes; // Return unchanged
-          });
-          
-          // Fetch ratings for new target (only real ratings)
-          if (newTarget) {
+            
+            // Fetch ratings for new target (only real ratings)
             const { data: ratingsData } = await (supabase as any)
               .from('ratings')
               .select('*')
@@ -185,6 +187,7 @@ const LiveDisplayPage = () => {
             console.log('LiveDisplayPage: Updated ratings for new target:', ratingsData);
           } else {
             setRatings([]);
+            setShowResumeView(false);
           }
         }
       )

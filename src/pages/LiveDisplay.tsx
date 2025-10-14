@@ -146,6 +146,10 @@ const LiveDisplayPage = () => {
     timestamp: rating.created_at
   }));
 
+  console.log('LiveDisplayPage: Component starting to render');
+  console.log('LiveDisplayPage: currentTarget =', currentTarget);
+  console.log('LiveDisplayPage: ratings count =', ratings.length);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 p-4">
       <div className="max-w-7xl mx-auto">
@@ -153,7 +157,7 @@ const LiveDisplayPage = () => {
           currentTarget={currentTarget}
           onTargetChange={setCurrentTarget}
         />
-        <LiveDisplay ratings={transformedRatings} />
+        <LiveDisplay ratings={transformedRatings} currentTarget={currentTarget} />
         {/* Direct floating reactions with current target */}
         <FloatingReactions currentTarget={currentTarget} />
       </div>

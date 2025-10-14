@@ -21,9 +21,10 @@ interface Rating {
 
 interface LiveDisplayProps {
   ratings: Rating[];
+  currentTarget?: string | null;
 }
 
-export function LiveDisplay({ ratings }: LiveDisplayProps) {
+export function LiveDisplay({ ratings, currentTarget }: LiveDisplayProps) {
   const [displayedRatings, setDisplayedRatings] = useState<Rating[]>([]);
   const [currentFeedback, setCurrentFeedback] = useState<string>('');
   const [isResultsHidden, setIsResultsHidden] = useState(false);
@@ -137,6 +138,9 @@ export function LiveDisplay({ ratings }: LiveDisplayProps) {
         <h1 className="text-2xl font-bold text-foreground mb-1">
           🚀 RESUME RATINGS LIVE 🚀
         </h1>
+        {currentTarget && (
+          <p className="text-base text-muted-foreground mb-1">Currently Reviewing: <span className="font-semibold text-foreground">{currentTarget}</span></p>
+        )}
         <p className="text-sm text-muted-foreground mb-2">feedback tool for resumes, live!</p>
         <div className="flex justify-center items-center gap-4 flex-wrap">
           <div className="flex items-center gap-2 text-white">
