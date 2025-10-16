@@ -37,7 +37,9 @@ export default function FormDisplay() {
   const [filteredLeads, setFilteredLeads] = useState<Lead[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    return localStorage.getItem('dashboardAuthenticated') === 'true';
+  });
   const [passwordInput, setPasswordInput] = useState("");
   const [schedulingEnabled, setSchedulingEnabled] = useState(false);
   const [showScheduleManager, setShowScheduleManager] = useState(false);
@@ -53,6 +55,7 @@ export default function FormDisplay() {
     e.preventDefault();
     if (passwordInput === "torcresumes") {
       setIsAuthenticated(true);
+      localStorage.setItem('dashboardAuthenticated', 'true');
       fetchSchedulingSettings();
     } else {
       toast.error("Incorrect password");

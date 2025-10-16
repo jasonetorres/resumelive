@@ -52,7 +52,9 @@ const LiveDisplayPage = () => {
   const [selectedResumeId, setSelectedResumeId] = useState<string>('');
   const [selectedResume, setSelectedResume] = useState<Resume | null>(null);
   const [showResumeView, setShowResumeView] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    return localStorage.getItem('displayAuthenticated') === 'true';
+  });
   const [passwordInput, setPasswordInput] = useState('');
   const [orientation, setOrientation] = useState<'landscape' | 'portrait'>('landscape');
 
@@ -329,6 +331,7 @@ const LiveDisplayPage = () => {
   const handlePasswordSubmit = () => {
     if (passwordInput === 'torcresumes') {
       setIsAuthenticated(true);
+      localStorage.setItem('displayAuthenticated', 'true');
       setPasswordInput('');
     } else {
       toast({
@@ -336,6 +339,7 @@ const LiveDisplayPage = () => {
         description: "Incorrect password",
         variant: "destructive"
       });
+      setPasswordInput('');
     }
   };
 

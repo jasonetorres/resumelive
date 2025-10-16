@@ -17,7 +17,9 @@ import { Chrome as Home, Monitor, Star, Users, Calendar, Database, ExternalLink 
 const HostPage = () => {
   const { toast } = useToast();
   const [currentTarget, setCurrentTarget] = useState<string | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    return localStorage.getItem('hostAuthenticated') === 'true';
+  });
   const [passwordInput, setPasswordInput] = useState('');
 
   // Debug logging
@@ -28,6 +30,7 @@ const HostPage = () => {
   const handlePasswordSubmit = () => {
     if (passwordInput === 'torcresumes') {
       setIsAuthenticated(true);
+      localStorage.setItem('hostAuthenticated', 'true');
       setPasswordInput('');
     } else {
       toast({
