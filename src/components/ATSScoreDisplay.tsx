@@ -2,7 +2,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { ATSAnalyzer } from '@/utils/atsAnalyzer';
-import { CheckCircle, AlertCircle, XCircle } from 'lucide-react';
+import { CheckCircle, AlertCircle, XCircle, Info } from 'lucide-react';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { useState } from 'react';
 
 interface ATSScoreDisplayProps {
   score: number;
@@ -19,6 +25,7 @@ export const ATSScoreDisplay = ({
 }: ATSScoreDisplayProps) => {
   const scoreColor = ATSAnalyzer.getScoreColor(score);
   const scoreLabel = ATSAnalyzer.getScoreLabel(score);
+  const [showScoringInfo, setShowScoringInfo] = useState(false);
   
   const getScoreIcon = (score: number) => {
     if (score >= 80) return <CheckCircle className="h-5 w-5 text-green-400" />;
@@ -58,6 +65,32 @@ export const ATSScoreDisplay = ({
               </div>
               <Progress value={formattingScore} className="h-2" />
             </div>
+
+            <Collapsible open={showScoringInfo} onOpenChange={setShowScoringInfo}>
+              <CollapsibleTrigger className="flex items-center gap-2 text-sm text-primary hover:text-primary/80 transition-colors">
+                <Info className="h-4 w-4" />
+                <span>How is this scored?</span>
+              </CollapsibleTrigger>
+              <CollapsibleContent className="mt-3 space-y-3 text-xs text-white/70">
+                <div>
+                  <div className="font-semibold text-white mb-1">Overall Score (100 points):</div>
+                  <ul className="space-y-1 ml-4">
+                    <li>• Skills: Up to 40 points (5 points per detected skill)</li>
+                    <li>• Action Verbs: Up to 30 points (2 points per keyword like "managed", "developed")</li>
+                    <li>• Length: 30 points for 200-800 words, 15 points otherwise</li>
+                  </ul>
+                </div>
+                <div>
+                  <div className="font-semibold text-white mb-1">Format Structure (100 points):</div>
+                  <ul className="space-y-1 ml-4">
+                    <li>• Contact Information: 25 points</li>
+                    <li>• Work Experience Section: 25 points</li>
+                    <li>• Education Section: 25 points</li>
+                    <li>• Skills Section: 25 points</li>
+                  </ul>
+                </div>
+              </CollapsibleContent>
+            </Collapsible>
           </div>
         </CardContent>
       </Card>
