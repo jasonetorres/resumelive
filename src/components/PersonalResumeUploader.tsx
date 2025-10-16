@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Upload, FileText, X, CheckCircle } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { ATSScoreDisplay } from './ATSScoreDisplay';
 
 interface PersonalResumeUploaderProps {
   className?: string;
@@ -15,7 +16,26 @@ interface PersonalResumeUploaderProps {
 export function PersonalResumeUploader({ className, onUploadSuccess }: PersonalResumeUploaderProps) {
   const [uploading, setUploading] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState<Array<{name: string, id: string}>>([]);
+  const [atsEnabled, setAtsEnabled] = useState(false);
+  const [atsAnalysis, setAtsAnalysis] = useState<any>(null);
+  const [analyzing, setAnalyzing] = useState(false);
   const { toast } = useToast();
+
+  useEffect(() => {
+    const fetchATSSettings = async () => {
+      const { data } = await supabase
+        .from('ats_settings')
+        .select('ats_enabled')
+        .eq('id', 1)
+        .single();
+      
+      if (data) {
+        setAtsEnabled(data.ats_enabled);
+      }
+    };
+    
+    fetchATSSettings();
+  }, []);
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -76,6 +96,34 @@ export function PersonalResumeUploader({ className, onUploadSuccess }: PersonalR
         title: "Upload successful! ✅",
         description: `${file.name} has been uploaded successfully.`,
       });
+
+      // Analyze resume if ATS is enabled
+      if (atsEnabled) {
+        setAnalyzing(true);
+        try {
+          const { data: analysisData, error: analysisError } = await supabase.functions.invoke('analyze-resume', {
+            body: { filePath: fileName, resumeId: data.id }
+          });
+
+          if (analysisError) throw analysisError;
+
+          setAtsAnalysis(analysisData);
+          
+          toast({
+            title: "Analysis complete! 📊",
+            description: `ATS Score: ${analysisData.score}/100`,
+          });
+        } catch (analysisError) {
+          console.error('Error analyzing resume:', analysisError);
+          toast({
+            title: "Analysis failed",
+            description: "Resume uploaded but ATS analysis could not be completed.",
+            variant: "destructive",
+          });
+        } finally {
+          setAnalyzing(false);
+        }
+      }
 
       onUploadSuccess?.();
 
@@ -139,6 +187,23 @@ export function PersonalResumeUploader({ className, onUploadSuccess }: PersonalR
               <div className="w-4 h-4 border-2 border-neon-purple border-t-transparent rounded-full animate-spin" />
               Uploading...
             </div>
+          )}
+
+          {analyzing && (
+            <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+              <div className="w-4 h-4 border-2 border-neon-green border-t-transparent rounded-full animate-spin" />
+              Analyzing resume...
+            </div>
+          )}
+
+          {/* ATS Analysis Results */}
+          {atsAnalysis && (
+            <ATSScoreDisplay
+              score={atsAnalysis.score}
+              formattingScore={atsAnalysis.formattingScore}
+              skillsExtracted={atsAnalysis.skillsExtracted}
+              suggestions={atsAnalysis.suggestions}
+            />
           )}
 
           {/* Uploaded Files This Session */}
