@@ -116,7 +116,7 @@ export function PersonalResumeUploader({ className, onUploadSuccess }: PersonalR
           <div className="border-2 border-dashed border-muted-foreground/20 rounded-lg p-4 text-center hover:border-neon-purple/50 transition-colors">
             <input
               type="file"
-              accept=".pdf,.jpg,.jpeg,.png"
+              accept="application/pdf,image/jpeg,image/png"
               onChange={handleFileUpload}
               disabled={uploading}
               className="hidden"
