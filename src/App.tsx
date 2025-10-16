@@ -9,6 +9,7 @@ import FormDisplay from "./pages/FormDisplay";
 import LeadFormPage from "./pages/LeadFormPage";
 import SchedulePage from "./pages/SchedulePage";
 import HostPage from "./pages/HostPage";
+import ATSAnalysisPage from "./pages/ATSAnalysisPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +27,7 @@ const App = () => (
           <Route path="/formdisplay" element={<FormDisplay />} />
           <Route path="/schedule" element={<SchedulePage />} />
           <Route path="/host" element={<HostPage />} />
+          <Route path="/ats" element={<ATSAnalysisPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
       </Routes>

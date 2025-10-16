@@ -12,7 +12,7 @@ import { ATSToggle } from "@/components/ATSToggle";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "react-router-dom";
-import { Chrome as Home, Monitor, Star, Users, Calendar, Database, ExternalLink } from "lucide-react";
+import { Chrome as Home, Monitor, Star, Users, Calendar, Database, ExternalLink, FileCheck } from "lucide-react";
 
 const HostPage = () => {
   const { toast } = useToast();
@@ -226,6 +226,13 @@ const HostPage = () => {
                 <Button variant="outline" className="w-full h-16 flex flex-col gap-1">
                   <Calendar className="h-5 w-5" />
                   <span className="text-xs">Schedule</span>
+                </Button>
+              </Link>
+              
+              <Link to="/ats">
+                <Button variant="outline" className="w-full h-16 flex flex-col gap-1">
+                  <FileCheck className="h-5 w-5" />
+                  <span className="text-xs">ATS Analysis</span>
                 </Button>
               </Link>
               
