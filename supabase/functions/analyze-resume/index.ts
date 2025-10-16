@@ -56,47 +56,71 @@ serve(async (req) => {
 
     console.log('File downloaded, processing with AI...');
 
-    // Convert file to base64 for AI processing
-    const arrayBuffer = await fileData.arrayBuffer();
-    const base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
-    const mimeType = filePath.toLowerCase().endsWith('.pdf') ? 'application/pdf' : 'image/jpeg';
-    const dataUrl = `data:${mimeType};base64,${base64}`;
+    let extractedText = '';
+    const isPdf = filePath.toLowerCase().endsWith('.pdf');
 
-    // Use Lovable AI to extract text from the resume
-    const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${lovableApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
-        messages: [
-          {
-            role: 'user',
-            content: [
-              {
-                type: 'text',
-                text: 'Extract all text content from this resume. Return only the extracted text, no formatting or commentary.'
-              },
-              {
-                type: 'image_url',
-                image_url: { url: dataUrl }
-              }
-            ]
-          }
-        ],
-      }),
-    });
+    if (isPdf) {
+      // For PDFs, use document understanding without image extraction
+      const arrayBuffer = await fileData.arrayBuffer();
+      const uint8Array = new Uint8Array(arrayBuffer);
+      
+      // Try to extract basic text patterns from PDF
+      const decoder = new TextDecoder('utf-8', { fatal: false });
+      const pdfText = decoder.decode(uint8Array);
+      
+      // Extract readable text (simple heuristic - PDFs have text between stream objects)
+      const textMatches = pdfText.match(/\(([^)]+)\)/g);
+      if (textMatches) {
+        extractedText = textMatches
+          .map(match => match.slice(1, -1))
+          .join(' ')
+          .replace(/\\[nrt]/g, ' ')
+          .replace(/\s+/g, ' ');
+      }
+      
+      console.log('Extracted text length:', extractedText.length);
+    } else {
+      // For images, use AI vision
+      const arrayBuffer = await fileData.arrayBuffer();
+      const base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+      const mimeType = 'image/jpeg';
+      const dataUrl = `data:${mimeType};base64,${base64}`;
 
-    if (!aiResponse.ok) {
-      const errorText = await aiResponse.text();
-      console.error('AI API error:', aiResponse.status, errorText);
-      throw new Error(`AI API error: ${aiResponse.status}`);
+      const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${lovableApiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'google/gemini-2.5-flash',
+          messages: [
+            {
+              role: 'user',
+              content: [
+                {
+                  type: 'text',
+                  text: 'Extract all text content from this resume image. Return only the extracted text, no formatting or commentary.'
+                },
+                {
+                  type: 'image_url',
+                  image_url: { url: dataUrl }
+                }
+              ]
+            }
+          ],
+        }),
+      });
+
+      if (!aiResponse.ok) {
+        const errorText = await aiResponse.text();
+        console.error('AI API error:', aiResponse.status, errorText);
+        throw new Error(`AI API error: ${aiResponse.status}`);
+      }
+
+      const aiData = await aiResponse.json();
+      extractedText = aiData.choices?.[0]?.message?.content || '';
     }
-
-    const aiData = await aiResponse.json();
-    const extractedText = aiData.choices?.[0]?.message?.content || '';
 
     console.log('Text extracted, analyzing...');
 
