@@ -8,6 +8,7 @@ import { DisplayController } from "@/components/DisplayController";
 import { HostQuestionControls } from "@/components/HostQuestionControls";
 import { SignupToggle } from "@/components/SignupToggle";
 import { OrientationToggle } from "@/components/OrientationToggle";
+import { ATSToggle } from "@/components/ATSToggle";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "react-router-dom";
@@ -174,6 +175,7 @@ const HostPage = () => {
 
         <SignupToggle />
         <OrientationToggle />
+        <ATSToggle />
         </div>
 
         {/* Navigation Section */}
