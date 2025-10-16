@@ -505,38 +505,32 @@ const LiveDisplayPage = () => {
                   <h2 className="text-lg font-semibold text-center text-foreground">Currently Reviewing: {selectedResume.name}</h2>
                 </div>
                 <div className="flex-1 p-4 overflow-hidden relative bg-muted/20">
-                  {(() => {
-                    const fileUrl = supabase.storage.from('resumes').getPublicUrl(selectedResume.file_path).data.publicUrl;
-                    if (selectedResume.file_type === 'application/pdf') {
-                      return (
-                        <iframe
-                          src={fileUrl}
-                          className="w-full h-full border-0 rounded"
-                          title={selectedResume.name}
-                          onLoad={() => setResumeLoadError(false)}
-                          onError={() => setResumeLoadError(true)}
-                        />
-                      );
-                    }
-                    return (
-                      <img
-                        src={fileUrl}
-                        alt={selectedResume.name}
-                        className="w-full h-full object-contain rounded"
-                        onLoad={() => setResumeLoadError(false)}
-                        onError={() => setResumeLoadError(true)}
-                      />
-                    );
-                  })()}
+                  {selectedResume.file_type === 'application/pdf' ? (
+                    <iframe
+                      src={`https://docs.google.com/viewer?url=${encodeURIComponent(supabase.storage.from('resumes').getPublicUrl(selectedResume.file_path).data.publicUrl)}&embedded=true`}
+                      className="w-full h-full border-0 rounded"
+                      title={selectedResume.name}
+                      onLoad={() => setResumeLoadError(false)}
+                      onError={() => setResumeLoadError(true)}
+                    />
+                  ) : (
+                    <img
+                      src={supabase.storage.from('resumes').getPublicUrl(selectedResume.file_path).data.publicUrl}
+                      alt={selectedResume.name}
+                      className="w-full h-full object-contain rounded"
+                      onLoad={() => setResumeLoadError(false)}
+                      onError={() => setResumeLoadError(true)}
+                    />
+                  )}
                   {resumeLoadError && (
-                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                      <div className="text-center p-8 bg-card/80 rounded-lg backdrop-blur">
+                    <div className="absolute inset-0 flex items-center justify-center bg-muted/50">
+                      <div className="text-center p-8 bg-card rounded-lg border">
                         <FileText className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
                         <p className="text-sm text-muted-foreground">
                           Resume: {selectedResume.name}
                         </p>
                         <p className="text-xs text-muted-foreground mt-2">
-                          {selectedResume.file_type}
+                          Failed to load preview
                         </p>
                       </div>
                     </div>
