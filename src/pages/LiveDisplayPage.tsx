@@ -29,6 +29,10 @@ interface Rating {
   agreement?: 'agree' | 'disagree' | null;
   reaction?: string;
   created_at: string;
+  ats_score?: number;
+  ats_formatting_score?: number;
+  ats_skills?: string[];
+  ats_keywords?: string[];
 }
 
 interface Resume {
@@ -381,7 +385,11 @@ const LiveDisplayPage = () => {
     category: rating.category,
     agreement: rating.agreement,
     reaction: rating.reaction,
-    timestamp: rating.created_at
+    timestamp: rating.created_at,
+    ats_score: rating.ats_score,
+    ats_formatting_score: rating.ats_formatting_score,
+    ats_skills: rating.ats_skills,
+    ats_keywords: rating.ats_keywords,
   }));
 
   // Password protection check

@@ -17,6 +17,10 @@ interface Rating {
   agreement?: 'agree' | 'disagree' | null;
   reaction?: string;
   timestamp: string;
+  ats_score?: number;
+  ats_formatting_score?: number;
+  ats_skills?: string[];
+  ats_keywords?: string[];
 }
 
 interface LiveDisplayProps {
@@ -102,20 +106,24 @@ export function LiveDisplay({ ratings, currentTarget }: LiveDisplayProps) {
   const calculateStats = (ratings: Rating[]) => {
     // Filter out quick reactions (ratings with overall = 0)
     const realRatings = ratings.filter(r => r.overall > 0);
-    if (realRatings.length === 0) return { average: 0, resumeQuality: 0, layout: 0, content: 0 };
+    if (realRatings.length === 0) return { average: 0, resumeQuality: 0, layout: 0, content: 0, atsAverage: 0 };
     
     const sum = realRatings.reduce((acc, r) => ({
       overall: acc.overall + r.overall,
       resumeQuality: acc.resumeQuality + r.presentation, // Map presentation to resumeQuality
       layout: acc.layout + (r.content || 0), // Use content field for layout since we don't have separate field
-      content: acc.content + r.content
-    }), { overall: 0, resumeQuality: 0, layout: 0, content: 0 });
+      content: acc.content + r.content,
+      atsTotal: acc.atsTotal + (r.ats_score || 0)
+    }), { overall: 0, resumeQuality: 0, layout: 0, content: 0, atsTotal: 0 });
+    
+    const ratingsWithATS = realRatings.filter(r => r.ats_score && r.ats_score > 0).length;
     
     return {
       average: sum.overall / realRatings.length,
       resumeQuality: sum.resumeQuality / realRatings.length,
       layout: sum.layout / realRatings.length,
-      content: sum.content / realRatings.length
+      content: sum.content / realRatings.length,
+      atsAverage: ratingsWithATS > 0 ? sum.atsTotal / ratingsWithATS : 0
     };
   };
 
@@ -166,13 +174,13 @@ export function LiveDisplay({ ratings, currentTarget }: LiveDisplayProps) {
       {/* Results Section - Show/Hide based on settings */}
       {!isResultsHidden && (
         <div className="flex-shrink-0">
-          <div className="flex justify-center mb-2">
-            {/* Single Score Card */}
-            <Card className="glow-effect transition-all duration-500 max-w-sm w-full">
+          <div className="flex justify-center gap-3 mb-2">
+            {/* Resume Score Card */}
+            <Card className="glow-effect transition-all duration-500 max-w-xs w-full">
               <CardHeader className="pb-1 pt-3 text-center">
                 <CardTitle className="flex items-center justify-center gap-2 text-white text-sm">
                   <TrendingUp className="w-4 h-4" />
-                  SCORE
+                  RESUME SCORE
                 </CardTitle>
                 <div className="text-xs text-muted-foreground">({resumeRatings.length} votes)</div>
               </CardHeader>
@@ -198,11 +206,39 @@ export function LiveDisplay({ ratings, currentTarget }: LiveDisplayProps) {
                     })}
                   </div>
                   <div className="text-xs text-muted-foreground/70 font-medium">
-                    OUT OF 5 STARS
+                    Human Rating
                   </div>
                 </div>
               </CardContent>
             </Card>
+
+            {/* ATS Score Card */}
+            {allStats.atsAverage > 0 && (
+              <Card className="glow-effect transition-all duration-500 max-w-xs w-full border-primary/30">
+                <CardHeader className="pb-1 pt-3 text-center">
+                  <CardTitle className="flex items-center justify-center gap-2 text-primary text-sm">
+                    <Sparkles className="w-4 h-4" />
+                    ATS SCORE
+                  </CardTitle>
+                  <div className="text-xs text-muted-foreground">AI Analysis</div>
+                </CardHeader>
+                <CardContent className="pb-3 pt-2">
+                  <div className="text-center space-y-2">
+                    <div className="text-4xl font-bold text-primary">
+                      {Math.round(allStats.atsAverage)}
+                    </div>
+                    <div className="text-lg font-semibold text-muted-foreground">
+                      /100
+                    </div>
+                    <div className="text-xs text-muted-foreground/70 font-medium">
+                      {allStats.atsAverage >= 80 ? 'Excellent' : 
+                       allStats.atsAverage >= 60 ? 'Good' :
+                       allStats.atsAverage >= 40 ? 'Fair' : 'Needs Work'}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </div>
 
           {/* Current Feedback Box */}

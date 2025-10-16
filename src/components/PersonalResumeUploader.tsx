@@ -11,9 +11,10 @@ import { ATSScoreDisplay } from './ATSScoreDisplay';
 interface PersonalResumeUploaderProps {
   className?: string;
   onUploadSuccess?: () => void;
+  onATSAnalysisComplete?: (analysis: any) => void;
 }
 
-export function PersonalResumeUploader({ className, onUploadSuccess }: PersonalResumeUploaderProps) {
+export function PersonalResumeUploader({ className, onUploadSuccess, onATSAnalysisComplete }: PersonalResumeUploaderProps) {
   const [uploading, setUploading] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState<Array<{name: string, id: string}>>([]);
   const [atsEnabled, setAtsEnabled] = useState(false);
@@ -108,6 +109,7 @@ export function PersonalResumeUploader({ className, onUploadSuccess }: PersonalR
           if (analysisError) throw analysisError;
 
           setAtsAnalysis(analysisData);
+          onATSAnalysisComplete?.(analysisData);
           
           toast({
             title: "Analysis complete! 📊",

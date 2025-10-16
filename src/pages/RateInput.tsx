@@ -18,6 +18,10 @@ interface RatingData {
   category: 'resume' | 'linkedin';
   agreement?: 'agree' | 'disagree';
   reaction?: string;
+  atsScore?: number;
+  atsFormattingScore?: number;
+  atsSkills?: string[];
+  atsKeywords?: string[];
 }
 
 const RateInputPage = () => {
@@ -185,6 +189,10 @@ const RateInputPage = () => {
         category: rating.category,
         agreement: rating.agreement,
         reaction: rating.reaction,
+        ats_score: rating.atsScore,
+        ats_formatting_score: rating.atsFormattingScore,
+        ats_skills: rating.atsSkills,
+        ats_keywords: rating.atsKeywords,
       })
       .select();
 

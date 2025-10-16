@@ -247,6 +247,10 @@ export type Database = {
       ratings: {
         Row: {
           agreement: string | null
+          ats_formatting_score: number | null
+          ats_keywords: string[] | null
+          ats_score: number | null
+          ats_skills: string[] | null
           category: string
           content: number | null
           created_at: string
@@ -259,6 +263,10 @@ export type Database = {
         }
         Insert: {
           agreement?: string | null
+          ats_formatting_score?: number | null
+          ats_keywords?: string[] | null
+          ats_score?: number | null
+          ats_skills?: string[] | null
           category: string
           content?: number | null
           created_at?: string
@@ -271,6 +279,10 @@ export type Database = {
         }
         Update: {
           agreement?: string | null
+          ats_formatting_score?: number | null
+          ats_keywords?: string[] | null
+          ats_score?: number | null
+          ats_skills?: string[] | null
           category?: string
           content?: number | null
           created_at?: string
