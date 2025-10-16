@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { LiveDisplay } from '@/components/LiveDisplay';
 import { TargetManager } from '@/components/TargetManager';
 import { QRCodeGenerator } from '@/components/QRCodeGenerator';
@@ -57,6 +57,9 @@ const LiveDisplayPage = () => {
   });
   const [passwordInput, setPasswordInput] = useState('');
   const [orientation, setOrientation] = useState<'landscape' | 'portrait'>('landscape');
+  const [resumeLoadError, setResumeLoadError] = useState(false);
+  const [atsScore, setAtsScore] = useState<number | null>(null);
+  const lastAnalyzedResumeId = useRef<string | null>(null);
 
   console.log('LiveDisplayPage: Component render');
   console.log('  isAuthenticated:', isAuthenticated);
@@ -381,6 +384,27 @@ const LiveDisplayPage = () => {
     }
   }, [selectedResume, currentTarget]);
 
+  // Run ATS analysis when a resume is loaded for viewing (only then)
+  useEffect(() => {
+    if (!showResumeView || !selectedResume) return;
+    if (lastAnalyzedResumeId.current === selectedResume.id) return;
+    lastAnalyzedResumeId.current = selectedResume.id;
+
+    (async () => {
+      try {
+        const { data, error } = await supabase.functions.invoke('analyze-resume', {
+          body: { filePath: selectedResume.file_path, resumeId: selectedResume.id }
+        });
+        if (error) throw error;
+        setAtsScore(data?.score ?? null);
+        toast({ title: 'ATS Analysis complete', description: `Score: ${data?.score}/100` });
+      } catch (e) {
+        console.error('ATS analysis error:', e);
+        toast({ title: 'ATS analysis failed', description: 'We could not analyze this resume.', variant: 'destructive' });
+      }
+    })();
+  }, [showResumeView, selectedResume?.id]);
+
   // Transform ratings to match the LiveDisplay component's expected format
   const transformedRatings = ratings.map(rating => ({
     id: rating.id,
@@ -481,34 +505,42 @@ const LiveDisplayPage = () => {
                   <h2 className="text-lg font-semibold text-center text-foreground">Currently Reviewing: {selectedResume.name}</h2>
                 </div>
                 <div className="flex-1 p-4 overflow-hidden relative bg-muted/20">
-                  {selectedResume.file_type === 'application/pdf' ? (
-                    <iframe
-                      src={`https://docs.google.com/viewer?url=${encodeURIComponent(supabase.storage.from('resumes').getPublicUrl(selectedResume.file_path).data.publicUrl)}&embedded=true`}
-                      className="w-full h-full border-0 rounded"
-                      title={selectedResume.name}
-                      onError={() => console.error('PDF iframe failed to load')}
-                    />
-                  ) : (
-                    <img
-                      src={supabase.storage.from('resumes').getPublicUrl(selectedResume.file_path).data.publicUrl}
-                      alt={selectedResume.name}
-                      className="w-full h-full object-contain rounded"
-                      onError={() => console.error('Image failed to load')}
-                    />
-                  )}
-                  
-                  {/* Fallback for when resume doesn't load */}
-                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                    <div className="text-center p-8 bg-card/80 rounded-lg backdrop-blur">
-                      <FileText className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-                      <p className="text-sm text-muted-foreground">
-                        Resume: {selectedResume.name}
-                      </p>
-                      <p className="text-xs text-muted-foreground mt-2">
-                        {selectedResume.file_type}
-                      </p>
+                  {(() => {
+                    const fileUrl = supabase.storage.from('resumes').getPublicUrl(selectedResume.file_path).data.publicUrl;
+                    if (selectedResume.file_type === 'application/pdf') {
+                      return (
+                        <iframe
+                          src={fileUrl}
+                          className="w-full h-full border-0 rounded"
+                          title={selectedResume.name}
+                          onLoad={() => setResumeLoadError(false)}
+                          onError={() => setResumeLoadError(true)}
+                        />
+                      );
+                    }
+                    return (
+                      <img
+                        src={fileUrl}
+                        alt={selectedResume.name}
+                        className="w-full h-full object-contain rounded"
+                        onLoad={() => setResumeLoadError(false)}
+                        onError={() => setResumeLoadError(true)}
+                      />
+                    );
+                  })()}
+                  {resumeLoadError && (
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                      <div className="text-center p-8 bg-card/80 rounded-lg backdrop-blur">
+                        <FileText className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+                        <p className="text-sm text-muted-foreground">
+                          Resume: {selectedResume.name}
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-2">
+                          {selectedResume.file_type}
+                        </p>
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               </div>
             </ResizablePanel>
@@ -544,7 +576,7 @@ const LiveDisplayPage = () => {
                         </div>
                       </div>
                       <div className="flex-1 overflow-auto p-2">
-                        <LiveDisplay ratings={transformedRatings} />
+                        <LiveDisplay ratings={transformedRatings} currentTarget={currentTarget} atsScore={atsScore ?? undefined} />
                       </div>
                     </div>
                     
@@ -591,7 +623,7 @@ const LiveDisplayPage = () => {
                               </div>
                             </div>
                             <div className="flex-1 overflow-auto p-2">
-                              <LiveDisplay ratings={transformedRatings} />
+                              <LiveDisplay ratings={transformedRatings} currentTarget={currentTarget} atsScore={atsScore ?? undefined} />
                             </div>
                           </div>
                         </ResizablePanel>
@@ -692,7 +724,7 @@ const LiveDisplayPage = () => {
           </CardHeader>
           <CardContent>
             <div className="h-96">
-              <LiveDisplay ratings={transformedRatings} />
+              <LiveDisplay ratings={transformedRatings} currentTarget={currentTarget} atsScore={atsScore ?? undefined} />
             </div>
           </CardContent>
         </Card>

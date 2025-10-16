@@ -26,9 +26,10 @@ interface Rating {
 interface LiveDisplayProps {
   ratings: Rating[];
   currentTarget?: string | null;
+  atsScore?: number;
 }
 
-export function LiveDisplay({ ratings, currentTarget }: LiveDisplayProps) {
+export function LiveDisplay({ ratings, currentTarget, atsScore }: LiveDisplayProps) {
   const [displayedRatings, setDisplayedRatings] = useState<Rating[]>([]);
   const [currentFeedback, setCurrentFeedback] = useState<string>('');
   const [isResultsHidden, setIsResultsHidden] = useState(false);
@@ -130,6 +131,9 @@ export function LiveDisplay({ ratings, currentTarget }: LiveDisplayProps) {
   // Only show resume ratings now (remove LinkedIn)
   const resumeRatings = displayedRatings.filter(r => r.overall !== null);
   const allStats = calculateStats(displayedRatings.filter(r => r.overall > 0));
+  const normalizedAts = typeof atsScore === 'number'
+    ? atsScore
+    : (allStats.atsAverage > 0 ? Math.round(allStats.atsAverage) : undefined);
 
   // Calculate agreement stats
   const realRatingsWithAgreement = displayedRatings.filter(r => r.overall > 0);
@@ -175,18 +179,44 @@ export function LiveDisplay({ ratings, currentTarget }: LiveDisplayProps) {
       {!isResultsHidden && (
         <div className="flex-shrink-0">
           {resumeRatings.length === 0 ? (
-            <Card className="glow-effect max-w-lg mx-auto my-4">
-              <CardContent className="py-6 text-center">
-                <Users className="w-12 h-12 mx-auto mb-3 text-muted-foreground" />
-                <h3 className="text-lg font-semibold text-foreground mb-2">Waiting for Ratings</h3>
-                <p className="text-sm text-muted-foreground mb-2">
-                  No votes yet. Attendees can scan the QR code to submit ratings.
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  ATS scores will appear here when someone uploads their resume and submits a rating.
-                </p>
-              </CardContent>
-            </Card>
+            <>
+              <Card className="glow-effect max-w-lg mx-auto my-4">
+                <CardContent className="py-6 text-center">
+                  <Users className="w-12 h-12 mx-auto mb-3 text-muted-foreground" />
+                  <h3 className="text-lg font-semibold text-foreground mb-2">Waiting for Ratings</h3>
+                  <p className="text-sm text-muted-foreground mb-2">
+                    No votes yet. Attendees can scan the QR code to submit ratings.
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    ATS scores will appear here when someone uploads their resume and submits a rating.
+                  </p>
+                </CardContent>
+              </Card>
+              {normalizedAts !== undefined && (
+                <div className="flex justify-center gap-3 mb-2">
+                  <Card className="glow-effect transition-all duration-500 max-w-xs w-full border-primary/30">
+                    <CardHeader className="pb-1 pt-3 text-center">
+                      <CardTitle className="flex items-center justify-center gap-2 text-primary text-sm">
+                        <Sparkles className="w-4 h-4" />
+                        ATS SCORE
+                      </CardTitle>
+                      <div className="text-xs text-muted-foreground">AI Analysis</div>
+                    </CardHeader>
+                    <CardContent className="pb-3 pt-2">
+                      <div className="text-center space-y-2">
+                        <div className="text-4xl font-bold text-primary">
+                          {normalizedAts}
+                        </div>
+                        <div className="text-lg font-semibold text-muted-foreground">/100</div>
+                        <div className="text-xs text-muted-foreground/70 font-medium">
+                          {normalizedAts >= 80 ? 'Excellent' : normalizedAts >= 60 ? 'Good' : normalizedAts >= 40 ? 'Fair' : 'Needs Work'}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              )}
+            </>
           ) : (
           <div className="flex justify-center gap-3 mb-2">
             {/* Resume Score Card */}
@@ -227,7 +257,7 @@ export function LiveDisplay({ ratings, currentTarget }: LiveDisplayProps) {
             </Card>
 
             {/* ATS Score Card */}
-            {allStats.atsAverage > 0 && (
+            {normalizedAts !== undefined && (
               <Card className="glow-effect transition-all duration-500 max-w-xs w-full border-primary/30">
                 <CardHeader className="pb-1 pt-3 text-center">
                   <CardTitle className="flex items-center justify-center gap-2 text-primary text-sm">
@@ -239,15 +269,15 @@ export function LiveDisplay({ ratings, currentTarget }: LiveDisplayProps) {
                 <CardContent className="pb-3 pt-2">
                   <div className="text-center space-y-2">
                     <div className="text-4xl font-bold text-primary">
-                      {Math.round(allStats.atsAverage)}
+                      {normalizedAts}
                     </div>
                     <div className="text-lg font-semibold text-muted-foreground">
                       /100
                     </div>
                     <div className="text-xs text-muted-foreground/70 font-medium">
-                      {allStats.atsAverage >= 80 ? 'Excellent' : 
-                       allStats.atsAverage >= 60 ? 'Good' :
-                       allStats.atsAverage >= 40 ? 'Fair' : 'Needs Work'}
+                      {normalizedAts >= 80 ? 'Excellent' : 
+                       normalizedAts >= 60 ? 'Good' :
+                       normalizedAts >= 40 ? 'Fair' : 'Needs Work'}
                     </div>
                   </div>
                 </CardContent>

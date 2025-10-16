@@ -98,34 +98,9 @@ export function PersonalResumeUploader({ className, onUploadSuccess, onATSAnalys
         description: `${file.name} has been uploaded successfully.`,
       });
 
-      // Analyze resume if ATS is enabled
-      if (atsEnabled) {
-        setAnalyzing(true);
-        try {
-          const { data: analysisData, error: analysisError } = await supabase.functions.invoke('analyze-resume', {
-            body: { filePath: fileName, resumeId: data.id }
-          });
+      // ATS analysis now runs when a resume is loaded for viewing, not on upload
+      // (moved to LiveDisplayPage)
 
-          if (analysisError) throw analysisError;
-
-          setAtsAnalysis(analysisData);
-          onATSAnalysisComplete?.(analysisData);
-          
-          toast({
-            title: "Analysis complete! 📊",
-            description: `ATS Score: ${analysisData.score}/100`,
-          });
-        } catch (analysisError) {
-          console.error('Error analyzing resume:', analysisError);
-          toast({
-            title: "Analysis failed",
-            description: "Resume uploaded but ATS analysis could not be completed.",
-            variant: "destructive",
-          });
-        } finally {
-          setAnalyzing(false);
-        }
-      }
 
       onUploadSuccess?.();
 
@@ -191,14 +166,7 @@ export function PersonalResumeUploader({ className, onUploadSuccess, onATSAnalys
             </div>
           )}
 
-          {analyzing && (
-            <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-              <div className="w-4 h-4 border-2 border-neon-green border-t-transparent rounded-full animate-spin" />
-              Analyzing resume...
-            </div>
-          )}
-
-          {/* ATS Analysis Results */}
+          {/* ATS Analysis Results - disabled on upload view */}
           {atsAnalysis && (
             <ATSScoreDisplay
               score={atsAnalysis.score}
