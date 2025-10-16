@@ -47,6 +47,10 @@ export const ATSScoreDisplay = ({
               <div className="text-sm text-white/70">{scoreLabel}</div>
             </div>
           </div>
+          <div className="mt-3 flex items-center gap-2 text-xs text-white/60">
+            <CheckCircle className="h-3 w-3" />
+            <span>ATS features active: Resume scoring, skills extraction, and compatibility analysis</span>
+          </div>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
