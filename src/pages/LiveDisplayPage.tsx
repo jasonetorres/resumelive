@@ -478,22 +478,37 @@ const LiveDisplayPage = () => {
             <ResizablePanel defaultSize={orientation === 'portrait' ? 70 : 70} minSize={60}>
               <div className="h-full flex flex-col bg-card">
                 <div className="p-3 border-b border-border bg-card/80 flex-shrink-0">
-                  <h2 className="text-lg font-semibold text-center">Currently Reviewing: {selectedResume.name}</h2>
+                  <h2 className="text-lg font-semibold text-center text-foreground">Currently Reviewing: {selectedResume.name}</h2>
                 </div>
-                <div className="flex-1 p-4 overflow-hidden">
+                <div className="flex-1 p-4 overflow-hidden relative bg-muted/20">
                   {selectedResume.file_type === 'application/pdf' ? (
                     <iframe
                       src={`https://docs.google.com/viewer?url=${encodeURIComponent(supabase.storage.from('resumes').getPublicUrl(selectedResume.file_path).data.publicUrl)}&embedded=true`}
                       className="w-full h-full border-0 rounded"
                       title={selectedResume.name}
+                      onError={() => console.error('PDF iframe failed to load')}
                     />
                   ) : (
                     <img
                       src={supabase.storage.from('resumes').getPublicUrl(selectedResume.file_path).data.publicUrl}
                       alt={selectedResume.name}
                       className="w-full h-full object-contain rounded"
+                      onError={() => console.error('Image failed to load')}
                     />
                   )}
+                  
+                  {/* Fallback for when resume doesn't load */}
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <div className="text-center p-8 bg-card/80 rounded-lg backdrop-blur">
+                      <FileText className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+                      <p className="text-sm text-muted-foreground">
+                        Resume: {selectedResume.name}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-2">
+                        {selectedResume.file_type}
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </ResizablePanel>

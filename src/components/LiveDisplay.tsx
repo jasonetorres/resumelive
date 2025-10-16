@@ -174,6 +174,20 @@ export function LiveDisplay({ ratings, currentTarget }: LiveDisplayProps) {
       {/* Results Section - Show/Hide based on settings */}
       {!isResultsHidden && (
         <div className="flex-shrink-0">
+          {resumeRatings.length === 0 ? (
+            <Card className="glow-effect max-w-lg mx-auto my-4">
+              <CardContent className="py-6 text-center">
+                <Users className="w-12 h-12 mx-auto mb-3 text-muted-foreground" />
+                <h3 className="text-lg font-semibold text-foreground mb-2">Waiting for Ratings</h3>
+                <p className="text-sm text-muted-foreground mb-2">
+                  No votes yet. Attendees can scan the QR code to submit ratings.
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  ATS scores will appear here when someone uploads their resume and submits a rating.
+                </p>
+              </CardContent>
+            </Card>
+          ) : (
           <div className="flex justify-center gap-3 mb-2">
             {/* Resume Score Card */}
             <Card className="glow-effect transition-all duration-500 max-w-xs w-full">
@@ -240,6 +254,7 @@ export function LiveDisplay({ ratings, currentTarget }: LiveDisplayProps) {
               </Card>
             )}
           </div>
+          )}
 
           {/* Current Feedback Box */}
           {currentFeedback && (
