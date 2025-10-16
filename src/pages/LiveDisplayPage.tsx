@@ -171,13 +171,15 @@ const LiveDisplayPage = () => {
           
           // Fetch the matching resume directly from database
           if (newTarget) {
-            const { data: matchingResume } = await supabase
+            const { data: matchingResume, error: resumeFetchError } = await supabase
               .from('resumes')
               .select('*')
               .eq('name', newTarget)
+              .order('created_at', { ascending: false })
+              .limit(1)
               .maybeSingle();
             
-            if (matchingResume) {
+            if (!resumeFetchError && matchingResume) {
               console.log('LiveDisplayPage: Found matching resume:', matchingResume.name);
               setSelectedResume(matchingResume as Resume);
               setSelectedResumeId(matchingResume.id);
