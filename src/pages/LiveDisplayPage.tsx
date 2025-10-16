@@ -29,10 +29,6 @@ interface Rating {
   agreement?: 'agree' | 'disagree' | null;
   reaction?: string;
   created_at: string;
-  ats_score?: number;
-  ats_formatting_score?: number;
-  ats_skills?: string[];
-  ats_keywords?: string[];
 }
 
 interface Resume {
@@ -58,8 +54,6 @@ const LiveDisplayPage = () => {
   const [passwordInput, setPasswordInput] = useState('');
   const [orientation, setOrientation] = useState<'landscape' | 'portrait'>('landscape');
   const [resumeLoadError, setResumeLoadError] = useState(false);
-  const [atsScore, setAtsScore] = useState<number | null>(null);
-  const lastAnalyzedResumeId = useRef<string | null>(null);
 
   console.log('LiveDisplayPage: Component render');
   console.log('  isAuthenticated:', isAuthenticated);
@@ -384,27 +378,6 @@ const LiveDisplayPage = () => {
     }
   }, [selectedResume, currentTarget]);
 
-  // Run ATS analysis when a resume is loaded for viewing (only then)
-  useEffect(() => {
-    if (!showResumeView || !selectedResume) return;
-    if (lastAnalyzedResumeId.current === selectedResume.id) return;
-    lastAnalyzedResumeId.current = selectedResume.id;
-
-    (async () => {
-      try {
-        const { data, error } = await supabase.functions.invoke('analyze-resume', {
-          body: { filePath: selectedResume.file_path, resumeId: selectedResume.id }
-        });
-        if (error) throw error;
-        setAtsScore(data?.score ?? null);
-        toast({ title: 'ATS Analysis complete', description: `Score: ${data?.score}/100` });
-      } catch (e) {
-        console.error('ATS analysis error:', e);
-        toast({ title: 'ATS analysis failed', description: 'We could not analyze this resume.', variant: 'destructive' });
-      }
-    })();
-  }, [showResumeView, selectedResume?.id]);
-
   // Transform ratings to match the LiveDisplay component's expected format
   const transformedRatings = ratings.map(rating => ({
     id: rating.id,
@@ -416,10 +389,6 @@ const LiveDisplayPage = () => {
     agreement: rating.agreement,
     reaction: rating.reaction,
     timestamp: rating.created_at,
-    ats_score: rating.ats_score,
-    ats_formatting_score: rating.ats_formatting_score,
-    ats_skills: rating.ats_skills,
-    ats_keywords: rating.ats_keywords,
   }));
 
   // Password protection check
@@ -569,9 +538,9 @@ const LiveDisplayPage = () => {
                           <Badge variant="outline" className="text-xs">Live</Badge>
                         </div>
                       </div>
-                      <div className="flex-1 overflow-auto p-2">
-                        <LiveDisplay ratings={transformedRatings} currentTarget={currentTarget} atsScore={atsScore ?? undefined} />
-                      </div>
+                            <div className="flex-1 overflow-auto p-2">
+                              <LiveDisplay ratings={transformedRatings} currentTarget={currentTarget} />
+                            </div>
                     </div>
                     
                     {/* Questions Section - Horizontal */}
@@ -617,7 +586,7 @@ const LiveDisplayPage = () => {
                               </div>
                             </div>
                             <div className="flex-1 overflow-auto p-2">
-                              <LiveDisplay ratings={transformedRatings} currentTarget={currentTarget} atsScore={atsScore ?? undefined} />
+                              <LiveDisplay ratings={transformedRatings} currentTarget={currentTarget} />
                             </div>
                           </div>
                         </ResizablePanel>
@@ -718,7 +687,7 @@ const LiveDisplayPage = () => {
           </CardHeader>
           <CardContent>
             <div className="h-96">
-              <LiveDisplay ratings={transformedRatings} currentTarget={currentTarget} atsScore={atsScore ?? undefined} />
+              <LiveDisplay ratings={transformedRatings} currentTarget={currentTarget} />
             </div>
           </CardContent>
         </Card>
