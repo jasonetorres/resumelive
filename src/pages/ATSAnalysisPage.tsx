@@ -3,10 +3,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ATSScoreDisplay } from "@/components/ATSScoreDisplay";
-import { FileText, ArrowLeft, CheckCircle, XCircle, AlertCircle } from "lucide-react";
+import { FileText, ArrowLeft, CheckCircle, XCircle, AlertCircle, ArrowUpDown } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface Resume {
   id: string;
@@ -14,6 +15,8 @@ interface Resume {
   file_path: string;
   file_type: string;
   created_at: string;
+  submitter_name?: string;
+  ats_score?: number;
 }
 
 interface ATSAnalysis {
@@ -36,23 +39,79 @@ const ATSAnalysisPage = () => {
   const [selectedResume, setSelectedResume] = useState<Resume | null>(null);
   const [atsAnalysis, setAtsAnalysis] = useState<ATSAnalysis | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [sortBy, setSortBy] = useState<'date' | 'name' | 'score'>('date');
 
   useEffect(() => {
     fetchResumes();
   }, []);
 
   const fetchResumes = async () => {
-    const { data, error } = await supabase
+    // Fetch resumes with lead data (submitter name and ATS score)
+    const { data: resumesData, error: resumesError } = await supabase
       .from('resumes')
       .select('*')
       .order('created_at', { ascending: false });
 
-    if (error) {
-      console.error('Error fetching resumes:', error);
+    if (resumesError) {
+      console.error('Error fetching resumes:', resumesError);
       return;
     }
 
-    setResumes(data || []);
+    // Fetch leads with their ATS scores
+    const { data: leadsData, error: leadsError } = await supabase
+      .from('leads')
+      .select('id, name, ats_score');
+
+    if (leadsError) {
+      console.error('Error fetching leads:', leadsError);
+    }
+
+    // Fetch resume analysis data
+    const { data: analysisData, error: analysisError } = await supabase
+      .from('resume_analysis')
+      .select('resume_id, lead_id, ats_score');
+
+    if (analysisError) {
+      console.error('Error fetching analysis:', analysisError);
+    }
+
+    // Map resumes to include submitter names and scores
+    const enrichedResumes = resumesData?.map(resume => {
+      const analysis = analysisData?.find(a => a.resume_id === resume.id);
+      const lead = leadsData?.find(l => l.id === analysis?.lead_id);
+      
+      return {
+        ...resume,
+        submitter_name: lead?.name,
+        ats_score: analysis?.ats_score || lead?.ats_score
+      };
+    });
+
+    setResumes(enrichedResumes || []);
+  };
+
+  const getSortedResumes = () => {
+    const sorted = [...resumes];
+    
+    switch (sortBy) {
+      case 'name':
+        return sorted.sort((a, b) => {
+          const nameA = a.submitter_name || a.name;
+          const nameB = b.submitter_name || b.name;
+          return nameA.localeCompare(nameB);
+        });
+      case 'score':
+        return sorted.sort((a, b) => {
+          const scoreA = a.ats_score || 0;
+          const scoreB = b.ats_score || 0;
+          return scoreB - scoreA;
+        });
+      case 'date':
+      default:
+        return sorted.sort((a, b) => 
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        );
+    }
   };
 
   const analyzeResume = async (resume: Resume) => {
@@ -113,6 +172,19 @@ const ATSAnalysisPage = () => {
               <CardDescription>
                 Select a resume to analyze
               </CardDescription>
+              <div className="mt-4">
+                <Select value={sortBy} onValueChange={(value: 'date' | 'name' | 'score') => setSortBy(value)}>
+                  <SelectTrigger className="w-full">
+                    <ArrowUpDown className="h-4 w-4 mr-2" />
+                    <SelectValue placeholder="Sort by..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="date">Upload Date</SelectItem>
+                    <SelectItem value="name">Name</SelectItem>
+                    <SelectItem value="score">ATS Score</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </CardHeader>
             <CardContent className="space-y-2">
               {resumes.length === 0 ? (
@@ -120,7 +192,7 @@ const ATSAnalysisPage = () => {
                   No resumes uploaded yet
                 </p>
               ) : (
-                resumes.map((resume) => (
+                getSortedResumes().map((resume) => (
                   <Button
                     key={resume.id}
                     variant={selectedResume?.id === resume.id ? "default" : "outline"}
@@ -129,10 +201,17 @@ const ATSAnalysisPage = () => {
                     disabled={isAnalyzing}
                   >
                     <FileText className="h-4 w-4 flex-shrink-0" />
-                    <div className="text-left overflow-hidden">
-                      <div className="font-medium truncate">{resume.name}</div>
-                      <div className="text-xs opacity-70">
-                        {new Date(resume.created_at).toLocaleDateString()}
+                    <div className="text-left overflow-hidden flex-1">
+                      <div className="font-medium truncate">
+                        {resume.submitter_name || resume.name}
+                      </div>
+                      <div className="text-xs opacity-70 flex items-center gap-2">
+                        <span>{new Date(resume.created_at).toLocaleDateString()}</span>
+                        {resume.ats_score && (
+                          <Badge variant="secondary" className="text-xs px-1 py-0">
+                            {resume.ats_score}/100
+                          </Badge>
+                        )}
                       </div>
                     </div>
                   </Button>
