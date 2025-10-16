@@ -66,6 +66,19 @@ export function PersonalResumeUploader({ className, onUploadSuccess, onATSAnalys
     setUploading(true);
 
     try {
+      // Get submitter name from sessionStorage (from LeadForm)
+      const leadDataStr = sessionStorage.getItem('leadData');
+      let submitterName = null;
+      
+      if (leadDataStr) {
+        try {
+          const leadData = JSON.parse(leadDataStr);
+          submitterName = `${leadData.firstName || ''} ${leadData.lastName || ''}`.trim();
+        } catch (e) {
+          console.error('Error parsing lead data:', e);
+        }
+      }
+
       // Upload file to Supabase Storage
       const fileExt = file.name.split('.').pop();
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
@@ -76,7 +89,7 @@ export function PersonalResumeUploader({ className, onUploadSuccess, onATSAnalys
 
       if (uploadError) throw uploadError;
 
-      // Save metadata to database
+      // Save metadata to database with submitter name
       const { data, error: dbError } = await (supabase as any)
         .from('resumes')
         .insert({
@@ -84,6 +97,7 @@ export function PersonalResumeUploader({ className, onUploadSuccess, onATSAnalys
           file_path: fileName,
           file_type: file.type,
           file_size: file.size,
+          submitter_name: submitterName || file.name, // Use filename as fallback
         })
         .select()
         .single();

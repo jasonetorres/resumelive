@@ -106,29 +106,7 @@ const LiveDisplayPage = () => {
         if (resumesError) {
           console.error('Error fetching resumes:', resumesError);
         } else {
-          // Fetch leads with their names and ATS scores
-          const { data: leadsData } = await supabase
-            .from('leads')
-            .select('id, name, ats_score');
-
-          // Fetch resume analysis data
-          const { data: analysisData } = await supabase
-            .from('resume_analysis')
-            .select('resume_id, lead_id, ats_score');
-
-          // Enrich resumes with submitter names and scores
-          const enrichedResumes = (data as unknown as Resume[])?.map(resume => {
-            const analysis = analysisData?.find(a => a.resume_id === resume.id);
-            const lead = leadsData?.find(l => l.id === analysis?.lead_id);
-            
-            return {
-              ...resume,
-              submitter_name: lead?.name,
-              ats_score: analysis?.ats_score || lead?.ats_score
-            };
-          });
-
-          resumesData = enrichedResumes || [];
+          resumesData = (data as unknown as Resume[]) || [];
           setResumes(resumesData);
         }
       } catch (error) {

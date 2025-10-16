@@ -46,7 +46,7 @@ const ATSAnalysisPage = () => {
   }, []);
 
   const fetchResumes = async () => {
-    // Fetch resumes with lead data (submitter name and ATS score)
+    // Fetch resumes - they now have submitter_name directly in the table
     const { data: resumesData, error: resumesError } = await supabase
       .from('resumes')
       .select('*')
@@ -57,33 +57,22 @@ const ATSAnalysisPage = () => {
       return;
     }
 
-    // Fetch leads with their ATS scores
-    const { data: leadsData, error: leadsError } = await supabase
-      .from('leads')
-      .select('id, name, ats_score');
-
-    if (leadsError) {
-      console.error('Error fetching leads:', leadsError);
-    }
-
-    // Fetch resume analysis data
+    // Fetch resume analysis data for ATS scores
     const { data: analysisData, error: analysisError } = await supabase
       .from('resume_analysis')
-      .select('resume_id, lead_id, ats_score');
+      .select('resume_id, ats_score');
 
     if (analysisError) {
       console.error('Error fetching analysis:', analysisError);
     }
 
-    // Map resumes to include submitter names and scores
+    // Enrich resumes with ATS scores from analysis
     const enrichedResumes = resumesData?.map(resume => {
       const analysis = analysisData?.find(a => a.resume_id === resume.id);
-      const lead = leadsData?.find(l => l.id === analysis?.lead_id);
       
       return {
         ...resume,
-        submitter_name: lead?.name,
-        ats_score: analysis?.ats_score || lead?.ats_score
+        ats_score: analysis?.ats_score
       };
     });
 
