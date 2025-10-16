@@ -14,7 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { FileText, RotateCcw, Users, Bell, MessageSquare } from 'lucide-react';
+import { FileText, RotateCcw, Users, Bell, MessageSquare, ArrowUpDown } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -38,6 +38,8 @@ interface Resume {
   file_type: string;
   file_size: number;
   created_at: string;
+  submitter_name?: string;
+  ats_score?: number;
 }
 
 const LiveDisplayPage = () => {
@@ -54,6 +56,7 @@ const LiveDisplayPage = () => {
   const [passwordInput, setPasswordInput] = useState('');
   const [orientation, setOrientation] = useState<'landscape' | 'portrait'>('landscape');
   const [resumeLoadError, setResumeLoadError] = useState(false);
+  const [sortBy, setSortBy] = useState<'date' | 'name' | 'score'>('date');
 
   console.log('LiveDisplayPage: Component render');
   console.log('  isAuthenticated:', isAuthenticated);
@@ -64,6 +67,30 @@ const LiveDisplayPage = () => {
 
   // Get the rating page URL for QR code - now points to registration form
   const ratingPageUrl = `${window.location.origin}/register`;
+
+  const getSortedResumes = () => {
+    const sorted = [...resumes];
+    
+    switch (sortBy) {
+      case 'name':
+        return sorted.sort((a, b) => {
+          const nameA = a.submitter_name || a.name;
+          const nameB = b.submitter_name || b.name;
+          return nameA.localeCompare(nameB);
+        });
+      case 'score':
+        return sorted.sort((a, b) => {
+          const scoreA = a.ats_score || 0;
+          const scoreB = b.ats_score || 0;
+          return scoreB - scoreA;
+        });
+      case 'date':
+      default:
+        return sorted.sort((a, b) => 
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        );
+    }
+  };
 
   useEffect(() => {
     // Fetch initial data
@@ -79,7 +106,29 @@ const LiveDisplayPage = () => {
         if (resumesError) {
           console.error('Error fetching resumes:', resumesError);
         } else {
-          resumesData = (data as unknown as Resume[]) || [];
+          // Fetch leads with their names and ATS scores
+          const { data: leadsData } = await supabase
+            .from('leads')
+            .select('id, name, ats_score');
+
+          // Fetch resume analysis data
+          const { data: analysisData } = await supabase
+            .from('resume_analysis')
+            .select('resume_id, lead_id, ats_score');
+
+          // Enrich resumes with submitter names and scores
+          const enrichedResumes = (data as unknown as Resume[])?.map(resume => {
+            const analysis = analysisData?.find(a => a.resume_id === resume.id);
+            const lead = leadsData?.find(l => l.id === analysis?.lead_id);
+            
+            return {
+              ...resume,
+              submitter_name: lead?.name,
+              ats_score: analysis?.ats_score || lead?.ats_score
+            };
+          });
+
+          resumesData = enrichedResumes || [];
           setResumes(resumesData);
         }
       } catch (error) {
@@ -636,20 +685,41 @@ const LiveDisplayPage = () => {
                 <p className="text-muted-foreground">No resumes found. Please upload resumes on the home page first.</p>
               </div>
             ) : (
-              <div>
-                <label className="text-sm font-medium mb-2 block">Select Resume to Review ({resumes.length} available)</label>
-                <Select value={selectedResumeId} onValueChange={setSelectedResumeId}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Choose a resume from uploaded files" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {resumes.map((resume) => (
-                      <SelectItem key={resume.id} value={resume.id}>
-                        {resume.name} ({resume.file_type === 'application/pdf' ? 'PDF' : 'Image'})
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+              <div className="space-y-3">
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Sort By</label>
+                  <Select value={sortBy} onValueChange={(value: 'date' | 'name' | 'score') => setSortBy(value)}>
+                    <SelectTrigger>
+                      <div className="flex items-center gap-2">
+                        <ArrowUpDown className="h-4 w-4" />
+                        <SelectValue placeholder="Sort by..." />
+                      </div>
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="date">Upload Date</SelectItem>
+                      <SelectItem value="name">Name</SelectItem>
+                      <SelectItem value="score">ATS Score</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Select Resume to Review ({resumes.length} available)</label>
+                  <Select value={selectedResumeId} onValueChange={setSelectedResumeId}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Choose a resume from uploaded files" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {getSortedResumes().map((resume) => (
+                        <SelectItem key={resume.id} value={resume.id}>
+                          {resume.submitter_name || resume.name} 
+                          {resume.ats_score && ` (${resume.ats_score}/100)`}
+                          {!resume.submitter_name && ` - ${resume.file_type === 'application/pdf' ? 'PDF' : 'Image'}`}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             )}
             
