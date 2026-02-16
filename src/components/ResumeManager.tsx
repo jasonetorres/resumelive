@@ -89,7 +89,10 @@ export function ResumeManager({ className }: ResumeManagerProps) {
       
       const { error: uploadError } = await supabase.storage
         .from('resumes')
-        .upload(fileName, file);
+        .upload(fileName, file, {
+          contentType: file.type,
+          upsert: false
+        });
 
       if (uploadError) throw uploadError;
 
