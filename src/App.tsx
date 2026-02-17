@@ -2,6 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { ThemeProvider } from "@/components/ThemeProvider";
 import Index from "./pages/Index";
 import RateInputPage from "./pages/RateInput";
 import LiveDisplayPage from "./pages/LiveDisplayPage";
@@ -16,22 +17,24 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <Toaster />
-    <Sonner />
-    <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/register" element={<LeadFormPage />} />
-          <Route path="/rate" element={<RateInputPage />} />
-          <Route path="/display" element={<LiveDisplayPage />} />
-          <Route path="/formdisplay" element={<FormDisplay />} />
-          <Route path="/schedule" element={<SchedulePage />} />
-          <Route path="/host" element={<HostPage />} />
-          <Route path="/ats" element={<ATSAnalysisPage />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-      </Routes>
-    </BrowserRouter>
+    <ThemeProvider defaultTheme="dark" storageKey="resume-ratings-theme">
+      <Toaster />
+      <Sonner />
+      <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/register" element={<LeadFormPage />} />
+            <Route path="/rate" element={<RateInputPage />} />
+            <Route path="/display" element={<LiveDisplayPage />} />
+            <Route path="/formdisplay" element={<FormDisplay />} />
+            <Route path="/schedule" element={<SchedulePage />} />
+            <Route path="/host" element={<HostPage />} />
+            <Route path="/ats" element={<ATSAnalysisPage />} />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+        </Routes>
+      </BrowserRouter>
+    </ThemeProvider>
   </QueryClientProvider>
 );
 

@@ -12,9 +12,17 @@ export default {
 	theme: {
 		container: {
 			center: true,
-			padding: '2rem',
+			padding: {
+				DEFAULT: '1rem',
+				sm: '1.5rem',
+				lg: '2rem',
+			},
 			screens: {
-				'2xl': '1400px'
+				sm: '640px',
+				md: '768px',
+				lg: '1024px',
+				xl: '1280px',
+				'2xl': '1536px',
 			}
 		},
 		extend: {
@@ -25,10 +33,30 @@ export default {
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
 				primary: {
+					'50': '#f5f3ff',
+					'100': '#ede9fe',
+					'200': '#ddd6fe',
+					'300': '#c4b5fd',
+					'400': '#a78bfa',
+					'500': '#8b5cf6',
+					'600': '#7c3aed',
+					'700': '#6d28d9',
+					'800': '#5b21b6',
+					'900': '#4c1d95',
 					DEFAULT: 'hsl(var(--primary))',
 					foreground: 'hsl(var(--primary-foreground))'
 				},
 				secondary: {
+					'50': '#ecfeff',
+					'100': '#cffafe',
+					'200': '#a5f3fc',
+					'300': '#67e8f9',
+					'400': '#22d3ee',
+					'500': '#06b6d4',
+					'600': '#0891b2',
+					'700': '#0e7490',
+					'800': '#155e75',
+					'900': '#164e63',
 					DEFAULT: 'hsl(var(--secondary))',
 					foreground: 'hsl(var(--secondary-foreground))'
 				},
@@ -84,11 +112,29 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'float': {
+					'0%, 100%': {
+						transform: 'translateY(0px)'
+					},
+					'50%': {
+						transform: 'translateY(-20px)'
+					}
+				},
+				'glow-pulse': {
+					'0%, 100%': {
+						opacity: '1'
+					},
+					'50%': {
+						opacity: '0.5'
+					}
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'float': 'float 6s ease-in-out infinite',
+				'glow-pulse': 'glow-pulse 2s ease-in-out infinite'
 			}
 		}
 	},
