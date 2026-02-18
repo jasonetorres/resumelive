@@ -83,14 +83,26 @@ export function PersonalResumeUploader({ className, onUploadSuccess, onATSAnalys
       const fileExt = file.name.split('.').pop();
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
       
-      const { error: uploadError } = await supabase.storage
+      console.log('Uploading file:', {
+        fileName,
+        fileType: file.type,
+        fileSize: file.size,
+        actualFile: file instanceof File
+      });
+
+      const { data: uploadData, error: uploadError } = await supabase.storage
         .from('resumes')
         .upload(fileName, file, {
           contentType: file.type,
           upsert: false
         });
 
-      if (uploadError) throw uploadError;
+      console.log('Upload result:', { uploadData, uploadError });
+
+      if (uploadError) {
+        console.error('Upload error details:', uploadError);
+        throw uploadError;
+      }
 
       // Save metadata to database with submitter name
       const { data, error: dbError } = await (supabase as any)
@@ -123,11 +135,17 @@ export function PersonalResumeUploader({ className, onUploadSuccess, onATSAnalys
 
       // Clear the input
       event.target.value = '';
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error uploading file:', error);
+      console.error('Error details:', {
+        message: error?.message,
+        statusCode: error?.statusCode,
+        error: error?.error,
+        details: error
+      });
       toast({
         title: "Upload failed",
-        description: "There was an error uploading your file. Please try again.",
+        description: error?.message || "There was an error uploading your file. Please try again.",
         variant: "destructive",
       });
     } finally {
