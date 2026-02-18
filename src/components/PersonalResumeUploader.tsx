@@ -39,11 +39,17 @@ export function PersonalResumeUploader({ className, onUploadSuccess, onATSAnalys
   }, []);
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    console.log('handleFileUpload called');
     const file = event.target.files?.[0];
-    if (!file) return;
+    console.log('File selected:', file);
+    if (!file) {
+      console.log('No file selected, returning');
+      return;
+    }
 
     // Check file type
     const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'];
+    console.log('File type:', file.type, 'Allowed:', allowedTypes.includes(file.type));
     if (!allowedTypes.includes(file.type)) {
       toast({
         title: "Invalid file type",
@@ -182,8 +188,9 @@ export function PersonalResumeUploader({ className, onUploadSuccess, onATSAnalys
               className="hidden"
               id="resume-upload"
             />
-            <label 
-              htmlFor="resume-upload" 
+            <label
+              htmlFor="resume-upload"
+              onClick={() => console.log('Label clicked')}
               className={`cursor-pointer flex flex-col items-center gap-2 ${uploading ? 'opacity-50' : ''}`}
             >
               <Upload className="w-8 h-8 text-muted-foreground" />
